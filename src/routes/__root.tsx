@@ -29,20 +29,30 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "PerceptIA — Semillero de Investigación" },
+      {
+        name: "description",
+        content:
+          "PerceptIA: semillero de investigación en percepción artificial, ciencia de datos, IA y TinyML aplicada a entornos reales con recursos limitados.",
+      },
+      { name: "author", content: "PerceptIA" },
+      { property: "og:title", content: "PerceptIA — Semillero de Investigación" },
+      {
+        property: "og:description",
+        content:
+          "Percepción artificial, ciencia de datos e inteligencia artificial aplicada para entornos reales con recursos limitados.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: appCss,
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap",
       },
+      { rel: "stylesheet", href: appCss },
     ],
   }),
   shellComponent: RootShell,
