@@ -9,7 +9,7 @@ import { NodeBackdrop } from "@/components/NodeBackdrop";
 import { useAuth } from "@/lib/auth-context";
 import logo from "@/assets/perceptia-logo.svg";
 import { ArrowLeft, Loader2 } from "lucide-react";
-import { toast } from "sonner";
+
 
 export const Route = createFileRoute("/login")({
   head: () => ({
