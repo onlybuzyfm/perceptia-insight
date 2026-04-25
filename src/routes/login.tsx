@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { NodeBackdrop } from "@/components/NodeBackdrop";
-import logo from "@/assets/perceptia-logo.png";
+import logo from "@/assets/perceptia-logo.svg";
 import { ArrowLeft, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/login")({
