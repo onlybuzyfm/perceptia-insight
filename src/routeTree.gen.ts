@@ -24,6 +24,9 @@ import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authe
 import { Route as AuthenticatedDashboardStudentRouteImport } from './routes/_authenticated/dashboard.student'
 import { Route as AuthenticatedDashboardCoordinatorRouteImport } from './routes/_authenticated/dashboard.coordinator'
 import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated/dashboard.admin'
+import { Route as AuthenticatedDashboardAdminIndexRouteImport } from './routes/_authenticated/dashboard.admin.index'
+import { Route as AuthenticatedDashboardAdminUsersRouteImport } from './routes/_authenticated/dashboard.admin.users'
+import { Route as AuthenticatedDashboardAdminStudentsRouteImport } from './routes/_authenticated/dashboard.admin.students'
 
 const SobreRoute = SobreRouteImport.update({
   id: '/sobre',
@@ -104,6 +107,24 @@ const AuthenticatedDashboardAdminRoute =
     path: '/dashboard/admin',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardAdminIndexRoute =
+  AuthenticatedDashboardAdminIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedDashboardAdminRoute,
+  } as any)
+const AuthenticatedDashboardAdminUsersRoute =
+  AuthenticatedDashboardAdminUsersRouteImport.update({
+    id: '/users',
+    path: '/users',
+    getParentRoute: () => AuthenticatedDashboardAdminRoute,
+  } as any)
+const AuthenticatedDashboardAdminStudentsRoute =
+  AuthenticatedDashboardAdminStudentsRouteImport.update({
+    id: '/students',
+    path: '/students',
+    getParentRoute: () => AuthenticatedDashboardAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -116,10 +137,13 @@ export interface FileRoutesByFullPath {
   '/sobre': typeof SobreRoute
   '/resources': typeof AuthenticatedResourcesRoute
   '/weekly-updates': typeof AuthenticatedWeeklyUpdatesRoute
-  '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
+  '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/coordinator': typeof AuthenticatedDashboardCoordinatorRoute
   '/dashboard/student': typeof AuthenticatedDashboardStudentRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/dashboard/admin/students': typeof AuthenticatedDashboardAdminStudentsRoute
+  '/dashboard/admin/users': typeof AuthenticatedDashboardAdminUsersRoute
+  '/dashboard/admin/': typeof AuthenticatedDashboardAdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -132,10 +156,12 @@ export interface FileRoutesByTo {
   '/sobre': typeof SobreRoute
   '/resources': typeof AuthenticatedResourcesRoute
   '/weekly-updates': typeof AuthenticatedWeeklyUpdatesRoute
-  '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/dashboard/coordinator': typeof AuthenticatedDashboardCoordinatorRoute
   '/dashboard/student': typeof AuthenticatedDashboardStudentRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
+  '/dashboard/admin/students': typeof AuthenticatedDashboardAdminStudentsRoute
+  '/dashboard/admin/users': typeof AuthenticatedDashboardAdminUsersRoute
+  '/dashboard/admin': typeof AuthenticatedDashboardAdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -150,10 +176,13 @@ export interface FileRoutesById {
   '/sobre': typeof SobreRoute
   '/_authenticated/resources': typeof AuthenticatedResourcesRoute
   '/_authenticated/weekly-updates': typeof AuthenticatedWeeklyUpdatesRoute
-  '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
+  '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/_authenticated/dashboard/coordinator': typeof AuthenticatedDashboardCoordinatorRoute
   '/_authenticated/dashboard/student': typeof AuthenticatedDashboardStudentRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/_authenticated/dashboard/admin/students': typeof AuthenticatedDashboardAdminStudentsRoute
+  '/_authenticated/dashboard/admin/users': typeof AuthenticatedDashboardAdminUsersRoute
+  '/_authenticated/dashboard/admin/': typeof AuthenticatedDashboardAdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -172,6 +201,9 @@ export interface FileRouteTypes {
     | '/dashboard/coordinator'
     | '/dashboard/student'
     | '/dashboard/'
+    | '/dashboard/admin/students'
+    | '/dashboard/admin/users'
+    | '/dashboard/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -184,10 +216,12 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/resources'
     | '/weekly-updates'
-    | '/dashboard/admin'
     | '/dashboard/coordinator'
     | '/dashboard/student'
     | '/dashboard'
+    | '/dashboard/admin/students'
+    | '/dashboard/admin/users'
+    | '/dashboard/admin'
   id:
     | '__root__'
     | '/'
@@ -205,6 +239,9 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/coordinator'
     | '/_authenticated/dashboard/student'
     | '/_authenticated/dashboard/'
+    | '/_authenticated/dashboard/admin/students'
+    | '/_authenticated/dashboard/admin/users'
+    | '/_authenticated/dashboard/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -326,13 +363,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/admin/': {
+      id: '/_authenticated/dashboard/admin/'
+      path: '/'
+      fullPath: '/dashboard/admin/'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedDashboardAdminRoute
+    }
+    '/_authenticated/dashboard/admin/users': {
+      id: '/_authenticated/dashboard/admin/users'
+      path: '/users'
+      fullPath: '/dashboard/admin/users'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminUsersRouteImport
+      parentRoute: typeof AuthenticatedDashboardAdminRoute
+    }
+    '/_authenticated/dashboard/admin/students': {
+      id: '/_authenticated/dashboard/admin/students'
+      path: '/students'
+      fullPath: '/dashboard/admin/students'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminStudentsRouteImport
+      parentRoute: typeof AuthenticatedDashboardAdminRoute
+    }
   }
 }
+
+interface AuthenticatedDashboardAdminRouteChildren {
+  AuthenticatedDashboardAdminStudentsRoute: typeof AuthenticatedDashboardAdminStudentsRoute
+  AuthenticatedDashboardAdminUsersRoute: typeof AuthenticatedDashboardAdminUsersRoute
+  AuthenticatedDashboardAdminIndexRoute: typeof AuthenticatedDashboardAdminIndexRoute
+}
+
+const AuthenticatedDashboardAdminRouteChildren: AuthenticatedDashboardAdminRouteChildren =
+  {
+    AuthenticatedDashboardAdminStudentsRoute:
+      AuthenticatedDashboardAdminStudentsRoute,
+    AuthenticatedDashboardAdminUsersRoute:
+      AuthenticatedDashboardAdminUsersRoute,
+    AuthenticatedDashboardAdminIndexRoute:
+      AuthenticatedDashboardAdminIndexRoute,
+  }
+
+const AuthenticatedDashboardAdminRouteWithChildren =
+  AuthenticatedDashboardAdminRoute._addFileChildren(
+    AuthenticatedDashboardAdminRouteChildren,
+  )
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedResourcesRoute: typeof AuthenticatedResourcesRoute
   AuthenticatedWeeklyUpdatesRoute: typeof AuthenticatedWeeklyUpdatesRoute
-  AuthenticatedDashboardAdminRoute: typeof AuthenticatedDashboardAdminRoute
+  AuthenticatedDashboardAdminRoute: typeof AuthenticatedDashboardAdminRouteWithChildren
   AuthenticatedDashboardCoordinatorRoute: typeof AuthenticatedDashboardCoordinatorRoute
   AuthenticatedDashboardStudentRoute: typeof AuthenticatedDashboardStudentRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
@@ -341,7 +420,8 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedResourcesRoute: AuthenticatedResourcesRoute,
   AuthenticatedWeeklyUpdatesRoute: AuthenticatedWeeklyUpdatesRoute,
-  AuthenticatedDashboardAdminRoute: AuthenticatedDashboardAdminRoute,
+  AuthenticatedDashboardAdminRoute:
+    AuthenticatedDashboardAdminRouteWithChildren,
   AuthenticatedDashboardCoordinatorRoute:
     AuthenticatedDashboardCoordinatorRoute,
   AuthenticatedDashboardStudentRoute: AuthenticatedDashboardStudentRoute,

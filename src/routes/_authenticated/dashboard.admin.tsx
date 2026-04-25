@@ -1,128 +1,96 @@
-import { createFileRoute, Navigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { createFileRoute, Link, Navigate, Outlet, useLocation } from "@tanstack/react-router";
+import { LayoutDashboard, Users, GraduationCap, FolderKanban, Network, FileCheck2, Calendar, BookOpen, BarChart3, Settings, Palette, ScrollText, Inbox, type LucideIcon } from "lucide-react";
 import { DashboardShell } from "@/components/DashboardShell";
-import { useAuth, type AppRole } from "@/lib/auth-context";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { useAuth } from "@/lib/auth-context";
 
 export const Route = createFileRoute("/_authenticated/dashboard/admin")({
-  component: AdminDashboard,
+  component: AdminLayout,
 });
 
-interface UserWithRoles {
-  id: string;
-  full_name: string;
-  roles: AppRole[];
-}
+type AdminNavItem = {
+  to: string;
+  icon: LucideIcon;
+  label: string;
+  exact?: boolean;
+  soon?: boolean;
+};
 
-function AdminDashboard() {
+const ADMIN_NAV: AdminNavItem[] = [
+  { to: "/dashboard/admin", icon: LayoutDashboard, label: "Resumen", exact: true },
+  { to: "/dashboard/admin/users", icon: Users, label: "Usuarios" },
+  { to: "/dashboard/admin/students", icon: GraduationCap, label: "Estudiantes" },
+  { to: "/dashboard/admin/projects", icon: FolderKanban, label: "Proyectos", soon: true },
+  { to: "/dashboard/admin/lines", icon: Network, label: "Líneas", soon: true },
+  { to: "/dashboard/admin/teams", icon: Users, label: "Equipos", soon: true },
+  { to: "/dashboard/admin/applications", icon: Inbox, label: "Postulaciones", soon: true },
+  { to: "/dashboard/admin/updates", icon: FileCheck2, label: "Avances", soon: true },
+  { to: "/dashboard/admin/resources", icon: BookOpen, label: "Recursos", soon: true },
+  { to: "/dashboard/admin/events", icon: Calendar, label: "Eventos", soon: true },
+  { to: "/dashboard/admin/production", icon: ScrollText, label: "Producción", soon: true },
+  { to: "/dashboard/admin/indicators", icon: BarChart3, label: "Indicadores", soon: true },
+  { to: "/dashboard/admin/settings", icon: Settings, label: "Institucional", soon: true },
+  { to: "/dashboard/admin/branding", icon: Palette, label: "Visual", soon: true },
+  { to: "/dashboard/admin/audit", icon: ScrollText, label: "Auditoría", soon: true },
+];
+
+function AdminLayout() {
   const auth = useAuth();
-  const [users, setUsers] = useState<UserWithRoles[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const load = async () => {
-    const [profs, ur] = await Promise.all([
-      supabase.from("profiles").select("id, full_name"),
-      supabase.from("user_roles").select("user_id, role"),
-    ]);
-    const map = new Map<string, AppRole[]>();
-    (ur.data ?? []).forEach((r) => {
-      const arr = map.get(r.user_id) ?? [];
-      arr.push(r.role as AppRole);
-      map.set(r.user_id, arr);
-    });
-    setUsers(
-      (profs.data ?? []).map((p) => ({
-        id: p.id,
-        full_name: p.full_name || "(sin nombre)",
-        roles: map.get(p.id) ?? [],
-      })),
-    );
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    if (auth.hasRole("admin")) load();
-  }, [auth]);
+  const location = useLocation();
 
   if (!auth.isLoading && !auth.hasRole("admin")) {
     return <Navigate to="/dashboard" replace />;
   }
 
-  const toggleRole = async (userId: string, role: AppRole, has: boolean) => {
-    if (has) {
-      // Protección: no permitir que un admin se quite el rol admin a sí mismo si es el único admin
-      if (role === "admin" && userId === auth.user?.id) {
-        const adminCount = users.filter((u) => u.roles.includes("admin")).length;
-        if (adminCount <= 1) {
-          return toast.error("No puedes quitarte el rol de admin: eres el único administrador.");
-        }
-        const ok = window.confirm("¿Seguro que quieres quitarte el rol de admin? Perderás acceso a esta sección.");
-        if (!ok) return;
-      }
-      const { error } = await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", role);
-      if (error) return toast.error(error.message);
-    } else {
-      const { error } = await supabase.from("user_roles").insert({ user_id: userId, role });
-      if (error) return toast.error(error.message);
-    }
-    toast.success("Rol actualizado");
-    load();
-  };
-
-  const ALL_ROLES: AppRole[] = ["estudiante", "coordinador", "admin"];
+  // Título dinámico según subruta
+  const current = ADMIN_NAV.find((n) =>
+    n.exact ? location.pathname === n.to : location.pathname.startsWith(n.to),
+  );
+  const title = current ? `Admin · ${current.label}` : "Administración";
 
   return (
-    <DashboardShell title="Administración">
-      <Card className="border-border/70 p-6">
-        <h2 className="font-display text-lg font-semibold text-foreground">Usuarios y roles</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Activa o desactiva roles para cada usuario registrado.
-        </p>
-        {loading ? (
-          <p className="mt-4 text-sm text-muted-foreground">Cargando...</p>
-        ) : (
-          <ul className="mt-4 divide-y divide-border/60">
-            {users.map((u) => (
-              <li key={u.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
-                <div>
-                  <p className="font-medium text-foreground">{u.full_name}</p>
-                  <p className="text-xs text-muted-foreground">{u.id.slice(0, 8)}...</p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {ALL_ROLES.map((r) => {
-                    const has = u.roles.includes(r);
-                    return (
-                      <Button
-                        key={r}
-                        size="sm"
-                        variant={has ? "default" : "outline"}
-                        onClick={() => toggleRole(u.id, r, has)}
-                        className={has ? "bg-primary hover:bg-primary/90" : ""}
-                      >
-                        {r}
-                      </Button>
-                    );
-                  })}
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Card>
+    <DashboardShell title={title}>
+      <div className="grid gap-6 lg:grid-cols-[220px_1fr]">
+        <nav className="flex flex-wrap gap-1 lg:flex-col lg:gap-0.5">
+          {ADMIN_NAV.map((item) => {
+            const Icon = item.icon;
+            const baseCls = "flex items-center justify-between gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors";
+            if (item.soon) {
+              return (
+                <span
+                  key={item.to}
+                  className={`${baseCls} cursor-not-allowed text-muted-foreground/60`}
+                >
+                  <span className="flex items-center gap-2">
+                    <Icon className="h-4 w-4" />
+                    {item.label}
+                  </span>
+                  <span className="rounded bg-muted px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    pronto
+                  </span>
+                </span>
+              );
+            }
+            return (
+              <Link
+                key={item.to}
+                to={item.to}
+                activeOptions={{ exact: item.exact ?? false }}
+                className={`${baseCls} text-muted-foreground hover:bg-primary-soft hover:text-primary`}
+                activeProps={{ className: "bg-primary-soft text-primary" }}
+              >
+                <span className="flex items-center gap-2">
+                  <Icon className="h-4 w-4" />
+                  {item.label}
+                </span>
+              </Link>
+            );
+          })}
+        </nav>
 
-      <Card className="mt-6 border-border/70 p-6">
-        <h2 className="font-display text-lg font-semibold text-foreground">Tu sesión</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {auth.user?.email} · roles:{" "}
-          {auth.roles.map((r) => (
-            <Badge key={r} variant="outline" className="mx-0.5">{r}</Badge>
-          ))}
-        </p>
-      </Card>
+        <section className="min-w-0">
+          <Outlet />
+        </section>
+      </div>
     </DashboardShell>
   );
 }
