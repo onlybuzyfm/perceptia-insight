@@ -30,7 +30,7 @@ const schema = z.object({
 const INFO = [
   { icon: Building2, title: "Universidad", value: "Universidad Nacional de Chimborazo" },
   { icon: GraduationCap, title: "Carrera", value: "Ciencia de Datos e Inteligencia Artificial" },
-  { icon: Users, title: "Facultad", value: "Ciencias de la Educación, Humanas y Tecnologías" },
+  { icon: Users, title: "Facultad", value: "Ingeniería" },
   { icon: Mail, title: "Correo", value: "contacto@perceptia.dev" },
 ];
 
