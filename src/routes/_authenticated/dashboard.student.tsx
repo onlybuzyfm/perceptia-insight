@@ -25,6 +25,7 @@ interface ProjectRow {
 
 interface ProfileData {
   full_name: string;
+  username: string;
   carrera: string | null;
   semestre: string | null;
   phone: string | null;
@@ -35,6 +36,7 @@ interface ProfileData {
 
 const EMPTY_PROFILE: ProfileData = {
   full_name: "",
+  username: "",
   carrera: "",
   semestre: "",
   phone: "",
@@ -42,6 +44,8 @@ const EMPTY_PROFILE: ProfileData = {
   github_url: "",
   linkedin_url: "",
 };
+
+const USERNAME_RE = /^[a-z0-9_.]{3,30}$/;
 
 function StudentDashboard() {
   const auth = useAuth();
@@ -62,7 +66,7 @@ function StudentDashboard() {
           .eq("user_id", auth.user!.id),
         supabase
           .from("profiles")
-          .select("full_name, carrera, semestre, phone, bio, github_url, linkedin_url")
+          .select("full_name, username, carrera, semestre, phone, bio, github_url, linkedin_url")
           .eq("id", auth.user!.id)
           .maybeSingle(),
       ]);
@@ -72,6 +76,7 @@ function StudentDashboard() {
       setProjects(list);
       const data: ProfileData = {
         full_name: prof.data?.full_name ?? "",
+        username: prof.data?.username ?? "",
         carrera: prof.data?.carrera ?? "",
         semestre: prof.data?.semestre ?? "",
         phone: prof.data?.phone ?? "",
@@ -101,11 +106,17 @@ function StudentDashboard() {
       toast.error("El nombre no puede estar vacío");
       return;
     }
+    const uname = draft.username.trim().toLowerCase();
+    if (!USERNAME_RE.test(uname)) {
+      toast.error("Username inválido: 3-30 caracteres a-z, 0-9, _ o .");
+      return;
+    }
     setSaving(true);
     const { error } = await supabase
       .from("profiles")
       .update({
         full_name: draft.full_name.trim(),
+        username: uname,
         carrera: draft.carrera?.trim() || null,
         semestre: draft.semestre?.trim() || null,
         phone: draft.phone?.trim() || null,
@@ -116,10 +127,15 @@ function StudentDashboard() {
       .eq("id", auth.user.id);
     setSaving(false);
     if (error) {
-      toast.error("No se pudo guardar el perfil: " + error.message);
+      const msg = error.message.includes("profiles_username_key") || error.code === "23505"
+        ? "Ese username ya está en uso"
+        : error.message.includes("profiles_username_format_chk")
+        ? "Username inválido: 3-30 caracteres a-z, 0-9, _ o ."
+        : error.message;
+      toast.error("No se pudo guardar el perfil: " + msg);
       return;
     }
-    setProfile(draft);
+    setProfile({ ...draft, username: uname });
     setEditing(false);
     toast.success("Perfil actualizado");
   };
@@ -153,6 +169,7 @@ function StudentDashboard() {
         ) : !editing ? (
           <dl className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
             <Field label="Nombre" value={profile.full_name} />
+            <Field label="Username" value={profile.username ? "@" + profile.username : null} />
             <Field label="Correo" value={auth.user?.email ?? "—"} />
             <Field label="Carrera" value={profile.carrera} />
             <Field label="Semestre" value={profile.semestre} />
@@ -167,6 +184,7 @@ function StudentDashboard() {
         ) : (
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <FieldInput label="Nombre completo" value={draft.full_name} onChange={(v) => set("full_name", v)} required maxLength={120} />
+            <FieldInput label="Username" value={draft.username} onChange={(v) => set("username", v.toLowerCase())} required maxLength={30} placeholder="ej: juan.perez" />
             <div>
               <Label className="text-muted-foreground">Correo</Label>
               <Input value={auth.user?.email ?? ""} disabled className="mt-1.5" />
