@@ -8,6 +8,8 @@ export const Route = createFileRoute("/_authenticated")({
   component: AuthenticatedLayout,
 });
 
+// Force pathless layout — no path conflict with index route
+
 function AuthenticatedLayout() {
   const auth = useAuth();
   const navigate = useNavigate();
