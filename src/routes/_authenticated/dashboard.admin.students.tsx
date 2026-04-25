@@ -240,8 +240,13 @@ function EditDialog({ student, lines, onClose, onSaved }: { student: Student | n
   if (!student) return null;
 
   const save = async () => {
+    const uname = (form.username ?? "").trim().toLowerCase();
+    if (!USERNAME_RE.test(uname)) {
+      return toast.error("Username inválido: 3-30 caracteres a-z, 0-9, _ o .");
+    }
     const { error } = await supabase.from("profiles").update({
       full_name: form.full_name ?? "",
+      username: uname,
       carrera: form.carrera || null,
       semestre: form.semestre || null,
       paralelo: form.paralelo || null,
@@ -249,7 +254,14 @@ function EditDialog({ student, lines, onClose, onSaved }: { student: Student | n
       interest_line_id: form.interest_line_id || null,
       is_active: form.is_active ?? true,
     }).eq("id", student.id);
-    if (error) return toast.error(error.message);
+    if (error) {
+      const msg = error.code === "23505" || error.message.includes("profiles_username_key")
+        ? "Ese username ya está en uso"
+        : error.message.includes("profiles_username_format_chk")
+        ? "Username inválido: 3-30 caracteres a-z, 0-9, _ o ."
+        : error.message;
+      return toast.error(msg);
+    }
     toast.success("Estudiante actualizado");
     onSaved();
   };
@@ -263,6 +275,16 @@ function EditDialog({ student, lines, onClose, onSaved }: { student: Student | n
         <div className="grid gap-3">
           <Field label="Nombre completo">
             <Input value={form.full_name ?? ""} onChange={(e) => setForm({ ...form, full_name: e.target.value })} />
+          </Field>
+          <Field label="Username">
+            <Input
+              value={form.username ?? ""}
+              onChange={(e) => setForm({ ...form, username: e.target.value.toLowerCase() })}
+              maxLength={30}
+              placeholder="ej: juan.perez"
+              className="font-mono"
+            />
+            <p className="mt-1 text-[11px] text-muted-foreground">3-30 caracteres: a-z, 0-9, _ o .</p>
           </Field>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Carrera">
