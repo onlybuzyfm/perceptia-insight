@@ -20,7 +20,7 @@ function DashboardHome() {
     ? "coordinador"
     : auth.hasRole("estudiante")
     ? "estudiante"
-    : "visitante";
+    : "sin rol";
 
   useEffect(() => {
     if (!auth.user) return;
