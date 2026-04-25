@@ -8,7 +8,7 @@ export function Footer() {
         <div className="lg:col-span-2">
           <div className="flex items-center gap-3">
             <img src={logo} alt="" aria-hidden="true" className="h-10 w-auto" />
-            <span className="font-display text-xl font-bold text-foreground">
+            <span className="font-display text-xl font-bold text-foreground text-slate-400">
               Percept<span className="text-primary">IA</span>
             </span>
           </div>

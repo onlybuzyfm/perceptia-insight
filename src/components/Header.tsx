@@ -21,7 +21,7 @@ export function Header() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link to="/" className="flex items-center gap-2.5" aria-label="PerceptIA inicio">
           <img src={logo} alt="" aria-hidden="true" className="h-9 w-auto" />
-          <span className="font-display text-lg font-bold leading-none text-foreground">
+          <span className="font-display text-lg font-bold leading-none text-foreground text-slate-500">
             Percept<span className="text-primary">IA</span>
           </span>
         </Link>
