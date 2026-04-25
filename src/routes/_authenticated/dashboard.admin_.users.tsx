@@ -11,7 +11,7 @@ import { useAuth, type AppRole } from "@/lib/auth-context";
 import { toast } from "sonner";
 import { Search, UserCheck, UserX } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/dashboard/admin/users")({
+export const Route = createFileRoute("/_authenticated/dashboard/admin_/users")({
   component: () => <AdminShell><UsersAdmin /></AdminShell>,
 });
 

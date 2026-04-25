@@ -12,7 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Search, Pencil, Download } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/dashboard/admin/students")({
+export const Route = createFileRoute("/_authenticated/dashboard/admin_/students")({
   component: () => <AdminShell><StudentsAdmin /></AdminShell>,
 });
 

@@ -30,7 +30,7 @@ function startOfISOWeek(d: Date) {
   return date;
 }
 
-function AdminOverview() {
+export function AdminOverview() {
   const [m, setM] = useState<Metrics | null>(null);
   const [recentApps, setRecentApps] = useState<Array<{ id: string; full_name: string; email: string; status: string; created_at: string }>>([]);
   const [byStatus, setByStatus] = useState<Record<string, number>>({});
