@@ -3,7 +3,7 @@ import { type ReactNode, useEffect, useState } from "react";
 import { LayoutDashboard, FileText, BookOpen, LogOut, Users, Settings, GraduationCap, User as UserIcon, ChevronDown } from "lucide-react";
 import logo from "@/assets/perceptia-logo.svg";
 import { useAuth } from "@/lib/auth-context";
-import { Button } from "@/components/ui/button";
+
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
