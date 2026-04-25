@@ -4,7 +4,7 @@ import { PublicLayout } from "@/components/PublicLayout";
 import { NodeBackdrop } from "@/components/NodeBackdrop";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import logo from "@/assets/perceptia-logo.png";
+import logo from "@/assets/perceptia-logo.svg";
 import { HERO, RESEARCH_LINES } from "@/data/content";
 
 export const Route = createFileRoute("/")({

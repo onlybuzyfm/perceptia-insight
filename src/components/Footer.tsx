@@ -1,12 +1,17 @@
 import { Link } from "@tanstack/react-router";
-import logo from "@/assets/perceptia-logo.png";
+import logo from "@/assets/perceptia-logo.svg";
 
 export function Footer() {
   return (
     <footer className="border-t border-border bg-secondary/40">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-4 lg:px-8">
         <div className="lg:col-span-2">
-          <img src={logo} alt="PerceptIA" className="h-10 w-auto" />
+          <div className="flex items-center gap-3">
+            <img src={logo} alt="" aria-hidden="true" className="h-10 w-auto" />
+            <span className="font-display text-xl font-bold text-foreground">
+              Percept<span className="text-primary">IA</span>
+            </span>
+          </div>
           <p className="mt-4 max-w-md text-sm leading-relaxed text-muted-foreground">
             Semillero de investigación en percepción artificial, ciencia de datos,
             IA y TinyML aplicada a entornos reales con recursos limitados.
