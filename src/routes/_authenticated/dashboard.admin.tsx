@@ -41,7 +41,6 @@ function AdminLayout() {
     return <Navigate to="/dashboard" replace />;
   }
 
-  // Título dinámico según subruta
   const current = ADMIN_NAV.find((n) =>
     n.exact ? location.pathname === n.to : location.pathname.startsWith(n.to),
   );
