@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Navigate, Outlet, useLocation } from "@tanstack/react-router";
-import { LayoutDashboard, Users, GraduationCap, FolderKanban, Network, FileCheck2, Calendar, BookOpen, BarChart3, Settings, Palette, ScrollText, Inbox } from "lucide-react";
+import { LayoutDashboard, Users, GraduationCap, FolderKanban, Network, FileCheck2, Calendar, BookOpen, BarChart3, Settings, Palette, ScrollText, Inbox, type LucideIcon } from "lucide-react";
 import { DashboardShell } from "@/components/DashboardShell";
 import { useAuth } from "@/lib/auth-context";
 
