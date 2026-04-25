@@ -94,11 +94,16 @@ export type Database = {
           avatar_url: string | null
           bio: string | null
           carrera: string | null
+          codigo_estudiantil: string | null
           created_at: string
+          email: string | null
           full_name: string
           github_url: string | null
           id: string
+          interest_line_id: string | null
+          is_active: boolean
           linkedin_url: string | null
+          paralelo: string | null
           phone: string | null
           semestre: string | null
           updated_at: string
@@ -107,11 +112,16 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           carrera?: string | null
+          codigo_estudiantil?: string | null
           created_at?: string
+          email?: string | null
           full_name?: string
           github_url?: string | null
           id: string
+          interest_line_id?: string | null
+          is_active?: boolean
           linkedin_url?: string | null
+          paralelo?: string | null
           phone?: string | null
           semestre?: string | null
           updated_at?: string
@@ -120,16 +130,29 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           carrera?: string | null
+          codigo_estudiantil?: string | null
           created_at?: string
+          email?: string | null
           full_name?: string
           github_url?: string | null
           id?: string
+          interest_line_id?: string | null
+          is_active?: boolean
           linkedin_url?: string | null
+          paralelo?: string | null
           phone?: string | null
           semestre?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_interest_line_id_fkey"
+            columns: ["interest_line_id"]
+            isOneToOne: false
+            referencedRelation: "research_lines"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       project_members: {
         Row: {
@@ -346,6 +369,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_list_users: {
+        Args: never
+        Returns: {
+          created_at: string
+          email: string
+          id: string
+          last_sign_in_at: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -363,11 +395,13 @@ export type Database = {
       app_role: "visitante" | "estudiante" | "coordinador" | "admin"
       application_status: "pendiente" | "en_revision" | "aceptada" | "rechazada"
       project_status:
-        | "en_diseno"
-        | "en_curso"
+        | "propuesto"
+        | "planificacion"
         | "activo"
-        | "piloto"
+        | "pausado"
         | "finalizado"
+        | "publicado"
+        | "archivado"
       resource_category:
         | "moodle"
         | "dataset"
@@ -507,11 +541,13 @@ export const Constants = {
       app_role: ["visitante", "estudiante", "coordinador", "admin"],
       application_status: ["pendiente", "en_revision", "aceptada", "rechazada"],
       project_status: [
-        "en_diseno",
-        "en_curso",
+        "propuesto",
+        "planificacion",
         "activo",
-        "piloto",
+        "pausado",
         "finalizado",
+        "publicado",
+        "archivado",
       ],
       resource_category: [
         "moodle",
