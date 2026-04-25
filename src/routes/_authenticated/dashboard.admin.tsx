@@ -7,7 +7,15 @@ export const Route = createFileRoute("/_authenticated/dashboard/admin")({
   component: AdminLayout,
 });
 
-const ADMIN_NAV = [
+type AdminNavItem = {
+  to: string;
+  icon: LucideIcon;
+  label: string;
+  exact?: boolean;
+  soon?: boolean;
+};
+
+const ADMIN_NAV: AdminNavItem[] = [
   { to: "/dashboard/admin", icon: LayoutDashboard, label: "Resumen", exact: true },
   { to: "/dashboard/admin/users", icon: Users, label: "Usuarios" },
   { to: "/dashboard/admin/students", icon: GraduationCap, label: "Estudiantes" },
@@ -23,7 +31,7 @@ const ADMIN_NAV = [
   { to: "/dashboard/admin/settings", icon: Settings, label: "Institucional", soon: true },
   { to: "/dashboard/admin/branding", icon: Palette, label: "Visual", soon: true },
   { to: "/dashboard/admin/audit", icon: ScrollText, label: "Auditoría", soon: true },
-] as const;
+];
 
 function AdminLayout() {
   const auth = useAuth();
