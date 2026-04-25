@@ -1,7 +1,9 @@
 import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/lib/auth-context";
 import { DashboardShell } from "@/components/DashboardShell";
+import { supabase } from "@/integrations/supabase/client";
 import { GraduationCap, Users, Settings, FileText, BookOpen, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
@@ -10,6 +12,8 @@ export const Route = createFileRoute("/_authenticated/dashboard/")({
 
 function DashboardHome() {
   const auth = useAuth();
+  const [firstName, setFirstName] = useState<string>("");
+
   const primaryRole = auth.hasRole("admin")
     ? "admin"
     : auth.hasRole("coordinador")
@@ -18,12 +22,25 @@ function DashboardHome() {
     ? "estudiante"
     : "visitante";
 
+  useEffect(() => {
+    if (!auth.user) return;
+    supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", auth.user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        const name = (data?.full_name || "").trim().split(" ")[0];
+        setFirstName(name);
+      });
+  }, [auth.user]);
+
   // Auto-redirect to role-specific dashboard
   if (primaryRole === "admin") return <Navigate to="/dashboard/admin" replace />;
   if (primaryRole === "coordinador") return <Navigate to="/dashboard/coordinator" replace />;
 
   return (
-    <DashboardShell title={`Hola, ${auth.user?.email?.split("@")[0]} 👋`}>
+    <DashboardShell title={`Hola, ${firstName || "👋"} 👋`}>
       <p className="text-muted-foreground">
         Bienvenido al portal interno de PerceptIA. Tu rol actual es{" "}
         <span className="font-semibold text-primary">{primaryRole}</span>.
