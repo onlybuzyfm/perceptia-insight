@@ -2,12 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { AdminShell } from "@/components/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
 import { GraduationCap, FolderKanban, Inbox, FileCheck2, AlertTriangle, BookOpen, Calendar, ScrollText } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/admin/")({
-  component: AdminOverview,
+  component: () => <AdminShell><AdminOverview /></AdminShell>,
 });
 
 interface Metrics {
@@ -29,7 +30,7 @@ function startOfISOWeek(d: Date) {
   return date;
 }
 
-function AdminOverview() {
+export function AdminOverview() {
   const [m, setM] = useState<Metrics | null>(null);
   const [recentApps, setRecentApps] = useState<Array<{ id: string; full_name: string; email: string; status: string; created_at: string }>>([]);
   const [byStatus, setByStatus] = useState<Record<string, number>>({});
