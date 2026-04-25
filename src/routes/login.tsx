@@ -46,6 +46,7 @@ function LoginPage() {
   const [globalError, setGlobalError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [forgotSent, setForgotSent] = useState(false);
+  const [signupSent, setSignupSent] = useState(false);
 
   useEffect(() => {
     if (auth.isAuthenticated) {
@@ -74,7 +75,8 @@ function LoginPage() {
     }
 
     if (mode === "signup") {
-      const r = signUpSchema.safeParse({ email, password, full_name: fullName });
+      const confirmPassword = String(fd.get("confirm_password") ?? "");
+      const r = signUpSchema.safeParse({ email, password, full_name: fullName, confirm_password: confirmPassword });
       if (!r.success) {
         const fe: Record<string, string> = {};
         r.error.issues.forEach((i) => i.path[0] && (fe[String(i.path[0])] = i.message));
@@ -84,8 +86,7 @@ function LoginPage() {
       const { error } = await auth.signUp(email, password, fullName);
       setLoading(false);
       if (error) return setGlobalError(error);
-      toast.success("Cuenta creada. Revisa tu correo si se requiere confirmación.");
-      navigate({ to: "/dashboard" });
+      setSignupSent(true);
       return;
     }
 
