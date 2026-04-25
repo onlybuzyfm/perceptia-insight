@@ -148,8 +148,31 @@
     border-color: var(--color-border);
   }
 
+  html {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-feature-settings: "ss01", "cv11";
+  }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer utilities {
+  .bg-grid-soft {
+    background-image:
+      linear-gradient(to right, oklch(0.38 0.16 305 / 0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, oklch(0.38 0.16 305 / 0.06) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+  .bg-radial-fade {
+    background: radial-gradient(circle at 50% 0%, oklch(0.38 0.16 305 / 0.08), transparent 60%);
   }
 }
