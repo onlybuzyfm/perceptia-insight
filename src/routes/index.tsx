@@ -57,7 +57,7 @@ function HomePage() {
               <Button asChild size="lg" variant="outline" className="border-primary/30 text-primary hover:bg-primary-soft">
                 <Link to="/proyectos">Ver proyectos</Link>
               </Button>
-              <Button asChild size="lg" variant="ghost" className="text-foreground hover:text-primary">
+              <Button asChild size="lg" variant="outline" className="border-primary/30 text-primary hover:bg-primary-soft">
                 <Link to="/login">Ingresar al portal</Link>
               </Button>
             </div>
