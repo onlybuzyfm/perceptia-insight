@@ -53,24 +53,35 @@ function AdminLayout() {
         <nav className="flex flex-wrap gap-1 lg:flex-col lg:gap-0.5">
           {ADMIN_NAV.map((item) => {
             const Icon = item.icon;
+            const baseCls = "flex items-center justify-between gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors";
+            if (item.soon) {
+              return (
+                <span
+                  key={item.to}
+                  className={`${baseCls} cursor-not-allowed text-muted-foreground/60`}
+                >
+                  <span className="flex items-center gap-2">
+                    <Icon className="h-4 w-4" />
+                    {item.label}
+                  </span>
+                  <span className="rounded bg-muted px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    pronto
+                  </span>
+                </span>
+              );
+            }
             return (
               <Link
                 key={item.to}
                 to={item.to}
                 activeOptions={{ exact: item.exact ?? false }}
-                disabled={item.soon}
-                className={`flex items-center justify-between gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-primary-soft hover:text-primary ${item.soon ? "pointer-events-none opacity-50" : ""}`}
+                className={`${baseCls} text-muted-foreground hover:bg-primary-soft hover:text-primary`}
                 activeProps={{ className: "bg-primary-soft text-primary" }}
               >
                 <span className="flex items-center gap-2">
                   <Icon className="h-4 w-4" />
                   {item.label}
                 </span>
-                {item.soon && (
-                  <span className="rounded bg-muted px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    pronto
-                  </span>
-                )}
               </Link>
             );
           })}
