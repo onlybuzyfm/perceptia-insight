@@ -1,13 +1,36 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { type ReactNode } from "react";
-import { LayoutDashboard, FileText, BookOpen, LogOut, Users, Settings, GraduationCap } from "lucide-react";
+import { type ReactNode, useEffect, useState } from "react";
+import { LayoutDashboard, FileText, BookOpen, LogOut, Users, Settings, GraduationCap, User as UserIcon, ChevronDown } from "lucide-react";
 import logo from "@/assets/perceptia-logo.svg";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { supabase } from "@/integrations/supabase/client";
 
 export function DashboardShell({ children, title }: { children: ReactNode; title: string }) {
   const auth = useAuth();
   const navigate = useNavigate();
+  const [profile, setProfile] = useState<{ username: string; full_name: string } | null>(null);
+
+  useEffect(() => {
+    if (!auth.user) return;
+    supabase
+      .from("profiles")
+      .select("username, full_name")
+      .eq("id", auth.user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) setProfile({ username: data.username ?? "", full_name: data.full_name ?? "" });
+      });
+  }, [auth.user]);
 
   const handleSignOut = async () => {
     await auth.signOut();
@@ -16,6 +39,14 @@ export function DashboardShell({ children, title }: { children: ReactNode; title
 
   const isStaff = auth.isStaff();
   const isAdmin = auth.hasRole("admin");
+
+  const displayName = profile?.username || profile?.full_name?.split(" ")[0] || auth.user?.email?.split("@")[0] || "usuario";
+  const initials = (profile?.full_name || profile?.username || auth.user?.email || "U")
+    .split(/[\s._]+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((s) => s[0]?.toUpperCase())
+    .join("");
 
   return (
     <div className="flex min-h-screen flex-col bg-secondary/30">
