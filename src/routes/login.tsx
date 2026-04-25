@@ -9,7 +9,7 @@ import { NodeBackdrop } from "@/components/NodeBackdrop";
 import { useAuth } from "@/lib/auth-context";
 import logo from "@/assets/perceptia-logo.svg";
 import { ArrowLeft, Loader2 } from "lucide-react";
-import { toast } from "sonner";
+
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -28,9 +28,15 @@ const signInSchema = z.object({
   password: z.string().min(6, "Mínimo 6 caracteres").max(128),
 });
 
-const signUpSchema = signInSchema.extend({
-  full_name: z.string().trim().min(2, "Ingresa tu nombre").max(120),
-});
+const signUpSchema = signInSchema
+  .extend({
+    full_name: z.string().trim().min(2, "Ingresa tu nombre").max(120),
+    confirm_password: z.string().min(6, "Confirma tu contraseña").max(128),
+  })
+  .refine((d) => d.password === d.confirm_password, {
+    message: "Las contraseñas no coinciden",
+    path: ["confirm_password"],
+  });
 
 function LoginPage() {
   const auth = useAuth();
@@ -40,6 +46,7 @@ function LoginPage() {
   const [globalError, setGlobalError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [forgotSent, setForgotSent] = useState(false);
+  const [signupSent, setSignupSent] = useState(false);
 
   useEffect(() => {
     if (auth.isAuthenticated) {
@@ -68,7 +75,8 @@ function LoginPage() {
     }
 
     if (mode === "signup") {
-      const r = signUpSchema.safeParse({ email, password, full_name: fullName });
+      const confirmPassword = String(fd.get("confirm_password") ?? "");
+      const r = signUpSchema.safeParse({ email, password, full_name: fullName, confirm_password: confirmPassword });
       if (!r.success) {
         const fe: Record<string, string> = {};
         r.error.issues.forEach((i) => i.path[0] && (fe[String(i.path[0])] = i.message));
@@ -78,8 +86,7 @@ function LoginPage() {
       const { error } = await auth.signUp(email, password, fullName);
       setLoading(false);
       if (error) return setGlobalError(error);
-      toast.success("Cuenta creada. Revisa tu correo si se requiere confirmación.");
-      navigate({ to: "/dashboard" });
+      setSignupSent(true);
       return;
     }
 
@@ -132,6 +139,21 @@ function LoginPage() {
                 Volver al inicio de sesión
               </button>
             </div>
+          ) : signupSent ? (
+            <div className="mt-8 rounded-lg border border-primary/20 bg-primary-soft p-5 text-center text-sm text-foreground">
+              <p className="font-semibold text-foreground">¡Cuenta creada!</p>
+              <p className="mt-2 text-muted-foreground">
+                Te enviamos un correo de confirmación. Revisa tu bandeja de entrada
+                (y la carpeta de spam) y haz clic en el enlace para activar tu cuenta
+                antes de iniciar sesión.
+              </p>
+              <button
+                onClick={() => { setMode("signin"); setSignupSent(false); }}
+                className="mt-4 block w-full text-xs font-semibold text-primary hover:underline"
+              >
+                Volver al inicio de sesión
+              </button>
+            </div>
           ) : (
             <form onSubmit={onSubmit} className="mt-8 space-y-4" noValidate>
               {mode === "signup" && (
@@ -169,6 +191,20 @@ function LoginPage() {
                     className="mt-1.5"
                   />
                   {errors.password && <p className="mt-1 text-xs text-destructive">{errors.password}</p>}
+                </div>
+              )}
+
+              {mode === "signup" && (
+                <div>
+                  <Label htmlFor="confirm_password">Confirmar contraseña</Label>
+                  <Input
+                    id="confirm_password"
+                    name="confirm_password"
+                    type="password"
+                    autoComplete="new-password"
+                    className="mt-1.5"
+                  />
+                  {errors.confirm_password && <p className="mt-1 text-xs text-destructive">{errors.confirm_password}</p>}
                 </div>
               )}
 
