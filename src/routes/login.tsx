@@ -139,6 +139,21 @@ function LoginPage() {
                 Volver al inicio de sesión
               </button>
             </div>
+          ) : signupSent ? (
+            <div className="mt-8 rounded-lg border border-primary/20 bg-primary-soft p-5 text-center text-sm text-foreground">
+              <p className="font-semibold text-foreground">¡Cuenta creada!</p>
+              <p className="mt-2 text-muted-foreground">
+                Te enviamos un correo de confirmación. Revisa tu bandeja de entrada
+                (y la carpeta de spam) y haz clic en el enlace para activar tu cuenta
+                antes de iniciar sesión.
+              </p>
+              <button
+                onClick={() => { setMode("signin"); setSignupSent(false); }}
+                className="mt-4 block w-full text-xs font-semibold text-primary hover:underline"
+              >
+                Volver al inicio de sesión
+              </button>
+            </div>
           ) : (
             <form onSubmit={onSubmit} className="mt-8 space-y-4" noValidate>
               {mode === "signup" && (
@@ -176,6 +191,20 @@ function LoginPage() {
                     className="mt-1.5"
                   />
                   {errors.password && <p className="mt-1 text-xs text-destructive">{errors.password}</p>}
+                </div>
+              )}
+
+              {mode === "signup" && (
+                <div>
+                  <Label htmlFor="confirm_password">Confirmar contraseña</Label>
+                  <Input
+                    id="confirm_password"
+                    name="confirm_password"
+                    type="password"
+                    autoComplete="new-password"
+                    className="mt-1.5"
+                  />
+                  {errors.confirm_password && <p className="mt-1 text-xs text-destructive">{errors.confirm_password}</p>}
                 </div>
               )}
 
