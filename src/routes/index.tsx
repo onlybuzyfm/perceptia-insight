@@ -63,7 +63,7 @@ function HomePage() {
             </div>
           </div>
 
-          <div className="relative flex items-center justify-center">
+          <div className="relative flex flex-col items-center justify-center">
             <div className="absolute -inset-6 rounded-[2rem] bg-gradient-to-br from-primary-soft via-transparent to-transparent blur-2xl" />
             <div className="relative aspect-square w-full max-w-md rounded-[2rem] border border-primary/15 bg-white p-10 shadow-[var(--shadow-elegant)]">
               <div className="absolute right-4 top-4 rounded-full bg-primary-soft px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-primary">
@@ -72,6 +72,16 @@ function HomePage() {
               <img src={logo} alt="Logo PerceptIA" className="h-full w-full object-contain" />
               <div className="absolute -bottom-px left-1/2 h-px w-2/3 -translate-x-1/2 bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
             </div>
+            <figcaption className="relative mt-6 max-w-md text-center">
+              <p className="font-display text-sm font-semibold text-foreground">
+                El quinde andino: precisión, agilidad y percepción.
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                Símbolo de la sierra ecuatoriana, el colibrí encarna el espíritu de PerceptIA:
+                inteligencia que observa el detalle, se adapta al entorno y conecta nuestras
+                raíces andinas con la frontera de la inteligencia artificial.
+              </p>
+            </figcaption>
           </div>
         </div>
       </section>
