@@ -107,6 +107,7 @@ export type Database = {
           phone: string | null
           semestre: string | null
           updated_at: string
+          username: string
         }
         Insert: {
           avatar_url?: string | null
@@ -125,6 +126,7 @@ export type Database = {
           phone?: string | null
           semestre?: string | null
           updated_at?: string
+          username: string
         }
         Update: {
           avatar_url?: string | null
@@ -143,6 +145,7 @@ export type Database = {
           phone?: string | null
           semestre?: string | null
           updated_at?: string
+          username?: string
         }
         Relationships: [
           {

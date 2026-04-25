@@ -31,6 +31,11 @@ const signInSchema = z.object({
 const signUpSchema = signInSchema
   .extend({
     full_name: z.string().trim().min(2, "Ingresa tu nombre").max(120),
+    username: z
+      .string()
+      .trim()
+      .toLowerCase()
+      .regex(/^[a-z0-9_.]{3,30}$/, "Usa 3-30 caracteres: a-z, 0-9, _ o ."),
     confirm_password: z.string().min(6, "Confirma tu contraseña").max(128),
   })
   .refine((d) => d.password === d.confirm_password, {
@@ -62,6 +67,7 @@ function LoginPage() {
     const email = String(fd.get("email") ?? "");
     const password = String(fd.get("password") ?? "");
     const fullName = String(fd.get("full_name") ?? "");
+    const username = String(fd.get("username") ?? "").trim().toLowerCase();
 
     if (mode === "forgot") {
       const r = z.string().email().safeParse(email);
@@ -76,14 +82,14 @@ function LoginPage() {
 
     if (mode === "signup") {
       const confirmPassword = String(fd.get("confirm_password") ?? "");
-      const r = signUpSchema.safeParse({ email, password, full_name: fullName, confirm_password: confirmPassword });
+      const r = signUpSchema.safeParse({ email, password, full_name: fullName, username, confirm_password: confirmPassword });
       if (!r.success) {
         const fe: Record<string, string> = {};
         r.error.issues.forEach((i) => i.path[0] && (fe[String(i.path[0])] = i.message));
         return setErrors(fe);
       }
       setLoading(true);
-      const { error } = await auth.signUp(email, password, fullName);
+      const { error } = await auth.signUp(email, password, fullName, username);
       setLoading(false);
       if (error) return setGlobalError(error);
       setSignupSent(true);
@@ -157,11 +163,26 @@ function LoginPage() {
           ) : (
             <form onSubmit={onSubmit} className="mt-8 space-y-4" noValidate>
               {mode === "signup" && (
-                <div>
-                  <Label htmlFor="full_name">Nombre completo</Label>
-                  <Input id="full_name" name="full_name" autoComplete="name" className="mt-1.5" />
-                  {errors.full_name && <p className="mt-1 text-xs text-destructive">{errors.full_name}</p>}
-                </div>
+                <>
+                  <div>
+                    <Label htmlFor="full_name">Nombre completo</Label>
+                    <Input id="full_name" name="full_name" autoComplete="name" className="mt-1.5" />
+                    {errors.full_name && <p className="mt-1 text-xs text-destructive">{errors.full_name}</p>}
+                  </div>
+                  <div>
+                    <Label htmlFor="username">Nombre de usuario</Label>
+                    <Input
+                      id="username"
+                      name="username"
+                      autoComplete="username"
+                      placeholder="ej: juan.perez"
+                      className="mt-1.5"
+                      maxLength={30}
+                    />
+                    <p className="mt-1 text-[11px] text-muted-foreground">3-30 caracteres: a-z, 0-9, _ o .</p>
+                    {errors.username && <p className="mt-1 text-xs text-destructive">{errors.username}</p>}
+                  </div>
+                </>
               )}
               <div>
                 <Label htmlFor="email">Correo electrónico</Label>

@@ -19,6 +19,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/admin/students")
 interface Student {
   id: string;
   full_name: string;
+  username: string | null;
   email: string | null;
   carrera: string | null;
   semestre: string | null;
@@ -29,6 +30,8 @@ interface Student {
   project_ids: string[];
   project_titles: string[];
 }
+
+const USERNAME_RE = /^[a-z0-9_.]{3,30}$/;
 
 interface ResearchLine { id: string; title: string }
 
@@ -55,7 +58,7 @@ function StudentsAdmin() {
       setStudents([]); setLoading(false); return;
     }
     const [profs, ls, members, projs] = await Promise.all([
-      supabase.from("profiles").select("id, full_name, email, carrera, semestre, paralelo, codigo_estudiantil, is_active, interest_line_id").in("id", ids),
+      supabase.from("profiles").select("id, full_name, username, email, carrera, semestre, paralelo, codigo_estudiantil, is_active, interest_line_id").in("id", ids),
       supabase.from("research_lines").select("id, title").order("display_order"),
       supabase.from("project_members").select("user_id, project_id").in("user_id", ids),
       supabase.from("projects").select("id, title"),
@@ -71,6 +74,7 @@ function StudentsAdmin() {
     setStudents((profs.data ?? []).map((p) => ({
       id: p.id,
       full_name: p.full_name || "(sin nombre)",
+      username: p.username,
       email: p.email,
       carrera: p.carrera,
       semestre: p.semestre,
@@ -92,7 +96,7 @@ function StudentsAdmin() {
   const paralelos = useMemo(() => Array.from(new Set(students.map((s) => s.paralelo).filter(Boolean) as string[])), [students]);
 
   const filtered = useMemo(() => students.filter((s) => {
-    if (q && !`${s.full_name} ${s.email} ${s.codigo_estudiantil}`.toLowerCase().includes(q.toLowerCase())) return false;
+    if (q && !`${s.full_name} ${s.email} ${s.codigo_estudiantil} ${s.username ?? ""}`.toLowerCase().includes(q.toLowerCase())) return false;
     if (carreraFilter !== "all" && s.carrera !== carreraFilter) return false;
     if (semestreFilter !== "all" && s.semestre !== semestreFilter) return false;
     if (paraleloFilter !== "all" && s.paralelo !== paraleloFilter) return false;
@@ -103,9 +107,10 @@ function StudentsAdmin() {
   }), [students, q, carreraFilter, semestreFilter, paraleloFilter, statusFilter, lineFilter]);
 
   const exportCSV = () => {
-    const headers = ["Nombre", "Correo", "Carrera", "Semestre", "Paralelo", "Código", "Estado", "Línea", "Proyectos"];
+    const headers = ["Nombre", "Username", "Correo", "Carrera", "Semestre", "Paralelo", "Código", "Estado", "Línea", "Proyectos"];
     const rows = filtered.map((s) => [
       s.full_name,
+      s.username ?? "",
       s.email ?? "",
       s.carrera ?? "",
       s.semestre ?? "",
@@ -129,7 +134,7 @@ function StudentsAdmin() {
         <div className="flex flex-wrap items-center gap-2">
           <div className="relative min-w-[200px] flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Buscar nombre, correo o código..." value={q} onChange={(e) => setQ(e.target.value)} className="pl-9" />
+            <Input placeholder="Buscar nombre, username, correo o código..." value={q} onChange={(e) => setQ(e.target.value)} className="pl-9" />
           </div>
           <FilterSelect value={carreraFilter} onChange={setCarreraFilter} placeholder="Carrera" all="Todas las carreras" options={carreras} />
           <FilterSelect value={semestreFilter} onChange={setSemestreFilter} placeholder="Semestre" all="Todos" options={semestres} />
@@ -166,6 +171,7 @@ function StudentsAdmin() {
             <thead className="bg-secondary/50 text-left text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
                 <th className="px-4 py-3">Estudiante</th>
+                <th className="px-4 py-3">Username</th>
                 <th className="px-4 py-3">Correo</th>
                 <th className="px-4 py-3">Carrera</th>
                 <th className="px-4 py-3">Sem.</th>
@@ -181,6 +187,7 @@ function StudentsAdmin() {
               {filtered.map((s) => (
                 <tr key={s.id} className="hover:bg-secondary/30">
                   <td className="px-4 py-2.5 font-medium text-foreground">{s.full_name}</td>
+                  <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground">{s.username ? "@" + s.username : "—"}</td>
                   <td className="px-4 py-2.5 text-muted-foreground">{s.email ?? "—"}</td>
                   <td className="px-4 py-2.5 text-muted-foreground">{s.carrera ?? "—"}</td>
                   <td className="px-4 py-2.5 text-muted-foreground">{s.semestre ?? "—"}</td>
@@ -233,8 +240,13 @@ function EditDialog({ student, lines, onClose, onSaved }: { student: Student | n
   if (!student) return null;
 
   const save = async () => {
+    const uname = (form.username ?? "").trim().toLowerCase();
+    if (!USERNAME_RE.test(uname)) {
+      return toast.error("Username inválido: 3-30 caracteres a-z, 0-9, _ o .");
+    }
     const { error } = await supabase.from("profiles").update({
       full_name: form.full_name ?? "",
+      username: uname,
       carrera: form.carrera || null,
       semestre: form.semestre || null,
       paralelo: form.paralelo || null,
@@ -242,7 +254,14 @@ function EditDialog({ student, lines, onClose, onSaved }: { student: Student | n
       interest_line_id: form.interest_line_id || null,
       is_active: form.is_active ?? true,
     }).eq("id", student.id);
-    if (error) return toast.error(error.message);
+    if (error) {
+      const msg = error.code === "23505" || error.message.includes("profiles_username_key")
+        ? "Ese username ya está en uso"
+        : error.message.includes("profiles_username_format_chk")
+        ? "Username inválido: 3-30 caracteres a-z, 0-9, _ o ."
+        : error.message;
+      return toast.error(msg);
+    }
     toast.success("Estudiante actualizado");
     onSaved();
   };
@@ -256,6 +275,16 @@ function EditDialog({ student, lines, onClose, onSaved }: { student: Student | n
         <div className="grid gap-3">
           <Field label="Nombre completo">
             <Input value={form.full_name ?? ""} onChange={(e) => setForm({ ...form, full_name: e.target.value })} />
+          </Field>
+          <Field label="Username">
+            <Input
+              value={form.username ?? ""}
+              onChange={(e) => setForm({ ...form, username: e.target.value.toLowerCase() })}
+              maxLength={30}
+              placeholder="ej: juan.perez"
+              className="font-mono"
+            />
+            <p className="mt-1 text-[11px] text-muted-foreground">3-30 caracteres: a-z, 0-9, _ o .</p>
           </Field>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Carrera">
