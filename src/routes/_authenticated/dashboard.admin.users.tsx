@@ -18,6 +18,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/admin/users")({
 interface UserRow {
   id: string;
   full_name: string;
+  username: string | null;
   email: string | null;
   is_active: boolean;
   carrera: string | null;
@@ -46,7 +47,7 @@ function UsersAdmin() {
   const load = async () => {
     setLoading(true);
     const [profs, ur, ls, pr, members, authUsers] = await Promise.all([
-      supabase.from("profiles").select("id, full_name, email, is_active, carrera, semestre, interest_line_id"),
+      supabase.from("profiles").select("id, full_name, username, email, is_active, carrera, semestre, interest_line_id"),
       supabase.from("user_roles").select("user_id, role"),
       supabase.from("research_lines").select("id, title").order("display_order"),
       supabase.from("projects").select("id, title").order("title"),
@@ -77,6 +78,7 @@ function UsersAdmin() {
       (profs.data ?? []).map((p) => ({
         id: p.id,
         full_name: p.full_name || "(sin nombre)",
+        username: p.username,
         email: p.email || authMap.get(p.id)?.email || null,
         is_active: p.is_active ?? true,
         carrera: p.carrera,
@@ -96,7 +98,7 @@ function UsersAdmin() {
 
   const filtered = useMemo(() => {
     return users.filter((u) => {
-      if (q && !`${u.full_name} ${u.email}`.toLowerCase().includes(q.toLowerCase())) return false;
+      if (q && !`${u.full_name} ${u.email} ${u.username ?? ""}`.toLowerCase().includes(q.toLowerCase())) return false;
       if (roleFilter !== "all" && !u.roles.includes(roleFilter as AppRole)) return false;
       if (statusFilter === "active" && !u.is_active) return false;
       if (statusFilter === "inactive" && u.is_active) return false;
@@ -158,7 +160,7 @@ function UsersAdmin() {
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative min-w-[220px] flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Buscar por nombre o correo..." value={q} onChange={(e) => setQ(e.target.value)} className="pl-9" />
+            <Input placeholder="Buscar por nombre, username o correo..." value={q} onChange={(e) => setQ(e.target.value)} className="pl-9" />
           </div>
           <Select value={roleFilter} onValueChange={setRoleFilter}>
             <SelectTrigger className="w-[160px]"><SelectValue /></SelectTrigger>
@@ -196,7 +198,11 @@ function UsersAdmin() {
                       <p className="font-medium text-foreground">{u.full_name}</p>
                       {!u.is_active && <Badge variant="outline" className="border-destructive/40 text-destructive">Inactivo</Badge>}
                     </div>
-                    <p className="text-xs text-muted-foreground">{u.email ?? "(sin correo)"}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {u.username ? <span className="font-mono text-primary">@{u.username}</span> : <span className="italic">sin username</span>}
+                      <span className="mx-1.5">·</span>
+                      {u.email ?? "(sin correo)"}
+                    </p>
                     <p className="mt-1 text-[11px] text-muted-foreground">
                       Último acceso: {u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleString("es-EC") : "nunca"}
                     </p>
