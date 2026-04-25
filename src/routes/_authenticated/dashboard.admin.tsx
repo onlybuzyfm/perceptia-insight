@@ -54,6 +54,15 @@ function AdminDashboard() {
 
   const toggleRole = async (userId: string, role: AppRole, has: boolean) => {
     if (has) {
+      // Protección: no permitir que un admin se quite el rol admin a sí mismo si es el único admin
+      if (role === "admin" && userId === auth.user?.id) {
+        const adminCount = users.filter((u) => u.roles.includes("admin")).length;
+        if (adminCount <= 1) {
+          return toast.error("No puedes quitarte el rol de admin: eres el único administrador.");
+        }
+        const ok = window.confirm("¿Seguro que quieres quitarte el rol de admin? Perderás acceso a esta sección.");
+        if (!ok) return;
+      }
       const { error } = await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", role);
       if (error) return toast.error(error.message);
     } else {
