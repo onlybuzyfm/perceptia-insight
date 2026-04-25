@@ -41,15 +41,12 @@ function HomePage() {
               <span className="h-1.5 w-1.5 rounded-full bg-primary" />
               {HERO.subtitle}
             </span>
-            <h1 className="mt-5 font-display text-5xl font-bold leading-[1.05] text-foreground sm:text-6xl lg:text-7xl">
-              Percept<span className="text-primary">IA</span>
+            <h1 className="mt-5 font-display text-4xl font-bold leading-[1.1] text-foreground sm:text-5xl lg:text-6xl">
+              Percepción artificial para <span className="text-primary">entornos reales</span>.
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
               {HERO.tagline}
             </p>
-            <blockquote className="mt-6 border-l-2 border-primary/40 pl-4 text-sm italic text-foreground/80">
-              “{HERO.quote}”
-            </blockquote>
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
