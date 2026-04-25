@@ -16,7 +16,14 @@ import { Route as LineasRouteImport } from './routes/lineas'
 import { Route as IntegrantesRouteImport } from './routes/integrantes'
 import { Route as ContactoRouteImport } from './routes/contacto'
 import { Route as ActividadesRouteImport } from './routes/actividades'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedWeeklyUpdatesRouteImport } from './routes/_authenticated/weekly-updates'
+import { Route as AuthenticatedResourcesRouteImport } from './routes/_authenticated/resources'
+import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
+import { Route as AuthenticatedDashboardStudentRouteImport } from './routes/_authenticated/dashboard.student'
+import { Route as AuthenticatedDashboardCoordinatorRouteImport } from './routes/_authenticated/dashboard.coordinator'
+import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated/dashboard.admin'
 
 const SobreRoute = SobreRouteImport.update({
   id: '/sobre',
@@ -53,11 +60,50 @@ const ActividadesRoute = ActividadesRouteImport.update({
   path: '/actividades',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedWeeklyUpdatesRoute =
+  AuthenticatedWeeklyUpdatesRouteImport.update({
+    id: '/weekly-updates',
+    path: '/weekly-updates',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedResourcesRoute = AuthenticatedResourcesRouteImport.update({
+  id: '/resources',
+  path: '/resources',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDashboardIndexRoute =
+  AuthenticatedDashboardIndexRouteImport.update({
+    id: '/dashboard/',
+    path: '/dashboard/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardStudentRoute =
+  AuthenticatedDashboardStudentRouteImport.update({
+    id: '/dashboard/student',
+    path: '/dashboard/student',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardCoordinatorRoute =
+  AuthenticatedDashboardCoordinatorRouteImport.update({
+    id: '/dashboard/coordinator',
+    path: '/dashboard/coordinator',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardAdminRoute =
+  AuthenticatedDashboardAdminRouteImport.update({
+    id: '/dashboard/admin',
+    path: '/dashboard/admin',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -68,6 +114,12 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/proyectos': typeof ProyectosRoute
   '/sobre': typeof SobreRoute
+  '/resources': typeof AuthenticatedResourcesRoute
+  '/weekly-updates': typeof AuthenticatedWeeklyUpdatesRoute
+  '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
+  '/dashboard/coordinator': typeof AuthenticatedDashboardCoordinatorRoute
+  '/dashboard/student': typeof AuthenticatedDashboardStudentRoute
+  '/dashboard/': typeof AuthenticatedDashboardIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -78,10 +130,17 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/proyectos': typeof ProyectosRoute
   '/sobre': typeof SobreRoute
+  '/resources': typeof AuthenticatedResourcesRoute
+  '/weekly-updates': typeof AuthenticatedWeeklyUpdatesRoute
+  '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
+  '/dashboard/coordinator': typeof AuthenticatedDashboardCoordinatorRoute
+  '/dashboard/student': typeof AuthenticatedDashboardStudentRoute
+  '/dashboard': typeof AuthenticatedDashboardIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/actividades': typeof ActividadesRoute
   '/contacto': typeof ContactoRoute
   '/integrantes': typeof IntegrantesRoute
@@ -89,6 +148,12 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/proyectos': typeof ProyectosRoute
   '/sobre': typeof SobreRoute
+  '/_authenticated/resources': typeof AuthenticatedResourcesRoute
+  '/_authenticated/weekly-updates': typeof AuthenticatedWeeklyUpdatesRoute
+  '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
+  '/_authenticated/dashboard/coordinator': typeof AuthenticatedDashboardCoordinatorRoute
+  '/_authenticated/dashboard/student': typeof AuthenticatedDashboardStudentRoute
+  '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -101,6 +166,12 @@ export interface FileRouteTypes {
     | '/login'
     | '/proyectos'
     | '/sobre'
+    | '/resources'
+    | '/weekly-updates'
+    | '/dashboard/admin'
+    | '/dashboard/coordinator'
+    | '/dashboard/student'
+    | '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -111,9 +182,16 @@ export interface FileRouteTypes {
     | '/login'
     | '/proyectos'
     | '/sobre'
+    | '/resources'
+    | '/weekly-updates'
+    | '/dashboard/admin'
+    | '/dashboard/coordinator'
+    | '/dashboard/student'
+    | '/dashboard'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/actividades'
     | '/contacto'
     | '/integrantes'
@@ -121,10 +199,17 @@ export interface FileRouteTypes {
     | '/login'
     | '/proyectos'
     | '/sobre'
+    | '/_authenticated/resources'
+    | '/_authenticated/weekly-updates'
+    | '/_authenticated/dashboard/admin'
+    | '/_authenticated/dashboard/coordinator'
+    | '/_authenticated/dashboard/student'
+    | '/_authenticated/dashboard/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   ActividadesRoute: typeof ActividadesRoute
   ContactoRoute: typeof ContactoRoute
   IntegrantesRoute: typeof IntegrantesRoute
@@ -185,6 +270,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ActividadesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -192,11 +284,77 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/weekly-updates': {
+      id: '/_authenticated/weekly-updates'
+      path: '/weekly-updates'
+      fullPath: '/weekly-updates'
+      preLoaderRoute: typeof AuthenticatedWeeklyUpdatesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/resources': {
+      id: '/_authenticated/resources'
+      path: '/resources'
+      fullPath: '/resources'
+      preLoaderRoute: typeof AuthenticatedResourcesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/': {
+      id: '/_authenticated/dashboard/'
+      path: '/dashboard'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/student': {
+      id: '/_authenticated/dashboard/student'
+      path: '/dashboard/student'
+      fullPath: '/dashboard/student'
+      preLoaderRoute: typeof AuthenticatedDashboardStudentRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/coordinator': {
+      id: '/_authenticated/dashboard/coordinator'
+      path: '/dashboard/coordinator'
+      fullPath: '/dashboard/coordinator'
+      preLoaderRoute: typeof AuthenticatedDashboardCoordinatorRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/admin': {
+      id: '/_authenticated/dashboard/admin'
+      path: '/dashboard/admin'
+      fullPath: '/dashboard/admin'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedResourcesRoute: typeof AuthenticatedResourcesRoute
+  AuthenticatedWeeklyUpdatesRoute: typeof AuthenticatedWeeklyUpdatesRoute
+  AuthenticatedDashboardAdminRoute: typeof AuthenticatedDashboardAdminRoute
+  AuthenticatedDashboardCoordinatorRoute: typeof AuthenticatedDashboardCoordinatorRoute
+  AuthenticatedDashboardStudentRoute: typeof AuthenticatedDashboardStudentRoute
+  AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedResourcesRoute: AuthenticatedResourcesRoute,
+  AuthenticatedWeeklyUpdatesRoute: AuthenticatedWeeklyUpdatesRoute,
+  AuthenticatedDashboardAdminRoute: AuthenticatedDashboardAdminRoute,
+  AuthenticatedDashboardCoordinatorRoute:
+    AuthenticatedDashboardCoordinatorRoute,
+  AuthenticatedDashboardStudentRoute: AuthenticatedDashboardStudentRoute,
+  AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   ActividadesRoute: ActividadesRoute,
   ContactoRoute: ContactoRoute,
   IntegrantesRoute: IntegrantesRoute,
@@ -208,12 +366,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
