@@ -28,9 +28,15 @@ const signInSchema = z.object({
   password: z.string().min(6, "Mínimo 6 caracteres").max(128),
 });
 
-const signUpSchema = signInSchema.extend({
-  full_name: z.string().trim().min(2, "Ingresa tu nombre").max(120),
-});
+const signUpSchema = signInSchema
+  .extend({
+    full_name: z.string().trim().min(2, "Ingresa tu nombre").max(120),
+    confirm_password: z.string().min(6, "Confirma tu contraseña").max(128),
+  })
+  .refine((d) => d.password === d.confirm_password, {
+    message: "Las contraseñas no coinciden",
+    path: ["confirm_password"],
+  });
 
 function LoginPage() {
   const auth = useAuth();
