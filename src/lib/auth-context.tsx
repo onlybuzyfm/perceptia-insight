@@ -14,7 +14,7 @@ export interface AuthState {
   hasAnyRole: (roles: AppRole[]) => boolean;
   isStaff: () => boolean;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
-  signUp: (email: string, password: string, fullName: string) => Promise<{ error: string | null }>;
+  signUp: (email: string, password: string, fullName: string, username: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: string | null }>;
   refreshRoles: () => Promise<void>;
@@ -73,12 +73,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       return { error: error?.message ?? null };
     },
-    signUp: async (email, password, fullName) => {
+    signUp: async (email, password, fullName, username) => {
       const redirectTo = typeof window !== "undefined" ? `${window.location.origin}/dashboard` : undefined;
       const { error } = await supabase.auth.signUp({
         email,
         password,
-        options: { emailRedirectTo: redirectTo, data: { full_name: fullName } },
+        options: { emailRedirectTo: redirectTo, data: { full_name: fullName, username } },
       });
       return { error: error?.message ?? null };
     },
