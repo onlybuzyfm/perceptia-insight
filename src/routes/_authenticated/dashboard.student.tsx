@@ -170,7 +170,19 @@ function StudentDashboard() {
 
         {loading ? (
           <p className="mt-4 text-sm text-muted-foreground">Cargando...</p>
-        ) : !editing ? (
+        ) : (
+          <>
+            <div className="mt-5 border-y border-border/60 py-5">
+              <AvatarUploader
+                userId={auth.user!.id}
+                avatarUrl={profile.avatar_url}
+                onChange={(url) => {
+                  setProfile((p) => ({ ...p, avatar_url: url }));
+                  setDraft((d) => ({ ...d, avatar_url: url }));
+                }}
+              />
+            </div>
+            {!editing ? (
           <dl className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
             <Field label="Nombre" value={profile.full_name} />
             <Field label="Username" value={profile.username ? "@" + profile.username : null} />
