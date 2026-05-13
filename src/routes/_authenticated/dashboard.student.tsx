@@ -8,14 +8,27 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DashboardShell } from "@/components/DashboardShell";
 import { AvatarUploader } from "@/components/AvatarUploader";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Pencil, Save, X } from "lucide-react";
+import { Pencil, Save, X, Network, Eye, Cpu, Brain, Users, Trophy, Tag, Upload, ExternalLink, Calendar, MapPin, type LucideIcon } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/student")({
   component: StudentDashboard,
 });
+
+const TEAM_ICONS: Record<string, { icon: LucideIcon; color: string; bg: string }> = {
+  nexus: { icon: Network, color: "text-violet-600", bg: "bg-violet-100" },
+  prisma: { icon: Eye, color: "text-sky-600", bg: "bg-sky-100" },
+  vector: { icon: Cpu, color: "text-emerald-600", bg: "bg-emerald-100" },
+  sinapsis: { icon: Brain, color: "text-amber-600", bg: "bg-amber-100" },
+};
+
+const TOOLS = [
+  { name: "Etiquetador", description: "CVAT — anotación de imágenes y video.", url: "https://cvat.perceptia.dev/auth/login", icon: Tag, active: true },
+  { name: "Uploader", description: "Carga masiva de datasets.", url: null as string | null, icon: Upload, active: false },
+];
 
 interface ProjectRow {
   id: string;
@@ -23,6 +36,17 @@ interface ProjectRow {
   description: string;
   status: string;
 }
+
+interface TeamInfo {
+  id: string;
+  name: string;
+  slug: string;
+  focus: string | null;
+  description: string;
+}
+
+interface Mate { user_id: string; full_name: string; username: string | null; avatar_url: string | null; role_in_team: string }
+interface CompetitionRow { id: string; name: string; description: string; url: string | null; event_date: string | null; location: string | null; result: string | null }
 
 interface ProfileData {
   full_name: string;
@@ -53,6 +77,9 @@ const USERNAME_RE = /^[a-z0-9_.]{3,30}$/;
 function StudentDashboard() {
   const auth = useAuth();
   const [projects, setProjects] = useState<ProjectRow[]>([]);
+  const [team, setTeam] = useState<TeamInfo | null>(null);
+  const [mates, setMates] = useState<Mate[]>([]);
+  const [competitions, setCompetitions] = useState<CompetitionRow[]>([]);
   const [profile, setProfile] = useState<ProfileData>(EMPTY_PROFILE);
   const [draft, setDraft] = useState<ProfileData>(EMPTY_PROFILE);
   const [editing, setEditing] = useState(false);
@@ -62,21 +89,77 @@ function StudentDashboard() {
   useEffect(() => {
     if (!auth.user) return;
     (async () => {
-      const [pm, prof] = await Promise.all([
+      const uid = auth.user!.id;
+      const [pm, prof, tm] = await Promise.all([
         supabase
           .from("project_members")
           .select("project_id, projects(id, title, description, status)")
-          .eq("user_id", auth.user!.id),
+          .eq("user_id", uid),
         supabase
           .from("profiles")
           .select("full_name, username, carrera, semestre, phone, bio, github_url, linkedin_url, avatar_url")
-          .eq("id", auth.user!.id)
+          .eq("id", uid)
+          .maybeSingle(),
+        supabase
+          .from("team_members")
+          .select("team_id, teams(id, name, slug, focus, description)")
+          .eq("user_id", uid)
           .maybeSingle(),
       ]);
-      const list: ProjectRow[] = (pm.data ?? [])
-        .map((r) => r.projects as ProjectRow | null)
-        .filter((p): p is ProjectRow => !!p);
-      setProjects(list);
+
+      const projMap = new Map<string, ProjectRow>();
+      (pm.data ?? []).forEach((r) => {
+        const p = r.projects as ProjectRow | null;
+        if (p) projMap.set(p.id, p);
+      });
+
+      const teamData = (tm.data?.teams ?? null) as TeamInfo | null;
+      setTeam(teamData);
+
+      if (teamData) {
+        const [tMembers, tProj, tComp] = await Promise.all([
+          supabase
+            .from("team_members")
+            .select("user_id, role_in_team, profiles:user_id(full_name, username, avatar_url)")
+            .eq("team_id", teamData.id),
+          supabase
+            .from("team_projects")
+            .select("projects(id, title, description, status)")
+            .eq("team_id", teamData.id),
+          supabase
+            .from("team_competitions")
+            .select("result, competitions(id, name, description, url, event_date, location)")
+            .eq("team_id", teamData.id),
+        ]);
+        setMates(
+          (tMembers.data ?? [])
+            .filter((r) => r.user_id !== uid)
+            .map((r) => {
+              const p = (r.profiles ?? {}) as { full_name?: string; username?: string | null; avatar_url?: string | null };
+              return {
+                user_id: r.user_id,
+                full_name: p.full_name ?? "",
+                username: p.username ?? null,
+                avatar_url: p.avatar_url ?? null,
+                role_in_team: r.role_in_team,
+              };
+            }),
+        );
+        (tProj.data ?? []).forEach((r) => {
+          const p = r.projects as ProjectRow | null;
+          if (p) projMap.set(p.id, p);
+        });
+        setCompetitions(
+          (tComp.data ?? [])
+            .map((r) => {
+              const c = r.competitions as Omit<CompetitionRow, "result"> | null;
+              return c ? { ...c, result: r.result } : null;
+            })
+            .filter((c): c is CompetitionRow => !!c),
+        );
+      }
+
+      setProjects(Array.from(projMap.values()));
       const data: ProfileData = {
         full_name: prof.data?.full_name ?? "",
         username: prof.data?.username ?? "",
@@ -227,13 +310,15 @@ function StudentDashboard() {
         )}
       </Card>
 
+      <TeamCard team={team} mates={mates} loading={loading} />
+
       <Card className="mt-6 border-border/70 p-6">
-        <h2 className="font-display text-lg font-semibold text-foreground">Proyectos asignados</h2>
+        <h2 className="font-display text-lg font-semibold text-foreground">Proyectos</h2>
         {loading ? (
           <p className="mt-3 text-sm text-muted-foreground">Cargando...</p>
         ) : projects.length === 0 ? (
           <p className="mt-3 text-sm text-muted-foreground">
-            Aún no tienes un proyecto asignado. Contacta a tu coordinador.
+            Aún no tienes proyectos asignados. Contacta a tu coordinador.
           </p>
         ) : (
           <ul className="mt-4 space-y-3">
@@ -249,7 +334,140 @@ function StudentDashboard() {
           </ul>
         )}
       </Card>
+
+      <CompetitionsCard competitions={competitions} loading={loading} hasTeam={!!team} />
+
+      <ToolsCard />
     </DashboardShell>
+  );
+}
+
+function TeamCard({ team, mates, loading }: { team: TeamInfo | null; mates: Mate[]; loading: boolean }) {
+  const meta = team ? TEAM_ICONS[team.slug] ?? { icon: Users, color: "text-primary", bg: "bg-primary-soft" } : null;
+  const Icon = meta?.icon ?? Users;
+  return (
+    <Card className="mt-6 border-border/70 p-6">
+      <h2 className="font-display text-lg font-semibold text-foreground">Mi equipo</h2>
+      {loading ? (
+        <p className="mt-3 text-sm text-muted-foreground">Cargando...</p>
+      ) : !team ? (
+        <p className="mt-3 text-sm text-muted-foreground">
+          Aún no estás asignado a un equipo. El administrador te asignará pronto.
+        </p>
+      ) : (
+        <>
+          <div className="mt-4 flex items-start gap-3">
+            <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${meta?.bg ?? "bg-primary-soft"} ${meta?.color ?? "text-primary"}`}>
+              <Icon className="h-6 w-6" />
+            </div>
+            <div className="min-w-0">
+              <h3 className="font-display text-xl font-semibold text-foreground">{team.name}</h3>
+              {team.focus && <p className="text-sm text-muted-foreground">{team.focus}</p>}
+              {team.description && <p className="mt-1 text-sm text-muted-foreground">{team.description}</p>}
+            </div>
+          </div>
+          <div className="mt-5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Compañeros</p>
+            {mates.length === 0 ? (
+              <p className="mt-2 text-sm text-muted-foreground">Eres el único miembro por ahora.</p>
+            ) : (
+              <ul className="mt-2 grid gap-2 sm:grid-cols-2">
+                {mates.map((m) => {
+                  const initials = (m.full_name || m.username || "?").split(/\s+/).slice(0, 2).map((s) => s[0]?.toUpperCase()).join("");
+                  return (
+                    <li key={m.user_id} className="flex items-center gap-2.5 rounded-lg border border-border/60 p-2.5">
+                      <Avatar className="h-8 w-8">
+                        {m.avatar_url && <AvatarImage src={m.avatar_url} alt={m.full_name} />}
+                        <AvatarFallback className="bg-primary-soft text-xs font-semibold text-primary">{initials || "?"}</AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-foreground">{m.full_name || m.username}</p>
+                        <p className="truncate text-xs text-muted-foreground">{m.role_in_team}</p>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        </>
+      )}
+    </Card>
+  );
+}
+
+function CompetitionsCard({ competitions, loading, hasTeam }: { competitions: CompetitionRow[]; loading: boolean; hasTeam: boolean }) {
+  return (
+    <Card className="mt-6 border-border/70 p-6">
+      <div className="flex items-center gap-2">
+        <Trophy className="h-5 w-5 text-amber-600" />
+        <h2 className="font-display text-lg font-semibold text-foreground">Competencias del equipo</h2>
+      </div>
+      {loading ? (
+        <p className="mt-3 text-sm text-muted-foreground">Cargando...</p>
+      ) : !hasTeam ? (
+        <p className="mt-3 text-sm text-muted-foreground">Te aparecerán cuando seas asignado a un equipo.</p>
+      ) : competitions.length === 0 ? (
+        <p className="mt-3 text-sm text-muted-foreground">Tu equipo aún no tiene competencias asignadas.</p>
+      ) : (
+        <ul className="mt-4 space-y-3">
+          {competitions.map((c) => (
+            <li key={c.id} className="rounded-lg border border-border/60 p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <h3 className="font-semibold text-foreground">{c.name}</h3>
+                  {c.description && <p className="mt-0.5 text-sm text-muted-foreground">{c.description}</p>}
+                  <div className="mt-2 flex flex-wrap gap-3 text-xs text-muted-foreground">
+                    {c.event_date && <span className="inline-flex items-center gap-1"><Calendar className="h-3.5 w-3.5" />{new Date(c.event_date).toLocaleDateString()}</span>}
+                    {c.location && <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{c.location}</span>}
+                    {c.url && <a href={c.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline"><ExternalLink className="h-3.5 w-3.5" />Sitio</a>}
+                  </div>
+                </div>
+                {c.result && <Badge variant="outline" className="border-amber-300 text-amber-700">{c.result}</Badge>}
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </Card>
+  );
+}
+
+function ToolsCard() {
+  return (
+    <Card className="mt-6 border-border/70 p-6">
+      <h2 className="font-display text-lg font-semibold text-foreground">Herramientas</h2>
+      <p className="mt-1 text-xs text-muted-foreground">Accesos a las plataformas internas del laboratorio.</p>
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        {TOOLS.map((t) => {
+          const Icon = t.icon;
+          const inner = (
+            <div className={`group rounded-lg border border-border/60 p-4 transition-all ${t.active ? "hover:border-primary/40 hover:shadow-sm" : "opacity-60"}`}>
+              <div className="flex items-start justify-between">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-soft text-primary">
+                  <Icon className="h-5 w-5" />
+                </div>
+                {t.active ? (
+                  <Badge variant="outline" className="border-primary/40 text-primary">Activo</Badge>
+                ) : (
+                  <Badge variant="outline" className="border-border text-muted-foreground">Próximamente</Badge>
+                )}
+              </div>
+              <div className="mt-3 flex items-center gap-1.5">
+                <h3 className="font-semibold text-foreground">{t.name}</h3>
+                {t.active && <ExternalLink className="h-3.5 w-3.5 text-muted-foreground transition-colors group-hover:text-primary" />}
+              </div>
+              <p className="mt-1 text-sm text-muted-foreground">{t.description}</p>
+            </div>
+          );
+          return t.active && t.url ? (
+            <a key={t.name} href={t.url} target="_blank" rel="noopener noreferrer">{inner}</a>
+          ) : (
+            <div key={t.name}>{inner}</div>
+          );
+        })}
+      </div>
+    </Card>
   );
 }
 
