@@ -202,6 +202,38 @@ function LoginPage() {
                     <p className="mt-1 text-[11px] text-muted-foreground">3-30 caracteres: a-z, 0-9, _ o .</p>
                     {errors.username && <p className="mt-1 text-xs text-destructive">{errors.username}</p>}
                   </div>
+                  <div>
+                    <Label>Foto de perfil (opcional)</Label>
+                    <div className="mt-1.5 flex items-center gap-3">
+                      <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border/60 bg-primary-soft text-primary">
+                        {avatarPreview ? (
+                          <img src={avatarPreview} alt="Vista previa" className="h-full w-full object-cover" />
+                        ) : (
+                          <UserIcon className="h-5 w-5" />
+                        )}
+                      </div>
+                      <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-input bg-background px-3 py-1.5 text-xs font-medium hover:bg-secondary">
+                        <Camera className="h-3.5 w-3.5" />
+                        {avatarPreview ? "Cambiar" : "Subir foto"}
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp,image/gif"
+                          className="hidden"
+                          onChange={(e) => onAvatarChange(e.target.files?.[0] ?? null)}
+                        />
+                      </label>
+                      {avatarPreview && (
+                        <button
+                          type="button"
+                          onClick={() => onAvatarChange(null)}
+                          className="text-xs text-destructive hover:underline"
+                        >
+                          <XIcon className="inline h-3 w-3" /> Quitar
+                        </button>
+                      )}
+                    </div>
+                    <p className="mt-1 text-[11px] text-muted-foreground">JPG, PNG, WEBP o GIF. Máx 2 MB.</p>
+                  </div>
                 </>
               )}
               <div>
