@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { NodeBackdrop } from "@/components/NodeBackdrop";
 import { useAuth } from "@/lib/auth-context";
 import logo from "@/assets/perceptia-logo.svg";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Camera, Loader2, User as UserIcon, X as XIcon } from "lucide-react";
 
 
 export const Route = createFileRoute("/login")({
@@ -52,6 +52,25 @@ function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [forgotSent, setForgotSent] = useState(false);
   const [signupSent, setSignupSent] = useState(false);
+  const [signupAvatarUploaded, setSignupAvatarUploaded] = useState(false);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+
+  const onAvatarChange = (file: File | null) => {
+    if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+    if (!file) {
+      setAvatarFile(null);
+      setAvatarPreview(null);
+      return;
+    }
+    if (!file.type.startsWith("image/")) return;
+    if (file.size > 2 * 1024 * 1024) {
+      setGlobalError("La foto debe pesar menos de 2 MB");
+      return;
+    }
+    setAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
+  };
 
   useEffect(() => {
     if (auth.isAuthenticated) {
