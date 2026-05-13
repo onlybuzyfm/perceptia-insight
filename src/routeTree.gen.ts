@@ -22,6 +22,7 @@ import { Route as AuthenticatedWeeklyUpdatesRouteImport } from './routes/_authen
 import { Route as AuthenticatedResourcesRouteImport } from './routes/_authenticated/resources'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedDashboardStudentRouteImport } from './routes/_authenticated/dashboard.student'
+import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
 import { Route as AuthenticatedDashboardCoordinatorRouteImport } from './routes/_authenticated/dashboard.coordinator'
 import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated/dashboard.admin'
 import { Route as AuthenticatedDashboardAdminIndexRouteImport } from './routes/_authenticated/dashboard.admin.index'
@@ -100,6 +101,12 @@ const AuthenticatedDashboardStudentRoute =
     path: '/dashboard/student',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardSettingsRoute =
+  AuthenticatedDashboardSettingsRouteImport.update({
+    id: '/dashboard/settings',
+    path: '/dashboard/settings',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardCoordinatorRoute =
   AuthenticatedDashboardCoordinatorRouteImport.update({
     id: '/dashboard/coordinator',
@@ -174,6 +181,7 @@ export interface FileRoutesByFullPath {
   '/weekly-updates': typeof AuthenticatedWeeklyUpdatesRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/coordinator': typeof AuthenticatedDashboardCoordinatorRoute
+  '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/dashboard/student': typeof AuthenticatedDashboardStudentRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/admin/competitions': typeof AuthenticatedDashboardAdminCompetitionsRoute
@@ -197,6 +205,7 @@ export interface FileRoutesByTo {
   '/resources': typeof AuthenticatedResourcesRoute
   '/weekly-updates': typeof AuthenticatedWeeklyUpdatesRoute
   '/dashboard/coordinator': typeof AuthenticatedDashboardCoordinatorRoute
+  '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/dashboard/student': typeof AuthenticatedDashboardStudentRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/admin/competitions': typeof AuthenticatedDashboardAdminCompetitionsRoute
@@ -223,6 +232,7 @@ export interface FileRoutesById {
   '/_authenticated/weekly-updates': typeof AuthenticatedWeeklyUpdatesRoute
   '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/_authenticated/dashboard/coordinator': typeof AuthenticatedDashboardCoordinatorRoute
+  '/_authenticated/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/_authenticated/dashboard/student': typeof AuthenticatedDashboardStudentRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/admin/competitions': typeof AuthenticatedDashboardAdminCompetitionsRoute
@@ -249,6 +259,7 @@ export interface FileRouteTypes {
     | '/weekly-updates'
     | '/dashboard/admin'
     | '/dashboard/coordinator'
+    | '/dashboard/settings'
     | '/dashboard/student'
     | '/dashboard/'
     | '/dashboard/admin/competitions'
@@ -272,6 +283,7 @@ export interface FileRouteTypes {
     | '/resources'
     | '/weekly-updates'
     | '/dashboard/coordinator'
+    | '/dashboard/settings'
     | '/dashboard/student'
     | '/dashboard'
     | '/dashboard/admin/competitions'
@@ -297,6 +309,7 @@ export interface FileRouteTypes {
     | '/_authenticated/weekly-updates'
     | '/_authenticated/dashboard/admin'
     | '/_authenticated/dashboard/coordinator'
+    | '/_authenticated/dashboard/settings'
     | '/_authenticated/dashboard/student'
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/admin/competitions'
@@ -414,6 +427,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardStudentRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/settings': {
+      id: '/_authenticated/dashboard/settings'
+      path: '/dashboard/settings'
+      fullPath: '/dashboard/settings'
+      preLoaderRoute: typeof AuthenticatedDashboardSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/coordinator': {
       id: '/_authenticated/dashboard/coordinator'
       path: '/dashboard/coordinator'
@@ -528,6 +548,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedWeeklyUpdatesRoute: typeof AuthenticatedWeeklyUpdatesRoute
   AuthenticatedDashboardAdminRoute: typeof AuthenticatedDashboardAdminRouteWithChildren
   AuthenticatedDashboardCoordinatorRoute: typeof AuthenticatedDashboardCoordinatorRoute
+  AuthenticatedDashboardSettingsRoute: typeof AuthenticatedDashboardSettingsRoute
   AuthenticatedDashboardStudentRoute: typeof AuthenticatedDashboardStudentRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
 }
@@ -539,6 +560,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardAdminRouteWithChildren,
   AuthenticatedDashboardCoordinatorRoute:
     AuthenticatedDashboardCoordinatorRoute,
+  AuthenticatedDashboardSettingsRoute: AuthenticatedDashboardSettingsRoute,
   AuthenticatedDashboardStudentRoute: AuthenticatedDashboardStudentRoute,
   AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
 }

@@ -88,8 +88,8 @@ export function DashboardShell({ children, title }: { children: ReactNode; title
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/resources" className="cursor-pointer">
-                  <Settings className="mr-2 h-4 w-4" /> Configuración
+                <Link to="/dashboard/settings" className="cursor-pointer">
+                  <Settings className="mr-2 h-4 w-4" /> Ajustes
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />

@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DashboardShell } from "@/components/DashboardShell";
-import { AvatarUploader } from "@/components/AvatarUploader";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
@@ -255,16 +254,6 @@ function StudentDashboard() {
           <p className="mt-4 text-sm text-muted-foreground">Cargando...</p>
         ) : (
           <>
-            <div className="mt-5 border-y border-border/60 py-5">
-              <AvatarUploader
-                userId={auth.user!.id}
-                avatarUrl={profile.avatar_url}
-                onChange={(url) => {
-                  setProfile((p) => ({ ...p, avatar_url: url }));
-                  setDraft((d) => ({ ...d, avatar_url: url }));
-                }}
-              />
-            </div>
             {!editing ? (
           <dl className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
             <Field label="Nombre" value={profile.full_name} />
