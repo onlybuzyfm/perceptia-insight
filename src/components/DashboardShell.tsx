@@ -4,7 +4,7 @@ import { LayoutDashboard, FileText, BookOpen, LogOut, Users, Settings, Graduatio
 import logo from "@/assets/perceptia-logo.svg";
 import { useAuth } from "@/lib/auth-context";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,17 +18,17 @@ import { supabase } from "@/integrations/supabase/client";
 export function DashboardShell({ children, title }: { children: ReactNode; title: string }) {
   const auth = useAuth();
   const navigate = useNavigate();
-  const [profile, setProfile] = useState<{ username: string; full_name: string } | null>(null);
+  const [profile, setProfile] = useState<{ username: string; full_name: string; avatar_url: string | null } | null>(null);
 
   useEffect(() => {
     if (!auth.user) return;
     supabase
       .from("profiles")
-      .select("username, full_name")
+      .select("username, full_name, avatar_url")
       .eq("id", auth.user.id)
       .maybeSingle()
       .then(({ data }) => {
-        if (data) setProfile({ username: data.username ?? "", full_name: data.full_name ?? "" });
+        if (data) setProfile({ username: data.username ?? "", full_name: data.full_name ?? "", avatar_url: data.avatar_url ?? null });
       });
   }, [auth.user]);
 
@@ -65,6 +65,7 @@ export function DashboardShell({ children, title }: { children: ReactNode; title
             <DropdownMenuTrigger asChild>
               <button className="flex items-center gap-2 rounded-full border border-border/60 bg-background px-1.5 py-1 pr-2.5 text-sm transition-colors hover:bg-secondary">
                 <Avatar className="h-7 w-7">
+                  {profile?.avatar_url && <AvatarImage src={profile.avatar_url} alt={displayName} />}
                   <AvatarFallback className="bg-primary-soft text-xs font-semibold text-primary">
                     {initials || <UserIcon className="h-3.5 w-3.5" />}
                   </AvatarFallback>
