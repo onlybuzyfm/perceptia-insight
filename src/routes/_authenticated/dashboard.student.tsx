@@ -314,28 +314,7 @@ function StudentDashboard() {
 
       <TeamCard team={team} mates={mates} loading={loading} />
 
-      <Card className="mt-6 border-border/70 p-6">
-        <h2 className="font-display text-lg font-semibold text-foreground">Proyectos</h2>
-        {loading ? (
-          <p className="mt-3 text-sm text-muted-foreground">Cargando...</p>
-        ) : projects.length === 0 ? (
-          <p className="mt-3 text-sm text-muted-foreground">
-            Aún no tienes proyectos asignados. Contacta a tu coordinador.
-          </p>
-        ) : (
-          <ul className="mt-4 space-y-3">
-            {projects.map((p) => (
-              <li key={p.id} className="rounded-lg border border-border/60 p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <h3 className="font-semibold text-foreground">{p.title}</h3>
-                  <Badge variant="outline">{p.status}</Badge>
-                </div>
-                <p className="mt-1 text-sm text-muted-foreground">{p.description}</p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Card>
+      <ProjectsCard projects={projects} loading={loading} userId={auth.user?.id ?? null} />
 
       <CompetitionsCard competitions={competitions} loading={loading} hasTeam={!!team} />
 
