@@ -173,6 +173,14 @@ function LoginPage() {
                 (y la carpeta de spam) y haz clic en el enlace para activar tu cuenta
                 antes de iniciar sesión.
               </p>
+              {avatarFile && !signupAvatarUploaded && (
+                <p className="mt-3 text-xs text-muted-foreground">
+                  Tu foto se podrá subir después desde <span className="font-semibold">Mi perfil</span> al iniciar sesión.
+                </p>
+              )}
+              {signupAvatarUploaded && (
+                <p className="mt-3 text-xs text-muted-foreground">Foto de perfil guardada ✓</p>
+              )}
               <button
                 onClick={() => { setMode("signin"); setSignupSent(false); }}
                 className="mt-4 block w-full text-xs font-semibold text-primary hover:underline"
