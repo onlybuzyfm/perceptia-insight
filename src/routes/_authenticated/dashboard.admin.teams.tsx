@@ -100,14 +100,9 @@ function TeamsAdmin() {
   return (
     <div className="space-y-4">
       <Card className="border-border/70 bg-white p-4">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <Users className="h-4 w-4 text-primary" />
-            <h2 className="text-sm font-semibold">Equipos del semillero</h2>
-          </div>
-          <Button size="sm" variant="outline" onClick={() => setNewCompOpen(true)}>
-            <Plus className="mr-1.5 h-3.5 w-3.5" /> Nueva competencia
-          </Button>
+        <div className="flex items-center gap-2">
+          <Users className="h-4 w-4 text-primary" />
+          <h2 className="text-sm font-semibold">Equipos del semillero</h2>
         </div>
         <p className="mt-1 text-xs text-muted-foreground">
           Asigna integrantes, proyectos y competencias a cada equipo.
