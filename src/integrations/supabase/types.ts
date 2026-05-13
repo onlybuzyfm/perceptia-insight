@@ -102,9 +102,11 @@ export type Database = {
           id: string
           interest_line_id: string | null
           is_active: boolean
+          is_public_member: boolean
           linkedin_url: string | null
           paralelo: string | null
           phone: string | null
+          public_role: string | null
           semestre: string | null
           updated_at: string
           username: string
@@ -121,9 +123,11 @@ export type Database = {
           id: string
           interest_line_id?: string | null
           is_active?: boolean
+          is_public_member?: boolean
           linkedin_url?: string | null
           paralelo?: string | null
           phone?: string | null
+          public_role?: string | null
           semestre?: string | null
           updated_at?: string
           username: string
@@ -140,9 +144,11 @@ export type Database = {
           id?: string
           interest_line_id?: string | null
           is_active?: boolean
+          is_public_member?: boolean
           linkedin_url?: string | null
           paralelo?: string | null
           phone?: string | null
+          public_role?: string | null
           semestre?: string | null
           updated_at?: string
           username?: string
@@ -385,6 +391,21 @@ export type Database = {
           email: string
           id: string
           last_sign_in_at: string
+        }[]
+      }
+      get_public_members: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          bio: string
+          carrera: string
+          full_name: string
+          github_url: string
+          id: string
+          interest_line_id: string
+          linkedin_url: string
+          public_role: string
+          username: string
         }[]
       }
       has_role: {
