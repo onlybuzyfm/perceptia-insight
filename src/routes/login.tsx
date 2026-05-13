@@ -108,9 +108,10 @@ function LoginPage() {
         return setErrors(fe);
       }
       setLoading(true);
-      const { error } = await auth.signUp(email, password, fullName, username);
+      const { error, needsEmailConfirm } = await auth.signUp(email, password, fullName, username, avatarFile);
       setLoading(false);
       if (error) return setGlobalError(error);
+      setSignupAvatarUploaded(!!avatarFile && !needsEmailConfirm);
       setSignupSent(true);
       return;
     }
