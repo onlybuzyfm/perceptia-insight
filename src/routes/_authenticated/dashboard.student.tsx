@@ -254,6 +254,19 @@ function StudentDashboard() {
           <p className="mt-4 text-sm text-muted-foreground">Cargando...</p>
         ) : (
           <>
+            <div className="mt-5 flex items-center gap-4 border-y border-border/60 py-5">
+              <Avatar className="h-20 w-20">
+                {profile.avatar_url && <AvatarImage src={profile.avatar_url} alt={profile.full_name} />}
+                <AvatarFallback className="bg-primary-soft text-lg font-semibold text-primary">
+                  {(profile.full_name || profile.username || "?").split(/\s+/).slice(0, 2).map((s) => s[0]?.toUpperCase()).join("") || "?"}
+                </AvatarFallback>
+              </Avatar>
+              <div className="min-w-0">
+                <p className="font-display text-base font-semibold text-foreground">{profile.full_name || "—"}</p>
+                {profile.username && <p className="text-sm text-muted-foreground">@{profile.username}</p>}
+                <p className="mt-0.5 text-xs text-muted-foreground">Cambia tu foto desde Ajustes.</p>
+              </div>
+            </div>
             {!editing ? (
           <dl className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
             <Field label="Nombre" value={profile.full_name} />
