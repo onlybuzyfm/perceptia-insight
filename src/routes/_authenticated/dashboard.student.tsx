@@ -76,6 +76,9 @@ const USERNAME_RE = /^[a-z0-9_.]{3,30}$/;
 function StudentDashboard() {
   const auth = useAuth();
   const [projects, setProjects] = useState<ProjectRow[]>([]);
+  const [team, setTeam] = useState<TeamInfo | null>(null);
+  const [mates, setMates] = useState<Mate[]>([]);
+  const [competitions, setCompetitions] = useState<CompetitionRow[]>([]);
   const [profile, setProfile] = useState<ProfileData>(EMPTY_PROFILE);
   const [draft, setDraft] = useState<ProfileData>(EMPTY_PROFILE);
   const [editing, setEditing] = useState(false);
@@ -85,21 +88,77 @@ function StudentDashboard() {
   useEffect(() => {
     if (!auth.user) return;
     (async () => {
-      const [pm, prof] = await Promise.all([
+      const uid = auth.user!.id;
+      const [pm, prof, tm] = await Promise.all([
         supabase
           .from("project_members")
           .select("project_id, projects(id, title, description, status)")
-          .eq("user_id", auth.user!.id),
+          .eq("user_id", uid),
         supabase
           .from("profiles")
           .select("full_name, username, carrera, semestre, phone, bio, github_url, linkedin_url, avatar_url")
-          .eq("id", auth.user!.id)
+          .eq("id", uid)
+          .maybeSingle(),
+        supabase
+          .from("team_members")
+          .select("team_id, teams(id, name, slug, focus, description)")
+          .eq("user_id", uid)
           .maybeSingle(),
       ]);
-      const list: ProjectRow[] = (pm.data ?? [])
-        .map((r) => r.projects as ProjectRow | null)
-        .filter((p): p is ProjectRow => !!p);
-      setProjects(list);
+
+      const projMap = new Map<string, ProjectRow>();
+      (pm.data ?? []).forEach((r) => {
+        const p = r.projects as ProjectRow | null;
+        if (p) projMap.set(p.id, p);
+      });
+
+      const teamData = (tm.data?.teams ?? null) as TeamInfo | null;
+      setTeam(teamData);
+
+      if (teamData) {
+        const [tMembers, tProj, tComp] = await Promise.all([
+          supabase
+            .from("team_members")
+            .select("user_id, role_in_team, profiles:user_id(full_name, username, avatar_url)")
+            .eq("team_id", teamData.id),
+          supabase
+            .from("team_projects")
+            .select("projects(id, title, description, status)")
+            .eq("team_id", teamData.id),
+          supabase
+            .from("team_competitions")
+            .select("result, competitions(id, name, description, url, event_date, location)")
+            .eq("team_id", teamData.id),
+        ]);
+        setMates(
+          (tMembers.data ?? [])
+            .filter((r) => r.user_id !== uid)
+            .map((r) => {
+              const p = (r.profiles ?? {}) as { full_name?: string; username?: string | null; avatar_url?: string | null };
+              return {
+                user_id: r.user_id,
+                full_name: p.full_name ?? "",
+                username: p.username ?? null,
+                avatar_url: p.avatar_url ?? null,
+                role_in_team: r.role_in_team,
+              };
+            }),
+        );
+        (tProj.data ?? []).forEach((r) => {
+          const p = r.projects as ProjectRow | null;
+          if (p) projMap.set(p.id, p);
+        });
+        setCompetitions(
+          (tComp.data ?? [])
+            .map((r) => {
+              const c = r.competitions as Omit<CompetitionRow, "result"> | null;
+              return c ? { ...c, result: r.result } : null;
+            })
+            .filter((c): c is CompetitionRow => !!c),
+        );
+      }
+
+      setProjects(Array.from(projMap.values()));
       const data: ProfileData = {
         full_name: prof.data?.full_name ?? "",
         username: prof.data?.username ?? "",
