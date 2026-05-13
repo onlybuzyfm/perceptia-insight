@@ -222,6 +222,8 @@ function StudentDashboard() {
               />
             </div>
           </div>
+            )}
+          </>
         )}
       </Card>
 
