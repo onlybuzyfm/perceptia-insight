@@ -26,6 +26,8 @@ import { Route as AuthenticatedDashboardCoordinatorRouteImport } from './routes/
 import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated/dashboard.admin'
 import { Route as AuthenticatedDashboardAdminIndexRouteImport } from './routes/_authenticated/dashboard.admin.index'
 import { Route as AuthenticatedDashboardAdminUsersRouteImport } from './routes/_authenticated/dashboard.admin.users'
+import { Route as AuthenticatedDashboardAdminUpdatesRouteImport } from './routes/_authenticated/dashboard.admin.updates'
+import { Route as AuthenticatedDashboardAdminTeamsRouteImport } from './routes/_authenticated/dashboard.admin.teams'
 import { Route as AuthenticatedDashboardAdminStudentsRouteImport } from './routes/_authenticated/dashboard.admin.students'
 import { Route as AuthenticatedDashboardAdminProjectsRouteImport } from './routes/_authenticated/dashboard.admin.projects'
 
@@ -120,6 +122,18 @@ const AuthenticatedDashboardAdminUsersRoute =
     path: '/users',
     getParentRoute: () => AuthenticatedDashboardAdminRoute,
   } as any)
+const AuthenticatedDashboardAdminUpdatesRoute =
+  AuthenticatedDashboardAdminUpdatesRouteImport.update({
+    id: '/updates',
+    path: '/updates',
+    getParentRoute: () => AuthenticatedDashboardAdminRoute,
+  } as any)
+const AuthenticatedDashboardAdminTeamsRoute =
+  AuthenticatedDashboardAdminTeamsRouteImport.update({
+    id: '/teams',
+    path: '/teams',
+    getParentRoute: () => AuthenticatedDashboardAdminRoute,
+  } as any)
 const AuthenticatedDashboardAdminStudentsRoute =
   AuthenticatedDashboardAdminStudentsRouteImport.update({
     id: '/students',
@@ -150,6 +164,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/admin/projects': typeof AuthenticatedDashboardAdminProjectsRoute
   '/dashboard/admin/students': typeof AuthenticatedDashboardAdminStudentsRoute
+  '/dashboard/admin/teams': typeof AuthenticatedDashboardAdminTeamsRoute
+  '/dashboard/admin/updates': typeof AuthenticatedDashboardAdminUpdatesRoute
   '/dashboard/admin/users': typeof AuthenticatedDashboardAdminUsersRoute
   '/dashboard/admin/': typeof AuthenticatedDashboardAdminIndexRoute
 }
@@ -169,6 +185,8 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/admin/projects': typeof AuthenticatedDashboardAdminProjectsRoute
   '/dashboard/admin/students': typeof AuthenticatedDashboardAdminStudentsRoute
+  '/dashboard/admin/teams': typeof AuthenticatedDashboardAdminTeamsRoute
+  '/dashboard/admin/updates': typeof AuthenticatedDashboardAdminUpdatesRoute
   '/dashboard/admin/users': typeof AuthenticatedDashboardAdminUsersRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminIndexRoute
 }
@@ -191,6 +209,8 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/admin/projects': typeof AuthenticatedDashboardAdminProjectsRoute
   '/_authenticated/dashboard/admin/students': typeof AuthenticatedDashboardAdminStudentsRoute
+  '/_authenticated/dashboard/admin/teams': typeof AuthenticatedDashboardAdminTeamsRoute
+  '/_authenticated/dashboard/admin/updates': typeof AuthenticatedDashboardAdminUpdatesRoute
   '/_authenticated/dashboard/admin/users': typeof AuthenticatedDashboardAdminUsersRoute
   '/_authenticated/dashboard/admin/': typeof AuthenticatedDashboardAdminIndexRoute
 }
@@ -213,6 +233,8 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/dashboard/admin/projects'
     | '/dashboard/admin/students'
+    | '/dashboard/admin/teams'
+    | '/dashboard/admin/updates'
     | '/dashboard/admin/users'
     | '/dashboard/admin/'
   fileRoutesByTo: FileRoutesByTo
@@ -232,6 +254,8 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/dashboard/admin/projects'
     | '/dashboard/admin/students'
+    | '/dashboard/admin/teams'
+    | '/dashboard/admin/updates'
     | '/dashboard/admin/users'
     | '/dashboard/admin'
   id:
@@ -253,6 +277,8 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/admin/projects'
     | '/_authenticated/dashboard/admin/students'
+    | '/_authenticated/dashboard/admin/teams'
+    | '/_authenticated/dashboard/admin/updates'
     | '/_authenticated/dashboard/admin/users'
     | '/_authenticated/dashboard/admin/'
   fileRoutesById: FileRoutesById
@@ -390,6 +416,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAdminUsersRouteImport
       parentRoute: typeof AuthenticatedDashboardAdminRoute
     }
+    '/_authenticated/dashboard/admin/updates': {
+      id: '/_authenticated/dashboard/admin/updates'
+      path: '/updates'
+      fullPath: '/dashboard/admin/updates'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminUpdatesRouteImport
+      parentRoute: typeof AuthenticatedDashboardAdminRoute
+    }
+    '/_authenticated/dashboard/admin/teams': {
+      id: '/_authenticated/dashboard/admin/teams'
+      path: '/teams'
+      fullPath: '/dashboard/admin/teams'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminTeamsRouteImport
+      parentRoute: typeof AuthenticatedDashboardAdminRoute
+    }
     '/_authenticated/dashboard/admin/students': {
       id: '/_authenticated/dashboard/admin/students'
       path: '/students'
@@ -410,6 +450,8 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedDashboardAdminRouteChildren {
   AuthenticatedDashboardAdminProjectsRoute: typeof AuthenticatedDashboardAdminProjectsRoute
   AuthenticatedDashboardAdminStudentsRoute: typeof AuthenticatedDashboardAdminStudentsRoute
+  AuthenticatedDashboardAdminTeamsRoute: typeof AuthenticatedDashboardAdminTeamsRoute
+  AuthenticatedDashboardAdminUpdatesRoute: typeof AuthenticatedDashboardAdminUpdatesRoute
   AuthenticatedDashboardAdminUsersRoute: typeof AuthenticatedDashboardAdminUsersRoute
   AuthenticatedDashboardAdminIndexRoute: typeof AuthenticatedDashboardAdminIndexRoute
 }
@@ -420,6 +462,10 @@ const AuthenticatedDashboardAdminRouteChildren: AuthenticatedDashboardAdminRoute
       AuthenticatedDashboardAdminProjectsRoute,
     AuthenticatedDashboardAdminStudentsRoute:
       AuthenticatedDashboardAdminStudentsRoute,
+    AuthenticatedDashboardAdminTeamsRoute:
+      AuthenticatedDashboardAdminTeamsRoute,
+    AuthenticatedDashboardAdminUpdatesRoute:
+      AuthenticatedDashboardAdminUpdatesRoute,
     AuthenticatedDashboardAdminUsersRoute:
       AuthenticatedDashboardAdminUsersRoute,
     AuthenticatedDashboardAdminIndexRoute:
@@ -468,3 +514,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
