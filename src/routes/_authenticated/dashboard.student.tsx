@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Pencil, Save, X, Network, Eye, Cpu, Brain, Users, Trophy, Tag, Upload, ExternalLink, Calendar, MapPin, type LucideIcon } from "lucide-react";
+import { Pencil, Save, X, Network, Eye, Cpu, Brain, Users, Trophy, Tag, Upload, ExternalLink, Calendar, MapPin, Plus, ChevronDown, ChevronUp, type LucideIcon } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/student")({
   component: StudentDashboard,
@@ -314,28 +314,7 @@ function StudentDashboard() {
 
       <TeamCard team={team} mates={mates} loading={loading} />
 
-      <Card className="mt-6 border-border/70 p-6">
-        <h2 className="font-display text-lg font-semibold text-foreground">Proyectos</h2>
-        {loading ? (
-          <p className="mt-3 text-sm text-muted-foreground">Cargando...</p>
-        ) : projects.length === 0 ? (
-          <p className="mt-3 text-sm text-muted-foreground">
-            Aún no tienes proyectos asignados. Contacta a tu coordinador.
-          </p>
-        ) : (
-          <ul className="mt-4 space-y-3">
-            {projects.map((p) => (
-              <li key={p.id} className="rounded-lg border border-border/60 p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <h3 className="font-semibold text-foreground">{p.title}</h3>
-                  <Badge variant="outline">{p.status}</Badge>
-                </div>
-                <p className="mt-1 text-sm text-muted-foreground">{p.description}</p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Card>
+      <ProjectsCard projects={projects} loading={loading} userId={auth.user?.id ?? null} />
 
       <CompetitionsCard competitions={competitions} loading={loading} hasTeam={!!team} />
 
@@ -510,5 +489,156 @@ function FieldInput({
         placeholder={placeholder}
       />
     </div>
+  );
+}
+
+interface UpdateRow {
+  id: string;
+  week_start: string;
+  summary: string;
+  achievements: string | null;
+  blockers: string | null;
+  hours_spent: number | null;
+}
+
+function ProjectsCard({ projects, loading, userId }: { projects: ProjectRow[]; loading: boolean; userId: string | null }) {
+  const [updatesByProject, setUpdatesByProject] = useState<Record<string, UpdateRow[]>>({});
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState({ week_start: "", summary: "", achievements: "", blockers: "", hours_spent: "0" });
+
+  const loadUpdates = async (projectId: string) => {
+    if (!userId) return;
+    const { data } = await supabase
+      .from("weekly_updates")
+      .select("id, week_start, summary, achievements, blockers, hours_spent")
+      .eq("user_id", userId)
+      .eq("project_id", projectId)
+      .order("week_start", { ascending: false })
+      .limit(5);
+    setUpdatesByProject((m) => ({ ...m, [projectId]: data ?? [] }));
+  };
+
+  const toggleOpen = (id: string) => {
+    if (openId === id) {
+      setOpenId(null);
+      return;
+    }
+    setOpenId(id);
+    setForm({ week_start: new Date().toISOString().slice(0, 10), summary: "", achievements: "", blockers: "", hours_spent: "0" });
+    if (!updatesByProject[id]) loadUpdates(id);
+  };
+
+  const submitUpdate = async (projectId: string) => {
+    if (!userId) return;
+    if (!form.week_start) return toast.error("Indica la semana");
+    if (form.summary.trim().length < 5) return toast.error("El resumen debe tener al menos 5 caracteres");
+    const hours = Number(form.hours_spent || 0);
+    if (Number.isNaN(hours) || hours < 0 || hours > 168) return toast.error("Horas inválidas");
+    setSubmitting(true);
+    const { error } = await supabase.from("weekly_updates").insert({
+      user_id: userId,
+      project_id: projectId,
+      week_start: form.week_start,
+      summary: form.summary.trim(),
+      achievements: form.achievements.trim() || null,
+      blockers: form.blockers.trim() || null,
+      hours_spent: hours,
+    });
+    setSubmitting(false);
+    if (error) return toast.error(error.message);
+    toast.success("Avance registrado");
+    setForm({ week_start: new Date().toISOString().slice(0, 10), summary: "", achievements: "", blockers: "", hours_spent: "0" });
+    loadUpdates(projectId);
+  };
+
+  return (
+    <Card className="mt-6 border-border/70 p-6">
+      <h2 className="font-display text-lg font-semibold text-foreground">Proyectos</h2>
+      <p className="mt-1 text-xs text-muted-foreground">Registra tus avances semanales en cada proyecto asignado.</p>
+      {loading ? (
+        <p className="mt-3 text-sm text-muted-foreground">Cargando...</p>
+      ) : projects.length === 0 ? (
+        <p className="mt-3 text-sm text-muted-foreground">
+          Aún no tienes proyectos asignados. Contacta a tu coordinador.
+        </p>
+      ) : (
+        <ul className="mt-4 space-y-3">
+          {projects.map((p) => {
+            const isOpen = openId === p.id;
+            const ups = updatesByProject[p.id] ?? [];
+            return (
+              <li key={p.id} className="rounded-lg border border-border/60 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h3 className="font-semibold text-foreground">{p.title}</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">{p.description}</p>
+                  </div>
+                  <Badge variant="outline">{p.status}</Badge>
+                </div>
+                <div className="mt-3 flex justify-end">
+                  <Button variant="outline" size="sm" onClick={() => toggleOpen(p.id)}>
+                    {isOpen ? <ChevronUp className="mr-1.5 h-3.5 w-3.5" /> : <Plus className="mr-1.5 h-3.5 w-3.5" />}
+                    {isOpen ? "Cerrar" : "Registrar avance"}
+                  </Button>
+                </div>
+                {isOpen && (
+                  <div className="mt-4 space-y-4 border-t border-border/60 pt-4">
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div>
+                        <Label className="text-muted-foreground">Semana del</Label>
+                        <Input type="date" className="mt-1.5" value={form.week_start} onChange={(e) => setForm((f) => ({ ...f, week_start: e.target.value }))} />
+                      </div>
+                      <div>
+                        <Label className="text-muted-foreground">Horas dedicadas</Label>
+                        <Input type="number" min={0} max={168} step="0.5" className="mt-1.5" value={form.hours_spent} onChange={(e) => setForm((f) => ({ ...f, hours_spent: e.target.value }))} />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <Label className="text-muted-foreground">Resumen *</Label>
+                        <Textarea rows={3} className="mt-1.5" value={form.summary} onChange={(e) => setForm((f) => ({ ...f, summary: e.target.value }))} placeholder="¿Qué hiciste esta semana?" maxLength={2000} />
+                      </div>
+                      <div>
+                        <Label className="text-muted-foreground">Logros</Label>
+                        <Textarea rows={2} className="mt-1.5" value={form.achievements} onChange={(e) => setForm((f) => ({ ...f, achievements: e.target.value }))} maxLength={2000} />
+                      </div>
+                      <div>
+                        <Label className="text-muted-foreground">Bloqueos</Label>
+                        <Textarea rows={2} className="mt-1.5" value={form.blockers} onChange={(e) => setForm((f) => ({ ...f, blockers: e.target.value }))} maxLength={2000} />
+                      </div>
+                    </div>
+                    <div className="flex justify-end">
+                      <Button size="sm" onClick={() => submitUpdate(p.id)} disabled={submitting}>
+                        <Save className="mr-1.5 h-3.5 w-3.5" />
+                        {submitting ? "Guardando..." : "Guardar avance"}
+                      </Button>
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Avances recientes</p>
+                      {ups.length === 0 ? (
+                        <p className="mt-2 text-sm text-muted-foreground">Aún no has registrado avances en este proyecto.</p>
+                      ) : (
+                        <ul className="mt-2 space-y-2">
+                          {ups.map((u) => (
+                            <li key={u.id} className="rounded-md border border-border/60 p-3">
+                              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                <span>Semana del {u.week_start}</span>
+                                <span>{u.hours_spent ?? 0} h</span>
+                              </div>
+                              <p className="mt-1.5 text-sm text-foreground">{u.summary}</p>
+                              {u.achievements && <p className="mt-1 text-xs text-muted-foreground"><span className="font-semibold text-foreground">Logros:</span> {u.achievements}</p>}
+                              {u.blockers && <p className="mt-0.5 text-xs text-muted-foreground"><span className="font-semibold text-foreground">Bloqueos:</span> {u.blockers}</p>}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </Card>
   );
 }
