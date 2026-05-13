@@ -9,7 +9,7 @@ import { AdminShell } from "@/components/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, type AppRole } from "@/lib/auth-context";
 import { toast } from "sonner";
-import { Search, UserCheck, UserX } from "lucide-react";
+import { Eye, EyeOff, Search, UserCheck, UserX } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/admin/users")({
   component: () => <AdminShell><UsersAdmin /></AdminShell>,
@@ -24,6 +24,8 @@ interface UserRow {
   carrera: string | null;
   semestre: string | null;
   interest_line_id: string | null;
+  is_public_member: boolean;
+  public_role: string | null;
   roles: AppRole[];
   last_sign_in_at: string | null;
   project_ids: string[];
@@ -47,7 +49,7 @@ function UsersAdmin() {
   const load = async () => {
     setLoading(true);
     const [profs, ur, ls, pr, members, authUsers] = await Promise.all([
-      supabase.from("profiles").select("id, full_name, username, email, is_active, carrera, semestre, interest_line_id"),
+      supabase.from("profiles").select("id, full_name, username, email, is_active, carrera, semestre, interest_line_id, is_public_member, public_role"),
       supabase.from("user_roles").select("user_id, role"),
       supabase.from("research_lines").select("id, title").order("display_order"),
       supabase.from("projects").select("id, title").order("title"),
@@ -84,6 +86,8 @@ function UsersAdmin() {
         carrera: p.carrera,
         semestre: p.semestre,
         interest_line_id: p.interest_line_id,
+        is_public_member: p.is_public_member ?? false,
+        public_role: p.public_role,
         roles: rolesMap.get(p.id) ?? [],
         last_sign_in_at: authMap.get(p.id)?.last_sign_in_at ?? null,
         project_ids: projectsMap.get(p.id) ?? [],
