@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { NodeBackdrop } from "@/components/NodeBackdrop";
 import { useAuth } from "@/lib/auth-context";
 import logo from "@/assets/perceptia-logo.svg";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Camera, Loader2, User as UserIcon, X as XIcon } from "lucide-react";
 
 
 export const Route = createFileRoute("/login")({
@@ -52,6 +52,25 @@ function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [forgotSent, setForgotSent] = useState(false);
   const [signupSent, setSignupSent] = useState(false);
+  const [signupAvatarUploaded, setSignupAvatarUploaded] = useState(false);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+
+  const onAvatarChange = (file: File | null) => {
+    if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+    if (!file) {
+      setAvatarFile(null);
+      setAvatarPreview(null);
+      return;
+    }
+    if (!file.type.startsWith("image/")) return;
+    if (file.size > 2 * 1024 * 1024) {
+      setGlobalError("La foto debe pesar menos de 2 MB");
+      return;
+    }
+    setAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
+  };
 
   useEffect(() => {
     if (auth.isAuthenticated) {
@@ -89,9 +108,10 @@ function LoginPage() {
         return setErrors(fe);
       }
       setLoading(true);
-      const { error } = await auth.signUp(email, password, fullName, username);
+      const { error, needsEmailConfirm } = await auth.signUp(email, password, fullName, username, avatarFile);
       setLoading(false);
       if (error) return setGlobalError(error);
+      setSignupAvatarUploaded(!!avatarFile && !needsEmailConfirm);
       setSignupSent(true);
       return;
     }
@@ -153,6 +173,14 @@ function LoginPage() {
                 (y la carpeta de spam) y haz clic en el enlace para activar tu cuenta
                 antes de iniciar sesión.
               </p>
+              {avatarFile && !signupAvatarUploaded && (
+                <p className="mt-3 text-xs text-muted-foreground">
+                  Tu foto se podrá subir después desde <span className="font-semibold">Mi perfil</span> al iniciar sesión.
+                </p>
+              )}
+              {signupAvatarUploaded && (
+                <p className="mt-3 text-xs text-muted-foreground">Foto de perfil guardada ✓</p>
+              )}
               <button
                 onClick={() => { setMode("signin"); setSignupSent(false); }}
                 className="mt-4 block w-full text-xs font-semibold text-primary hover:underline"
@@ -181,6 +209,38 @@ function LoginPage() {
                     />
                     <p className="mt-1 text-[11px] text-muted-foreground">3-30 caracteres: a-z, 0-9, _ o .</p>
                     {errors.username && <p className="mt-1 text-xs text-destructive">{errors.username}</p>}
+                  </div>
+                  <div>
+                    <Label>Foto de perfil (opcional)</Label>
+                    <div className="mt-1.5 flex items-center gap-3">
+                      <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border/60 bg-primary-soft text-primary">
+                        {avatarPreview ? (
+                          <img src={avatarPreview} alt="Vista previa" className="h-full w-full object-cover" />
+                        ) : (
+                          <UserIcon className="h-5 w-5" />
+                        )}
+                      </div>
+                      <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-input bg-background px-3 py-1.5 text-xs font-medium hover:bg-secondary">
+                        <Camera className="h-3.5 w-3.5" />
+                        {avatarPreview ? "Cambiar" : "Subir foto"}
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp,image/gif"
+                          className="hidden"
+                          onChange={(e) => onAvatarChange(e.target.files?.[0] ?? null)}
+                        />
+                      </label>
+                      {avatarPreview && (
+                        <button
+                          type="button"
+                          onClick={() => onAvatarChange(null)}
+                          className="text-xs text-destructive hover:underline"
+                        >
+                          <XIcon className="inline h-3 w-3" /> Quitar
+                        </button>
+                      )}
+                    </div>
+                    <p className="mt-1 text-[11px] text-muted-foreground">JPG, PNG, WEBP o GIF. Máx 2 MB.</p>
                   </div>
                 </>
               )}

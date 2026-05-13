@@ -14,7 +14,7 @@ export interface AuthState {
   hasAnyRole: (roles: AppRole[]) => boolean;
   isStaff: () => boolean;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
-  signUp: (email: string, password: string, fullName: string, username: string) => Promise<{ error: string | null }>;
+  signUp: (email: string, password: string, fullName: string, username: string, avatarFile?: File | null) => Promise<{ error: string | null; needsEmailConfirm: boolean }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: string | null }>;
   refreshRoles: () => Promise<void>;
@@ -73,14 +73,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       return { error: error?.message ?? null };
     },
-    signUp: async (email, password, fullName, username) => {
+    signUp: async (email, password, fullName, username, avatarFile) => {
       const redirectTo = typeof window !== "undefined" ? `${window.location.origin}/dashboard` : undefined;
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: { emailRedirectTo: redirectTo, data: { full_name: fullName, username } },
       });
-      return { error: error?.message ?? null };
+      if (error) return { error: error.message, needsEmailConfirm: false };
+
+      // If session is immediately available (email auto-confirm on), upload avatar now
+      if (avatarFile && data.session && data.user) {
+        const ext = avatarFile.name.split(".").pop()?.toLowerCase() || "jpg";
+        const path = `${data.user.id}/avatar-${Date.now()}.${ext}`;
+        const { error: upErr } = await supabase.storage
+          .from("avatars")
+          .upload(path, avatarFile, { upsert: true, contentType: avatarFile.type });
+        if (!upErr) {
+          const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
+          await supabase.from("profiles").update({ avatar_url: pub.publicUrl }).eq("id", data.user.id);
+        }
+      }
+      return { error: null, needsEmailConfirm: !data.session };
     },
     signOut: async () => {
       await supabase.auth.signOut();
