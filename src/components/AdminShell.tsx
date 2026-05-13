@@ -30,7 +30,7 @@ const ADMIN_NAV: AdminNavItem[] = [
   { to: "/dashboard/admin", icon: LayoutDashboard, label: "Resumen", exact: true },
   { to: "/dashboard/admin/users", icon: Users, label: "Usuarios" },
   { to: "/dashboard/admin/students", icon: GraduationCap, label: "Estudiantes" },
-  { to: "/dashboard/admin/projects", icon: FolderKanban, label: "Proyectos", soon: true },
+  { to: "/dashboard/admin/projects", icon: FolderKanban, label: "Proyectos" },
   { to: "/dashboard/admin/lines", icon: Network, label: "Líneas", soon: true },
   { to: "/dashboard/admin/teams", icon: Users, label: "Equipos", soon: true },
   { to: "/dashboard/admin/applications", icon: Inbox, label: "Postulaciones", soon: true },
