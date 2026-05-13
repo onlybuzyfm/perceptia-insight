@@ -309,13 +309,15 @@ function StudentDashboard() {
         )}
       </Card>
 
+      <TeamCard team={team} mates={mates} loading={loading} />
+
       <Card className="mt-6 border-border/70 p-6">
-        <h2 className="font-display text-lg font-semibold text-foreground">Proyectos asignados</h2>
+        <h2 className="font-display text-lg font-semibold text-foreground">Proyectos</h2>
         {loading ? (
           <p className="mt-3 text-sm text-muted-foreground">Cargando...</p>
         ) : projects.length === 0 ? (
           <p className="mt-3 text-sm text-muted-foreground">
-            Aún no tienes un proyecto asignado. Contacta a tu coordinador.
+            Aún no tienes proyectos asignados. Contacta a tu coordinador.
           </p>
         ) : (
           <ul className="mt-4 space-y-3">
@@ -331,7 +333,140 @@ function StudentDashboard() {
           </ul>
         )}
       </Card>
+
+      <CompetitionsCard competitions={competitions} loading={loading} hasTeam={!!team} />
+
+      <ToolsCard />
     </DashboardShell>
+  );
+}
+
+function TeamCard({ team, mates, loading }: { team: TeamInfo | null; mates: Mate[]; loading: boolean }) {
+  const meta = team ? TEAM_ICONS[team.slug] ?? { icon: Users, color: "text-primary", bg: "bg-primary-soft" } : null;
+  const Icon = meta?.icon ?? Users;
+  return (
+    <Card className="mt-6 border-border/70 p-6">
+      <h2 className="font-display text-lg font-semibold text-foreground">Mi equipo</h2>
+      {loading ? (
+        <p className="mt-3 text-sm text-muted-foreground">Cargando...</p>
+      ) : !team ? (
+        <p className="mt-3 text-sm text-muted-foreground">
+          Aún no estás asignado a un equipo. El administrador te asignará pronto.
+        </p>
+      ) : (
+        <>
+          <div className="mt-4 flex items-start gap-3">
+            <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${meta?.bg ?? "bg-primary-soft"} ${meta?.color ?? "text-primary"}`}>
+              <Icon className="h-6 w-6" />
+            </div>
+            <div className="min-w-0">
+              <h3 className="font-display text-xl font-semibold text-foreground">{team.name}</h3>
+              {team.focus && <p className="text-sm text-muted-foreground">{team.focus}</p>}
+              {team.description && <p className="mt-1 text-sm text-muted-foreground">{team.description}</p>}
+            </div>
+          </div>
+          <div className="mt-5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Compañeros</p>
+            {mates.length === 0 ? (
+              <p className="mt-2 text-sm text-muted-foreground">Eres el único miembro por ahora.</p>
+            ) : (
+              <ul className="mt-2 grid gap-2 sm:grid-cols-2">
+                {mates.map((m) => {
+                  const initials = (m.full_name || m.username || "?").split(/\s+/).slice(0, 2).map((s) => s[0]?.toUpperCase()).join("");
+                  return (
+                    <li key={m.user_id} className="flex items-center gap-2.5 rounded-lg border border-border/60 p-2.5">
+                      <Avatar className="h-8 w-8">
+                        {m.avatar_url && <AvatarImage src={m.avatar_url} alt={m.full_name} />}
+                        <AvatarFallback className="bg-primary-soft text-xs font-semibold text-primary">{initials || "?"}</AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-foreground">{m.full_name || m.username}</p>
+                        <p className="truncate text-xs text-muted-foreground">{m.role_in_team}</p>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        </>
+      )}
+    </Card>
+  );
+}
+
+function CompetitionsCard({ competitions, loading, hasTeam }: { competitions: CompetitionRow[]; loading: boolean; hasTeam: boolean }) {
+  return (
+    <Card className="mt-6 border-border/70 p-6">
+      <div className="flex items-center gap-2">
+        <Trophy className="h-5 w-5 text-amber-600" />
+        <h2 className="font-display text-lg font-semibold text-foreground">Competencias del equipo</h2>
+      </div>
+      {loading ? (
+        <p className="mt-3 text-sm text-muted-foreground">Cargando...</p>
+      ) : !hasTeam ? (
+        <p className="mt-3 text-sm text-muted-foreground">Te aparecerán cuando seas asignado a un equipo.</p>
+      ) : competitions.length === 0 ? (
+        <p className="mt-3 text-sm text-muted-foreground">Tu equipo aún no tiene competencias asignadas.</p>
+      ) : (
+        <ul className="mt-4 space-y-3">
+          {competitions.map((c) => (
+            <li key={c.id} className="rounded-lg border border-border/60 p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <h3 className="font-semibold text-foreground">{c.name}</h3>
+                  {c.description && <p className="mt-0.5 text-sm text-muted-foreground">{c.description}</p>}
+                  <div className="mt-2 flex flex-wrap gap-3 text-xs text-muted-foreground">
+                    {c.event_date && <span className="inline-flex items-center gap-1"><Calendar className="h-3.5 w-3.5" />{new Date(c.event_date).toLocaleDateString()}</span>}
+                    {c.location && <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{c.location}</span>}
+                    {c.url && <a href={c.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline"><ExternalLink className="h-3.5 w-3.5" />Sitio</a>}
+                  </div>
+                </div>
+                {c.result && <Badge variant="outline" className="border-amber-300 text-amber-700">{c.result}</Badge>}
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </Card>
+  );
+}
+
+function ToolsCard() {
+  return (
+    <Card className="mt-6 border-border/70 p-6">
+      <h2 className="font-display text-lg font-semibold text-foreground">Herramientas</h2>
+      <p className="mt-1 text-xs text-muted-foreground">Accesos a las plataformas internas del laboratorio.</p>
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        {TOOLS.map((t) => {
+          const Icon = t.icon;
+          const inner = (
+            <div className={`group rounded-lg border border-border/60 p-4 transition-all ${t.active ? "hover:border-primary/40 hover:shadow-sm" : "opacity-60"}`}>
+              <div className="flex items-start justify-between">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-soft text-primary">
+                  <Icon className="h-5 w-5" />
+                </div>
+                {t.active ? (
+                  <Badge variant="outline" className="border-primary/40 text-primary">Activo</Badge>
+                ) : (
+                  <Badge variant="outline" className="border-border text-muted-foreground">Próximamente</Badge>
+                )}
+              </div>
+              <div className="mt-3 flex items-center gap-1.5">
+                <h3 className="font-semibold text-foreground">{t.name}</h3>
+                {t.active && <ExternalLink className="h-3.5 w-3.5 text-muted-foreground transition-colors group-hover:text-primary" />}
+              </div>
+              <p className="mt-1 text-sm text-muted-foreground">{t.description}</p>
+            </div>
+          );
+          return t.active && t.url ? (
+            <a key={t.name} href={t.url} target="_blank" rel="noopener noreferrer">{inner}</a>
+          ) : (
+            <div key={t.name}>{inner}</div>
+          );
+        })}
+      </div>
+    </Card>
   );
 }
 
