@@ -13,6 +13,7 @@ import {
   ScrollText,
   Inbox,
   Wrench,
+  Trophy,
   type LucideIcon,
 } from "lucide-react";
 import { DashboardShell } from "@/components/DashboardShell";
