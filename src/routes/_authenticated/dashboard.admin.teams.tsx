@@ -360,39 +360,3 @@ function AssignCompetitionDialog({ team, competitions, existing, onClose, onSave
   );
 }
 
-function NewCompetitionDialog({ open, onClose, onSaved }: { open: boolean; onClose: () => void; onSaved: () => void }) {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [url, setUrl] = useState("");
-  const [eventDate, setEventDate] = useState("");
-  const [location, setLocation] = useState("");
-  useEffect(() => { if (open) { setName(""); setDescription(""); setUrl(""); setEventDate(""); setLocation(""); } }, [open]);
-  const save = async () => {
-    if (!name.trim()) return toast.error("Ingresa el nombre");
-    const { error } = await supabase.from("competitions").insert({
-      name: name.trim(), description, url: url || null, event_date: eventDate || null, location: location || null,
-    });
-    if (error) return toast.error(error.message);
-    toast.success("Competencia creada"); onSaved();
-  };
-  return (
-    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="bg-white sm:max-w-md">
-        <DialogHeader><DialogTitle>Nueva competencia</DialogTitle></DialogHeader>
-        <div className="grid gap-3">
-          <div><Label className="text-xs">Nombre *</Label><Input value={name} onChange={(e) => setName(e.target.value)} className="mt-1" /></div>
-          <div><Label className="text-xs">Descripción</Label><Input value={description} onChange={(e) => setDescription(e.target.value)} className="mt-1" /></div>
-          <div className="grid grid-cols-2 gap-2">
-            <div><Label className="text-xs">Fecha</Label><Input type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} className="mt-1" /></div>
-            <div><Label className="text-xs">Lugar</Label><Input value={location} onChange={(e) => setLocation(e.target.value)} className="mt-1" /></div>
-          </div>
-          <div><Label className="text-xs">URL</Label><Input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://..." className="mt-1" /></div>
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancelar</Button>
-          <Button onClick={save} className="bg-primary hover:bg-primary/90">Crear</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
