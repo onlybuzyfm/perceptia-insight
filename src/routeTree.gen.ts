@@ -31,6 +31,7 @@ import { Route as AuthenticatedDashboardAdminToolsRouteImport } from './routes/_
 import { Route as AuthenticatedDashboardAdminTeamsRouteImport } from './routes/_authenticated/dashboard.admin.teams'
 import { Route as AuthenticatedDashboardAdminStudentsRouteImport } from './routes/_authenticated/dashboard.admin.students'
 import { Route as AuthenticatedDashboardAdminProjectsRouteImport } from './routes/_authenticated/dashboard.admin.projects'
+import { Route as AuthenticatedDashboardAdminCompetitionsRouteImport } from './routes/_authenticated/dashboard.admin.competitions'
 
 const SobreRoute = SobreRouteImport.update({
   id: '/sobre',
@@ -153,6 +154,12 @@ const AuthenticatedDashboardAdminProjectsRoute =
     path: '/projects',
     getParentRoute: () => AuthenticatedDashboardAdminRoute,
   } as any)
+const AuthenticatedDashboardAdminCompetitionsRoute =
+  AuthenticatedDashboardAdminCompetitionsRouteImport.update({
+    id: '/competitions',
+    path: '/competitions',
+    getParentRoute: () => AuthenticatedDashboardAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -169,6 +176,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/coordinator': typeof AuthenticatedDashboardCoordinatorRoute
   '/dashboard/student': typeof AuthenticatedDashboardStudentRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/dashboard/admin/competitions': typeof AuthenticatedDashboardAdminCompetitionsRoute
   '/dashboard/admin/projects': typeof AuthenticatedDashboardAdminProjectsRoute
   '/dashboard/admin/students': typeof AuthenticatedDashboardAdminStudentsRoute
   '/dashboard/admin/teams': typeof AuthenticatedDashboardAdminTeamsRoute
@@ -191,6 +199,7 @@ export interface FileRoutesByTo {
   '/dashboard/coordinator': typeof AuthenticatedDashboardCoordinatorRoute
   '/dashboard/student': typeof AuthenticatedDashboardStudentRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
+  '/dashboard/admin/competitions': typeof AuthenticatedDashboardAdminCompetitionsRoute
   '/dashboard/admin/projects': typeof AuthenticatedDashboardAdminProjectsRoute
   '/dashboard/admin/students': typeof AuthenticatedDashboardAdminStudentsRoute
   '/dashboard/admin/teams': typeof AuthenticatedDashboardAdminTeamsRoute
@@ -216,6 +225,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/coordinator': typeof AuthenticatedDashboardCoordinatorRoute
   '/_authenticated/dashboard/student': typeof AuthenticatedDashboardStudentRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/_authenticated/dashboard/admin/competitions': typeof AuthenticatedDashboardAdminCompetitionsRoute
   '/_authenticated/dashboard/admin/projects': typeof AuthenticatedDashboardAdminProjectsRoute
   '/_authenticated/dashboard/admin/students': typeof AuthenticatedDashboardAdminStudentsRoute
   '/_authenticated/dashboard/admin/teams': typeof AuthenticatedDashboardAdminTeamsRoute
@@ -241,6 +251,7 @@ export interface FileRouteTypes {
     | '/dashboard/coordinator'
     | '/dashboard/student'
     | '/dashboard/'
+    | '/dashboard/admin/competitions'
     | '/dashboard/admin/projects'
     | '/dashboard/admin/students'
     | '/dashboard/admin/teams'
@@ -263,6 +274,7 @@ export interface FileRouteTypes {
     | '/dashboard/coordinator'
     | '/dashboard/student'
     | '/dashboard'
+    | '/dashboard/admin/competitions'
     | '/dashboard/admin/projects'
     | '/dashboard/admin/students'
     | '/dashboard/admin/teams'
@@ -287,6 +299,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/coordinator'
     | '/_authenticated/dashboard/student'
     | '/_authenticated/dashboard/'
+    | '/_authenticated/dashboard/admin/competitions'
     | '/_authenticated/dashboard/admin/projects'
     | '/_authenticated/dashboard/admin/students'
     | '/_authenticated/dashboard/admin/teams'
@@ -464,10 +477,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAdminProjectsRouteImport
       parentRoute: typeof AuthenticatedDashboardAdminRoute
     }
+    '/_authenticated/dashboard/admin/competitions': {
+      id: '/_authenticated/dashboard/admin/competitions'
+      path: '/competitions'
+      fullPath: '/dashboard/admin/competitions'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminCompetitionsRouteImport
+      parentRoute: typeof AuthenticatedDashboardAdminRoute
+    }
   }
 }
 
 interface AuthenticatedDashboardAdminRouteChildren {
+  AuthenticatedDashboardAdminCompetitionsRoute: typeof AuthenticatedDashboardAdminCompetitionsRoute
   AuthenticatedDashboardAdminProjectsRoute: typeof AuthenticatedDashboardAdminProjectsRoute
   AuthenticatedDashboardAdminStudentsRoute: typeof AuthenticatedDashboardAdminStudentsRoute
   AuthenticatedDashboardAdminTeamsRoute: typeof AuthenticatedDashboardAdminTeamsRoute
@@ -479,6 +500,8 @@ interface AuthenticatedDashboardAdminRouteChildren {
 
 const AuthenticatedDashboardAdminRouteChildren: AuthenticatedDashboardAdminRouteChildren =
   {
+    AuthenticatedDashboardAdminCompetitionsRoute:
+      AuthenticatedDashboardAdminCompetitionsRoute,
     AuthenticatedDashboardAdminProjectsRoute:
       AuthenticatedDashboardAdminProjectsRoute,
     AuthenticatedDashboardAdminStudentsRoute:
