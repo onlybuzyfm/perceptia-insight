@@ -87,6 +87,10 @@ export const PROJECTS: { title: string; desc: string; status: ProjectStatus; lin
   { title: "Avalúos catastrales con IA", desc: "Modelos predictivos de valoración predial integrando datos espaciales y socioeconómicos.", status: "En diseño", line: "Ciencia de Datos" },
   { title: "TinyML para percepción artificial embebida", desc: "Despliegue de modelos en microcontroladores para inferencia en tiempo real.", status: "En curso", line: "TinyML" },
   { title: "Portal académico PerceptIA", desc: "Sitio institucional y portal interno del semillero (este sitio).", status: "Activo", line: "Plataforma" },
+  { title: "Clustering visual de frutas en diferentes estados", desc: "Agrupamiento no supervisado de imágenes de frutas según su estado de maduración y deterioro.", status: "En curso", line: "Visión artificial" },
+  { title: "IA para la detección de lavado de activos", desc: "Modelos de aprendizaje automático para identificar patrones sospechosos en transacciones financieras.", status: "En diseño", line: "Ciencia de Datos" },
+  { title: "Predicción del índice SPEI para el análisis de sequías", desc: "Modelos predictivos del Índice Estandarizado de Precipitación-Evapotranspiración para monitoreo climático.", status: "En curso", line: "Ciencia de Datos" },
+  { title: "Explorando los Agentes LLM", desc: "Investigación aplicada sobre arquitecturas de agentes basados en modelos de lenguaje y sus casos de uso.", status: "En diseño", line: "Agentes inteligentes" },
 ];
 
 export const RESULTS = [
