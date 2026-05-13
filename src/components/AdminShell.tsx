@@ -4,7 +4,6 @@ import {
   Users,
   GraduationCap,
   FolderKanban,
-  Network,
   FileCheck2,
   Calendar,
   BookOpen,
@@ -13,6 +12,7 @@ import {
   Palette,
   ScrollText,
   Inbox,
+  Wrench,
   type LucideIcon,
 } from "lucide-react";
 import { DashboardShell } from "@/components/DashboardShell";
