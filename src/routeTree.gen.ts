@@ -27,6 +27,7 @@ import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authe
 import { Route as AuthenticatedDashboardAdminIndexRouteImport } from './routes/_authenticated/dashboard.admin.index'
 import { Route as AuthenticatedDashboardAdminUsersRouteImport } from './routes/_authenticated/dashboard.admin.users'
 import { Route as AuthenticatedDashboardAdminUpdatesRouteImport } from './routes/_authenticated/dashboard.admin.updates'
+import { Route as AuthenticatedDashboardAdminToolsRouteImport } from './routes/_authenticated/dashboard.admin.tools'
 import { Route as AuthenticatedDashboardAdminTeamsRouteImport } from './routes/_authenticated/dashboard.admin.teams'
 import { Route as AuthenticatedDashboardAdminStudentsRouteImport } from './routes/_authenticated/dashboard.admin.students'
 import { Route as AuthenticatedDashboardAdminProjectsRouteImport } from './routes/_authenticated/dashboard.admin.projects'
@@ -128,6 +129,12 @@ const AuthenticatedDashboardAdminUpdatesRoute =
     path: '/updates',
     getParentRoute: () => AuthenticatedDashboardAdminRoute,
   } as any)
+const AuthenticatedDashboardAdminToolsRoute =
+  AuthenticatedDashboardAdminToolsRouteImport.update({
+    id: '/tools',
+    path: '/tools',
+    getParentRoute: () => AuthenticatedDashboardAdminRoute,
+  } as any)
 const AuthenticatedDashboardAdminTeamsRoute =
   AuthenticatedDashboardAdminTeamsRouteImport.update({
     id: '/teams',
@@ -165,6 +172,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin/projects': typeof AuthenticatedDashboardAdminProjectsRoute
   '/dashboard/admin/students': typeof AuthenticatedDashboardAdminStudentsRoute
   '/dashboard/admin/teams': typeof AuthenticatedDashboardAdminTeamsRoute
+  '/dashboard/admin/tools': typeof AuthenticatedDashboardAdminToolsRoute
   '/dashboard/admin/updates': typeof AuthenticatedDashboardAdminUpdatesRoute
   '/dashboard/admin/users': typeof AuthenticatedDashboardAdminUsersRoute
   '/dashboard/admin/': typeof AuthenticatedDashboardAdminIndexRoute
@@ -186,6 +194,7 @@ export interface FileRoutesByTo {
   '/dashboard/admin/projects': typeof AuthenticatedDashboardAdminProjectsRoute
   '/dashboard/admin/students': typeof AuthenticatedDashboardAdminStudentsRoute
   '/dashboard/admin/teams': typeof AuthenticatedDashboardAdminTeamsRoute
+  '/dashboard/admin/tools': typeof AuthenticatedDashboardAdminToolsRoute
   '/dashboard/admin/updates': typeof AuthenticatedDashboardAdminUpdatesRoute
   '/dashboard/admin/users': typeof AuthenticatedDashboardAdminUsersRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminIndexRoute
@@ -210,6 +219,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/admin/projects': typeof AuthenticatedDashboardAdminProjectsRoute
   '/_authenticated/dashboard/admin/students': typeof AuthenticatedDashboardAdminStudentsRoute
   '/_authenticated/dashboard/admin/teams': typeof AuthenticatedDashboardAdminTeamsRoute
+  '/_authenticated/dashboard/admin/tools': typeof AuthenticatedDashboardAdminToolsRoute
   '/_authenticated/dashboard/admin/updates': typeof AuthenticatedDashboardAdminUpdatesRoute
   '/_authenticated/dashboard/admin/users': typeof AuthenticatedDashboardAdminUsersRoute
   '/_authenticated/dashboard/admin/': typeof AuthenticatedDashboardAdminIndexRoute
@@ -234,6 +244,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/projects'
     | '/dashboard/admin/students'
     | '/dashboard/admin/teams'
+    | '/dashboard/admin/tools'
     | '/dashboard/admin/updates'
     | '/dashboard/admin/users'
     | '/dashboard/admin/'
@@ -255,6 +266,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/projects'
     | '/dashboard/admin/students'
     | '/dashboard/admin/teams'
+    | '/dashboard/admin/tools'
     | '/dashboard/admin/updates'
     | '/dashboard/admin/users'
     | '/dashboard/admin'
@@ -278,6 +290,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/admin/projects'
     | '/_authenticated/dashboard/admin/students'
     | '/_authenticated/dashboard/admin/teams'
+    | '/_authenticated/dashboard/admin/tools'
     | '/_authenticated/dashboard/admin/updates'
     | '/_authenticated/dashboard/admin/users'
     | '/_authenticated/dashboard/admin/'
@@ -423,6 +436,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAdminUpdatesRouteImport
       parentRoute: typeof AuthenticatedDashboardAdminRoute
     }
+    '/_authenticated/dashboard/admin/tools': {
+      id: '/_authenticated/dashboard/admin/tools'
+      path: '/tools'
+      fullPath: '/dashboard/admin/tools'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminToolsRouteImport
+      parentRoute: typeof AuthenticatedDashboardAdminRoute
+    }
     '/_authenticated/dashboard/admin/teams': {
       id: '/_authenticated/dashboard/admin/teams'
       path: '/teams'
@@ -451,6 +471,7 @@ interface AuthenticatedDashboardAdminRouteChildren {
   AuthenticatedDashboardAdminProjectsRoute: typeof AuthenticatedDashboardAdminProjectsRoute
   AuthenticatedDashboardAdminStudentsRoute: typeof AuthenticatedDashboardAdminStudentsRoute
   AuthenticatedDashboardAdminTeamsRoute: typeof AuthenticatedDashboardAdminTeamsRoute
+  AuthenticatedDashboardAdminToolsRoute: typeof AuthenticatedDashboardAdminToolsRoute
   AuthenticatedDashboardAdminUpdatesRoute: typeof AuthenticatedDashboardAdminUpdatesRoute
   AuthenticatedDashboardAdminUsersRoute: typeof AuthenticatedDashboardAdminUsersRoute
   AuthenticatedDashboardAdminIndexRoute: typeof AuthenticatedDashboardAdminIndexRoute
@@ -464,6 +485,8 @@ const AuthenticatedDashboardAdminRouteChildren: AuthenticatedDashboardAdminRoute
       AuthenticatedDashboardAdminStudentsRoute,
     AuthenticatedDashboardAdminTeamsRoute:
       AuthenticatedDashboardAdminTeamsRoute,
+    AuthenticatedDashboardAdminToolsRoute:
+      AuthenticatedDashboardAdminToolsRoute,
     AuthenticatedDashboardAdminUpdatesRoute:
       AuthenticatedDashboardAdminUpdatesRoute,
     AuthenticatedDashboardAdminUsersRoute:
