@@ -10,7 +10,14 @@ import { Label } from "@/components/ui/label";
 import { AdminShell } from "@/components/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { UserPlus, Trash2, Users, FolderKanban, Trophy, Plus } from "lucide-react";
+import { UserPlus, Trash2, Users, FolderKanban, Trophy, Plus, Network, Eye, Cpu, Brain, type LucideIcon } from "lucide-react";
+
+const TEAM_ICONS: Record<string, { icon: LucideIcon; color: string; bg: string }> = {
+  nexus: { icon: Network, color: "text-violet-600", bg: "bg-violet-100" },
+  prisma: { icon: Eye, color: "text-sky-600", bg: "bg-sky-100" },
+  vector: { icon: Cpu, color: "text-emerald-600", bg: "bg-emerald-100" },
+  sinapsis: { icon: Brain, color: "text-amber-600", bg: "bg-amber-100" },
+};
 
 export const Route = createFileRoute("/_authenticated/dashboard/admin/teams")({
   component: () => <AdminShell><TeamsAdmin /></AdminShell>,
@@ -119,12 +126,19 @@ function TeamsAdmin() {
             const teamCompsList = tComps.filter((x) => x.team_id === team.id)
               .map((x) => ({ link: x, comp: competitions.find((c) => c.id === x.competition_id) }))
               .filter((x) => x.comp);
+            const ic = TEAM_ICONS[team.slug] ?? { icon: Users, color: "text-primary", bg: "bg-primary-soft" };
+            const TeamIcon = ic.icon;
             return (
               <Card key={team.id} className="border-border/70 bg-white p-4">
                 <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div>
-                    <h3 className="font-semibold text-foreground">{team.name}</h3>
-                    {team.focus && <p className="text-xs text-muted-foreground">{team.focus}</p>}
+                  <div className="flex items-center gap-3">
+                    <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${ic.bg}`}>
+                      <TeamIcon className={`h-5 w-5 ${ic.color}`} />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-foreground">{team.name}</h3>
+                      {team.focus && <p className="text-xs text-muted-foreground">{team.focus}</p>}
+                    </div>
                   </div>
                 </div>
 
