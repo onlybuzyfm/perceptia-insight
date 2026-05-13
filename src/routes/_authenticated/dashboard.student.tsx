@@ -148,7 +148,7 @@ function StudentDashboard() {
     setDraft((d) => ({ ...d, [key]: value }));
 
   return (
-    <DashboardShell title="Mi espacio de estudiante">
+    <DashboardShell title="Mi espacio">
       <Card className="border-border/70 p-6">
         <div className="flex items-center justify-between gap-3">
           <h2 className="font-display text-lg font-semibold text-foreground">Mi perfil</h2>
