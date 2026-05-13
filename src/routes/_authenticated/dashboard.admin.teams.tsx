@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { AdminShell } from "@/components/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { UserPlus, Trash2, Users, FolderKanban, Trophy, Plus, Network, Eye, Cpu, Brain, type LucideIcon } from "lucide-react";
+import { UserPlus, Trash2, Users, FolderKanban, Trophy, Network, Eye, Cpu, Brain, type LucideIcon } from "lucide-react";
 
 const TEAM_ICONS: Record<string, { icon: LucideIcon; color: string; bg: string }> = {
   nexus: { icon: Network, color: "text-violet-600", bg: "bg-violet-100" },
@@ -44,7 +44,7 @@ function TeamsAdmin() {
   const [addingMemberTo, setAddingMemberTo] = useState<Team | null>(null);
   const [assignProjectTo, setAssignProjectTo] = useState<Team | null>(null);
   const [assignCompTo, setAssignCompTo] = useState<Team | null>(null);
-  const [newCompOpen, setNewCompOpen] = useState(false);
+  
 
   const load = async () => {
     setLoading(true);
@@ -100,14 +100,9 @@ function TeamsAdmin() {
   return (
     <div className="space-y-4">
       <Card className="border-border/70 bg-white p-4">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <Users className="h-4 w-4 text-primary" />
-            <h2 className="text-sm font-semibold">Equipos del semillero</h2>
-          </div>
-          <Button size="sm" variant="outline" onClick={() => setNewCompOpen(true)}>
-            <Plus className="mr-1.5 h-3.5 w-3.5" /> Nueva competencia
-          </Button>
+        <div className="flex items-center gap-2">
+          <Users className="h-4 w-4 text-primary" />
+          <h2 className="text-sm font-semibold">Equipos del semillero</h2>
         </div>
         <p className="mt-1 text-xs text-muted-foreground">
           Asigna integrantes, proyectos y competencias a cada equipo.
@@ -223,7 +218,6 @@ function TeamsAdmin() {
       <AddMemberDialog team={addingMemberTo} profiles={profiles} existing={members} onClose={() => setAddingMemberTo(null)} onSaved={() => { setAddingMemberTo(null); load(); }} />
       <AssignProjectDialog team={assignProjectTo} projects={projects} existing={tProjects} onClose={() => setAssignProjectTo(null)} onSaved={() => { setAssignProjectTo(null); load(); }} />
       <AssignCompetitionDialog team={assignCompTo} competitions={competitions} existing={tComps} onClose={() => setAssignCompTo(null)} onSaved={() => { setAssignCompTo(null); load(); }} />
-      <NewCompetitionDialog open={newCompOpen} onClose={() => setNewCompOpen(false)} onSaved={() => { setNewCompOpen(false); load(); }} />
     </div>
   );
 }
@@ -366,39 +360,3 @@ function AssignCompetitionDialog({ team, competitions, existing, onClose, onSave
   );
 }
 
-function NewCompetitionDialog({ open, onClose, onSaved }: { open: boolean; onClose: () => void; onSaved: () => void }) {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [url, setUrl] = useState("");
-  const [eventDate, setEventDate] = useState("");
-  const [location, setLocation] = useState("");
-  useEffect(() => { if (open) { setName(""); setDescription(""); setUrl(""); setEventDate(""); setLocation(""); } }, [open]);
-  const save = async () => {
-    if (!name.trim()) return toast.error("Ingresa el nombre");
-    const { error } = await supabase.from("competitions").insert({
-      name: name.trim(), description, url: url || null, event_date: eventDate || null, location: location || null,
-    });
-    if (error) return toast.error(error.message);
-    toast.success("Competencia creada"); onSaved();
-  };
-  return (
-    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="bg-white sm:max-w-md">
-        <DialogHeader><DialogTitle>Nueva competencia</DialogTitle></DialogHeader>
-        <div className="grid gap-3">
-          <div><Label className="text-xs">Nombre *</Label><Input value={name} onChange={(e) => setName(e.target.value)} className="mt-1" /></div>
-          <div><Label className="text-xs">Descripción</Label><Input value={description} onChange={(e) => setDescription(e.target.value)} className="mt-1" /></div>
-          <div className="grid grid-cols-2 gap-2">
-            <div><Label className="text-xs">Fecha</Label><Input type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} className="mt-1" /></div>
-            <div><Label className="text-xs">Lugar</Label><Input value={location} onChange={(e) => setLocation(e.target.value)} className="mt-1" /></div>
-          </div>
-          <div><Label className="text-xs">URL</Label><Input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://..." className="mt-1" /></div>
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancelar</Button>
-          <Button onClick={save} className="bg-primary hover:bg-primary/90">Crear</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
