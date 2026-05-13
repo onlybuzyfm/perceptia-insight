@@ -246,7 +246,19 @@ function UsersAdmin() {
                   </div>
                 </div>
 
-                <div className="mt-3 grid gap-3 md:grid-cols-3">
+                <div className="mt-3 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Rol público</p>
+                    <Input
+                      placeholder='ej. "Coordinador"'
+                      defaultValue={u.public_role ?? ""}
+                      onBlur={(e) => {
+                        const v = e.target.value.trim();
+                        if (v !== (u.public_role ?? "")) updatePublicRole(u.id, v);
+                      }}
+                      className="mt-1 h-8 text-xs"
+                    />
+                  </div>
                   <div>
                     <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Roles</p>
                     <div className="mt-1 flex flex-wrap gap-1">
