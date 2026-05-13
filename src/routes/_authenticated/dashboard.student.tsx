@@ -11,11 +11,23 @@ import { AvatarUploader } from "@/components/AvatarUploader";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Pencil, Save, X } from "lucide-react";
+import { Pencil, Save, X, Network, Eye, Cpu, Brain, Users, Trophy, Tag, Upload, ExternalLink, Calendar, MapPin, type LucideIcon } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/student")({
   component: StudentDashboard,
 });
+
+const TEAM_ICONS: Record<string, { icon: LucideIcon; color: string; bg: string }> = {
+  nexus: { icon: Network, color: "text-violet-600", bg: "bg-violet-100" },
+  prisma: { icon: Eye, color: "text-sky-600", bg: "bg-sky-100" },
+  vector: { icon: Cpu, color: "text-emerald-600", bg: "bg-emerald-100" },
+  sinapsis: { icon: Brain, color: "text-amber-600", bg: "bg-amber-100" },
+};
+
+const TOOLS = [
+  { name: "Etiquetador", description: "CVAT — anotación de imágenes y video.", url: "https://cvat.perceptia.dev/auth/login", icon: Tag, active: true },
+  { name: "Uploader", description: "Carga masiva de datasets.", url: null as string | null, icon: Upload, active: false },
+];
 
 interface ProjectRow {
   id: string;
@@ -23,6 +35,17 @@ interface ProjectRow {
   description: string;
   status: string;
 }
+
+interface TeamInfo {
+  id: string;
+  name: string;
+  slug: string;
+  focus: string | null;
+  description: string;
+}
+
+interface Mate { user_id: string; full_name: string; username: string | null; avatar_url: string | null; role_in_team: string }
+interface CompetitionRow { id: string; name: string; description: string; url: string | null; event_date: string | null; location: string | null; result: string | null }
 
 interface ProfileData {
   full_name: string;
