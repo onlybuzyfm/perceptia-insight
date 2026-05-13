@@ -218,7 +218,6 @@ function TeamsAdmin() {
       <AddMemberDialog team={addingMemberTo} profiles={profiles} existing={members} onClose={() => setAddingMemberTo(null)} onSaved={() => { setAddingMemberTo(null); load(); }} />
       <AssignProjectDialog team={assignProjectTo} projects={projects} existing={tProjects} onClose={() => setAssignProjectTo(null)} onSaved={() => { setAssignProjectTo(null); load(); }} />
       <AssignCompetitionDialog team={assignCompTo} competitions={competitions} existing={tComps} onClose={() => setAssignCompTo(null)} onSaved={() => { setAssignCompTo(null); load(); }} />
-      <NewCompetitionDialog open={newCompOpen} onClose={() => setNewCompOpen(false)} onSaved={() => { setNewCompOpen(false); load(); }} />
     </div>
   );
 }
