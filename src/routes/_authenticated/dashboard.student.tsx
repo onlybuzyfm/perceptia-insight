@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DashboardShell } from "@/components/DashboardShell";
+import { AvatarUploader } from "@/components/AvatarUploader";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -32,6 +33,7 @@ interface ProfileData {
   bio: string | null;
   github_url: string | null;
   linkedin_url: string | null;
+  avatar_url: string | null;
 }
 
 const EMPTY_PROFILE: ProfileData = {
@@ -43,6 +45,7 @@ const EMPTY_PROFILE: ProfileData = {
   bio: "",
   github_url: "",
   linkedin_url: "",
+  avatar_url: null,
 };
 
 const USERNAME_RE = /^[a-z0-9_.]{3,30}$/;
@@ -66,7 +69,7 @@ function StudentDashboard() {
           .eq("user_id", auth.user!.id),
         supabase
           .from("profiles")
-          .select("full_name, username, carrera, semestre, phone, bio, github_url, linkedin_url")
+          .select("full_name, username, carrera, semestre, phone, bio, github_url, linkedin_url, avatar_url")
           .eq("id", auth.user!.id)
           .maybeSingle(),
       ]);
@@ -83,6 +86,7 @@ function StudentDashboard() {
         bio: prof.data?.bio ?? "",
         github_url: prof.data?.github_url ?? "",
         linkedin_url: prof.data?.linkedin_url ?? "",
+        avatar_url: prof.data?.avatar_url ?? null,
       };
       setProfile(data);
       setDraft(data);
