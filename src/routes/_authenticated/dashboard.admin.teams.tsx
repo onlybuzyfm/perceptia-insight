@@ -44,7 +44,7 @@ function TeamsAdmin() {
   const [addingMemberTo, setAddingMemberTo] = useState<Team | null>(null);
   const [assignProjectTo, setAssignProjectTo] = useState<Team | null>(null);
   const [assignCompTo, setAssignCompTo] = useState<Team | null>(null);
-  const [newCompOpen, setNewCompOpen] = useState(false);
+  
 
   const load = async () => {
     setLoading(true);
