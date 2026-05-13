@@ -126,12 +126,19 @@ function TeamsAdmin() {
             const teamCompsList = tComps.filter((x) => x.team_id === team.id)
               .map((x) => ({ link: x, comp: competitions.find((c) => c.id === x.competition_id) }))
               .filter((x) => x.comp);
+            const ic = TEAM_ICONS[team.slug] ?? { icon: Users, color: "text-primary", bg: "bg-primary-soft" };
+            const TeamIcon = ic.icon;
             return (
               <Card key={team.id} className="border-border/70 bg-white p-4">
                 <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div>
-                    <h3 className="font-semibold text-foreground">{team.name}</h3>
-                    {team.focus && <p className="text-xs text-muted-foreground">{team.focus}</p>}
+                  <div className="flex items-center gap-3">
+                    <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${ic.bg}`}>
+                      <TeamIcon className={`h-5 w-5 ${ic.color}`} />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-foreground">{team.name}</h3>
+                      {team.focus && <p className="text-xs text-muted-foreground">{team.focus}</p>}
+                    </div>
                   </div>
                 </div>
 
