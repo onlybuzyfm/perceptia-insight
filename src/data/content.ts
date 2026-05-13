@@ -104,7 +104,7 @@ export const PROJECTS: { title: string; desc: string; status: ProjectStatus; lin
   { title: "Clustering visual de frutas en diferentes estados", desc: "Agrupamiento no supervisado de imágenes de frutas según su estado de maduración y deterioro.", status: "En curso", line: "Visión artificial", icon: "scan-search" },
   { title: "IA para la detección de lavado de activos", desc: "Modelos de aprendizaje automático para identificar patrones sospechosos en transacciones financieras.", status: "En diseño", line: "Ciencia de Datos", icon: "shield-alert" },
   { title: "Predicción del índice SPEI para el análisis de sequías", desc: "Modelos predictivos del Índice Estandarizado de Precipitación-Evapotranspiración para monitoreo climático.", status: "En curso", line: "Ciencia de Datos", icon: "cloud-rain" },
-  { title: "Explorando los Agentes LLM", desc: "Investigación aplicada sobre arquitecturas de agentes basados en modelos de lenguaje y sus casos de uso.", status: "En diseño", line: "Agentes inteligentes" },
+  { title: "Explorando los Agentes LLM", desc: "Investigación aplicada sobre arquitecturas de agentes basados en modelos de lenguaje y sus casos de uso.", status: "En diseño", line: "Agentes inteligentes", icon: "brain-circuit" },
 ];
 
 export const RESULTS = [
