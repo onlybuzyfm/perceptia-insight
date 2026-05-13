@@ -214,6 +214,7 @@ function UsersAdmin() {
                     <div className="flex items-center gap-2">
                       <p className="font-medium text-foreground">{u.full_name}</p>
                       {!u.is_active && <Badge variant="outline" className="border-destructive/40 text-destructive">Inactivo</Badge>}
+                      {u.is_public_member && <Badge variant="outline" className="border-primary/40 text-primary">Público</Badge>}
                     </div>
                     <p className="text-xs text-muted-foreground">
                       {u.username ? <span className="font-mono text-primary">@{u.username}</span> : <span className="italic">sin username</span>}
@@ -224,14 +225,25 @@ function UsersAdmin() {
                       Último acceso: {u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleString("es-EC") : "nunca"}
                     </p>
                   </div>
-                  <Button
-                    size="sm"
-                    variant={u.is_active ? "outline" : "default"}
-                    onClick={() => toggleActive(u)}
-                    className={u.is_active ? "" : "bg-primary hover:bg-primary/90"}
-                  >
-                    {u.is_active ? <><UserX className="mr-1.5 h-3.5 w-3.5" />Desactivar</> : <><UserCheck className="mr-1.5 h-3.5 w-3.5" />Activar</>}
-                  </Button>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      variant={u.is_public_member ? "default" : "outline"}
+                      onClick={() => togglePublic(u)}
+                      className={u.is_public_member ? "bg-primary hover:bg-primary/90" : ""}
+                      title="Mostrar en /integrantes"
+                    >
+                      {u.is_public_member ? <><Eye className="mr-1.5 h-3.5 w-3.5" />Público</> : <><EyeOff className="mr-1.5 h-3.5 w-3.5" />Oculto</>}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant={u.is_active ? "outline" : "default"}
+                      onClick={() => toggleActive(u)}
+                      className={u.is_active ? "" : "bg-primary hover:bg-primary/90"}
+                    >
+                      {u.is_active ? <><UserX className="mr-1.5 h-3.5 w-3.5" />Desactivar</> : <><UserCheck className="mr-1.5 h-3.5 w-3.5" />Activar</>}
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="mt-3 grid gap-3 md:grid-cols-3">
