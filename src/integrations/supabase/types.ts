@@ -193,8 +193,10 @@ export type Database = {
         Row: {
           created_at: string
           description: string
+          icon: string | null
           id: string
           is_published: boolean
+          line: string | null
           research_line_id: string | null
           slug: string
           status: Database["public"]["Enums"]["project_status"]
@@ -204,8 +206,10 @@ export type Database = {
         Insert: {
           created_at?: string
           description?: string
+          icon?: string | null
           id?: string
           is_published?: boolean
+          line?: string | null
           research_line_id?: string | null
           slug: string
           status?: Database["public"]["Enums"]["project_status"]
@@ -215,8 +219,10 @@ export type Database = {
         Update: {
           created_at?: string
           description?: string
+          icon?: string | null
           id?: string
           is_published?: boolean
+          line?: string | null
           research_line_id?: string | null
           slug?: string
           status?: Database["public"]["Enums"]["project_status"]
