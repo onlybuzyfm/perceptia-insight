@@ -35,7 +35,7 @@ export function Footer() {
           <h4 className="text-sm font-semibold text-foreground">Institución</h4>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             <li>Universidad Nacional de Chimborazo</li>
-            <li>Facultad de Ciencias de la Educación, Humanas y Tecnologías</li>
+            <li>Facultad de Ingeniería</li>
             <li>Carrera de Ciencia de Datos e IA</li>
             <li><Link to="/contacto" className="text-primary hover:underline">Contacto</Link></li>
           </ul>
