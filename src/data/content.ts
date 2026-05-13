@@ -78,18 +78,32 @@ export const ACTIVITIES = [
 
 export type ProjectStatus = "En curso" | "En diseño" | "Activo" | "Piloto";
 
-export const PROJECTS: { title: string; desc: string; status: ProjectStatus; line: string }[] = [
-  { title: "Dataset de frutas con visión por computador", desc: "Construcción y curación de un dataset visual de frutas locales para clasificación con CNNs ligeras.", status: "En curso", line: "Datasets locales" },
-  { title: "CVAT para anotación colaborativa", desc: "Infraestructura compartida para etiquetado de imágenes y video del semillero.", status: "Activo", line: "Curación de datos" },
-  { title: "Moodle PerceptIA con CodeRunner", desc: "Plataforma académica con evaluación automática de código para formación interna.", status: "Activo", line: "Formación" },
-  { title: "Agente académico (n8n + Notion + Telegram)", desc: "Automatización de seguimiento, recordatorios y bitácoras del semillero.", status: "Piloto", line: "Agentes inteligentes" },
-  { title: "Superresolución de imágenes satelitales", desc: "Modelos de SR aplicados a imágenes de baja resolución para análisis territorial.", status: "En diseño", line: "Visión artificial" },
-  { title: "Avalúos catastrales con IA", desc: "Modelos predictivos de valoración predial integrando datos espaciales y socioeconómicos.", status: "En diseño", line: "Ciencia de Datos" },
-  { title: "TinyML para percepción artificial embebida", desc: "Despliegue de modelos en microcontroladores para inferencia en tiempo real.", status: "En curso", line: "TinyML" },
-  { title: "Portal académico PerceptIA", desc: "Sitio institucional y portal interno del semillero (este sitio).", status: "Activo", line: "Plataforma" },
-  { title: "Clustering visual de frutas en diferentes estados", desc: "Agrupamiento no supervisado de imágenes de frutas según su estado de maduración y deterioro.", status: "En curso", line: "Visión artificial" },
-  { title: "IA para la detección de lavado de activos", desc: "Modelos de aprendizaje automático para identificar patrones sospechosos en transacciones financieras.", status: "En diseño", line: "Ciencia de Datos" },
-  { title: "Predicción del índice SPEI para el análisis de sequías", desc: "Modelos predictivos del Índice Estandarizado de Precipitación-Evapotranspiración para monitoreo climático.", status: "En curso", line: "Ciencia de Datos" },
+export type ProjectIcon =
+  | "apple"
+  | "tags"
+  | "graduation-cap"
+  | "bot"
+  | "satellite"
+  | "landmark"
+  | "cpu"
+  | "globe"
+  | "scan-search"
+  | "shield-alert"
+  | "cloud-rain"
+  | "brain-circuit";
+
+export const PROJECTS: { title: string; desc: string; status: ProjectStatus; line: string; icon: ProjectIcon }[] = [
+  { title: "Dataset de frutas con visión por computador", desc: "Construcción y curación de un dataset visual de frutas locales para clasificación con CNNs ligeras.", status: "En curso", line: "Datasets locales", icon: "apple" },
+  { title: "CVAT para anotación colaborativa", desc: "Infraestructura compartida para etiquetado de imágenes y video del semillero.", status: "Activo", line: "Curación de datos", icon: "tags" },
+  { title: "Moodle PerceptIA con CodeRunner", desc: "Plataforma académica con evaluación automática de código para formación interna.", status: "Activo", line: "Formación", icon: "graduation-cap" },
+  { title: "Agente académico (n8n + Notion + Telegram)", desc: "Automatización de seguimiento, recordatorios y bitácoras del semillero.", status: "Piloto", line: "Agentes inteligentes", icon: "bot" },
+  { title: "Superresolución de imágenes satelitales", desc: "Modelos de SR aplicados a imágenes de baja resolución para análisis territorial.", status: "En diseño", line: "Visión artificial", icon: "satellite" },
+  { title: "Avalúos catastrales con IA", desc: "Modelos predictivos de valoración predial integrando datos espaciales y socioeconómicos.", status: "En diseño", line: "Ciencia de Datos", icon: "landmark" },
+  { title: "TinyML para percepción artificial embebida", desc: "Despliegue de modelos en microcontroladores para inferencia en tiempo real.", status: "En curso", line: "TinyML", icon: "cpu" },
+  { title: "Portal académico PerceptIA", desc: "Sitio institucional y portal interno del semillero (este sitio).", status: "Activo", line: "Plataforma", icon: "globe" },
+  { title: "Clustering visual de frutas en diferentes estados", desc: "Agrupamiento no supervisado de imágenes de frutas según su estado de maduración y deterioro.", status: "En curso", line: "Visión artificial", icon: "scan-search" },
+  { title: "IA para la detección de lavado de activos", desc: "Modelos de aprendizaje automático para identificar patrones sospechosos en transacciones financieras.", status: "En diseño", line: "Ciencia de Datos", icon: "shield-alert" },
+  { title: "Predicción del índice SPEI para el análisis de sequías", desc: "Modelos predictivos del Índice Estandarizado de Precipitación-Evapotranspiración para monitoreo climático.", status: "En curso", line: "Ciencia de Datos", icon: "cloud-rain" },
   { title: "Explorando los Agentes LLM", desc: "Investigación aplicada sobre arquitecturas de agentes basados en modelos de lenguaje y sus casos de uso.", status: "En diseño", line: "Agentes inteligentes" },
 ];
 
