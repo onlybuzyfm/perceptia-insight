@@ -89,6 +89,39 @@ export type Database = {
         }
         Relationships: []
       }
+      competitions: {
+        Row: {
+          created_at: string
+          description: string
+          event_date: string | null
+          id: string
+          location: string | null
+          name: string
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          event_date?: string | null
+          id?: string
+          location?: string | null
+          name: string
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          event_date?: string | null
+          id?: string
+          location?: string | null
+          name?: string
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -311,6 +344,143 @@ export type Database = {
         }
         Relationships: []
       }
+      team_competitions: {
+        Row: {
+          assigned_at: string
+          competition_id: string
+          id: string
+          result: string | null
+          team_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          competition_id: string
+          id?: string
+          result?: string | null
+          team_id: string
+        }
+        Update: {
+          assigned_at?: string
+          competition_id?: string
+          id?: string
+          result?: string | null
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_competitions_competition_id_fkey"
+            columns: ["competition_id"]
+            isOneToOne: false
+            referencedRelation: "competitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_competitions_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_members: {
+        Row: {
+          id: string
+          joined_at: string
+          role_in_team: string
+          team_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          role_in_team?: string
+          team_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          role_in_team?: string
+          team_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_members_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_projects: {
+        Row: {
+          assigned_at: string
+          id: string
+          project_id: string
+          team_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          id?: string
+          project_id: string
+          team_id: string
+        }
+        Update: {
+          assigned_at?: string
+          id?: string
+          project_id?: string
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_projects_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_projects_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teams: {
+        Row: {
+          created_at: string
+          description: string
+          focus: string | null
+          id: string
+          name: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          focus?: string | null
+          id?: string
+          name: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          focus?: string | null
+          id?: string
+          name?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -420,6 +590,10 @@ export type Database = {
         Returns: boolean
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      is_team_member: {
+        Args: { _team_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "visitante" | "estudiante" | "coordinador" | "admin"
