@@ -10,7 +10,14 @@ import { Label } from "@/components/ui/label";
 import { AdminShell } from "@/components/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { UserPlus, Trash2, Users, FolderKanban, Trophy, Plus } from "lucide-react";
+import { UserPlus, Trash2, Users, FolderKanban, Trophy, Plus, Network, Eye, Cpu, Brain, type LucideIcon } from "lucide-react";
+
+const TEAM_ICONS: Record<string, { icon: LucideIcon; color: string; bg: string }> = {
+  nexus: { icon: Network, color: "text-violet-600", bg: "bg-violet-100" },
+  prisma: { icon: Eye, color: "text-sky-600", bg: "bg-sky-100" },
+  vector: { icon: Cpu, color: "text-emerald-600", bg: "bg-emerald-100" },
+  sinapsis: { icon: Brain, color: "text-amber-600", bg: "bg-amber-100" },
+};
 
 export const Route = createFileRoute("/_authenticated/dashboard/admin/teams")({
   component: () => <AdminShell><TeamsAdmin /></AdminShell>,
