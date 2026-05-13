@@ -158,6 +158,19 @@ function UsersAdmin() {
     load();
   };
 
+  const togglePublic = async (u: UserRow) => {
+    const { error } = await supabase.from("profiles").update({ is_public_member: !u.is_public_member }).eq("id", u.id);
+    if (error) return toast.error(error.message);
+    toast.success(u.is_public_member ? "Oculto del sitio público" : "Publicado en /integrantes");
+    load();
+  };
+
+  const updatePublicRole = async (userId: string, value: string) => {
+    const { error } = await supabase.from("profiles").update({ public_role: value || null }).eq("id", userId);
+    if (error) return toast.error(error.message);
+    load();
+  };
+
   return (
     <div className="space-y-4">
       <Card className="border-border/70 bg-white p-4">
