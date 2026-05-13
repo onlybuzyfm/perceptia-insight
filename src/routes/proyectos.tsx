@@ -82,7 +82,8 @@ function ProyectosPage() {
                 <span>Línea: <span className="font-medium text-foreground">{p.line}</span></span>
               </div>
             </Card>
-          ))}
+            );
+          })}
         </div>
       </section>
 
