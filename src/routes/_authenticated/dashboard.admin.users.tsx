@@ -9,7 +9,7 @@ import { AdminShell } from "@/components/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, type AppRole } from "@/lib/auth-context";
 import { toast } from "sonner";
-import { Search, UserCheck, UserX } from "lucide-react";
+import { Eye, EyeOff, Search, UserCheck, UserX } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/admin/users")({
   component: () => <AdminShell><UsersAdmin /></AdminShell>,
@@ -24,6 +24,8 @@ interface UserRow {
   carrera: string | null;
   semestre: string | null;
   interest_line_id: string | null;
+  is_public_member: boolean;
+  public_role: string | null;
   roles: AppRole[];
   last_sign_in_at: string | null;
   project_ids: string[];
@@ -47,7 +49,7 @@ function UsersAdmin() {
   const load = async () => {
     setLoading(true);
     const [profs, ur, ls, pr, members, authUsers] = await Promise.all([
-      supabase.from("profiles").select("id, full_name, username, email, is_active, carrera, semestre, interest_line_id"),
+      supabase.from("profiles").select("id, full_name, username, email, is_active, carrera, semestre, interest_line_id, is_public_member, public_role"),
       supabase.from("user_roles").select("user_id, role"),
       supabase.from("research_lines").select("id, title").order("display_order"),
       supabase.from("projects").select("id, title").order("title"),
@@ -84,6 +86,8 @@ function UsersAdmin() {
         carrera: p.carrera,
         semestre: p.semestre,
         interest_line_id: p.interest_line_id,
+        is_public_member: p.is_public_member ?? false,
+        public_role: p.public_role,
         roles: rolesMap.get(p.id) ?? [],
         last_sign_in_at: authMap.get(p.id)?.last_sign_in_at ?? null,
         project_ids: projectsMap.get(p.id) ?? [],
@@ -154,6 +158,19 @@ function UsersAdmin() {
     load();
   };
 
+  const togglePublic = async (u: UserRow) => {
+    const { error } = await supabase.from("profiles").update({ is_public_member: !u.is_public_member }).eq("id", u.id);
+    if (error) return toast.error(error.message);
+    toast.success(u.is_public_member ? "Oculto del sitio público" : "Publicado en /integrantes");
+    load();
+  };
+
+  const updatePublicRole = async (userId: string, value: string) => {
+    const { error } = await supabase.from("profiles").update({ public_role: value || null }).eq("id", userId);
+    if (error) return toast.error(error.message);
+    load();
+  };
+
   return (
     <div className="space-y-4">
       <Card className="border-border/70 bg-white p-4">
@@ -197,6 +214,7 @@ function UsersAdmin() {
                     <div className="flex items-center gap-2">
                       <p className="font-medium text-foreground">{u.full_name}</p>
                       {!u.is_active && <Badge variant="outline" className="border-destructive/40 text-destructive">Inactivo</Badge>}
+                      {u.is_public_member && <Badge variant="outline" className="border-primary/40 text-primary">Público</Badge>}
                     </div>
                     <p className="text-xs text-muted-foreground">
                       {u.username ? <span className="font-mono text-primary">@{u.username}</span> : <span className="italic">sin username</span>}
@@ -207,17 +225,40 @@ function UsersAdmin() {
                       Último acceso: {u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleString("es-EC") : "nunca"}
                     </p>
                   </div>
-                  <Button
-                    size="sm"
-                    variant={u.is_active ? "outline" : "default"}
-                    onClick={() => toggleActive(u)}
-                    className={u.is_active ? "" : "bg-primary hover:bg-primary/90"}
-                  >
-                    {u.is_active ? <><UserX className="mr-1.5 h-3.5 w-3.5" />Desactivar</> : <><UserCheck className="mr-1.5 h-3.5 w-3.5" />Activar</>}
-                  </Button>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      variant={u.is_public_member ? "default" : "outline"}
+                      onClick={() => togglePublic(u)}
+                      className={u.is_public_member ? "bg-primary hover:bg-primary/90" : ""}
+                      title="Mostrar en /integrantes"
+                    >
+                      {u.is_public_member ? <><Eye className="mr-1.5 h-3.5 w-3.5" />Público</> : <><EyeOff className="mr-1.5 h-3.5 w-3.5" />Oculto</>}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant={u.is_active ? "outline" : "default"}
+                      onClick={() => toggleActive(u)}
+                      className={u.is_active ? "" : "bg-primary hover:bg-primary/90"}
+                    >
+                      {u.is_active ? <><UserX className="mr-1.5 h-3.5 w-3.5" />Desactivar</> : <><UserCheck className="mr-1.5 h-3.5 w-3.5" />Activar</>}
+                    </Button>
+                  </div>
                 </div>
 
-                <div className="mt-3 grid gap-3 md:grid-cols-3">
+                <div className="mt-3 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Rol público</p>
+                    <Input
+                      placeholder='ej. "Coordinador"'
+                      defaultValue={u.public_role ?? ""}
+                      onBlur={(e) => {
+                        const v = e.target.value.trim();
+                        if (v !== (u.public_role ?? "")) updatePublicRole(u.id, v);
+                      }}
+                      className="mt-1 h-8 text-xs"
+                    />
+                  </div>
                   <div>
                     <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Roles</p>
                     <div className="mt-1 flex flex-wrap gap-1">
