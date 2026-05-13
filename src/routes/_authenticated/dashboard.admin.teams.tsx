@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { AdminShell } from "@/components/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { UserPlus, Trash2, Users, FolderKanban, Trophy, Plus, Network, Eye, Cpu, Brain, type LucideIcon } from "lucide-react";
+import { UserPlus, Trash2, Users, FolderKanban, Trophy, Network, Eye, Cpu, Brain, type LucideIcon } from "lucide-react";
 
 const TEAM_ICONS: Record<string, { icon: LucideIcon; color: string; bg: string }> = {
   nexus: { icon: Network, color: "text-violet-600", bg: "bg-violet-100" },
