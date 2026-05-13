@@ -2,7 +2,37 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PublicLayout, SectionHeader } from "@/components/PublicLayout";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { PROJECTS, RESULTS, type ProjectStatus } from "@/data/content";
+import { PROJECTS, RESULTS, type ProjectStatus, type ProjectIcon } from "@/data/content";
+import {
+  Apple,
+  Tags,
+  GraduationCap,
+  Bot,
+  Satellite,
+  Landmark,
+  Cpu,
+  Globe,
+  ScanSearch,
+  ShieldAlert,
+  CloudRain,
+  BrainCircuit,
+  type LucideIcon,
+} from "lucide-react";
+
+const PROJECT_ICONS: Record<ProjectIcon, LucideIcon> = {
+  apple: Apple,
+  tags: Tags,
+  "graduation-cap": GraduationCap,
+  bot: Bot,
+  satellite: Satellite,
+  landmark: Landmark,
+  cpu: Cpu,
+  globe: Globe,
+  "scan-search": ScanSearch,
+  "shield-alert": ShieldAlert,
+  "cloud-rain": CloudRain,
+  "brain-circuit": BrainCircuit,
+};
 
 export const Route = createFileRoute("/proyectos")({
   head: () => ({
