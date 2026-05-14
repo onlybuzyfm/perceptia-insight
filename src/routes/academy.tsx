@@ -122,8 +122,13 @@ function AcademyPage() {
 
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
+                <a href="https://moodle.perceptia.dev/" target="_blank" rel="noopener noreferrer">
+                  Ir a PerceptIA Academy <ArrowRight className="ml-1 h-4 w-4" />
+                </a>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="border-primary/30 text-primary hover:bg-primary-soft">
                 <Link to="/lineas">
-                  Explorar líneas de aprendizaje <ArrowRight className="ml-1 h-4 w-4" />
+                  Explorar líneas de aprendizaje
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="border-primary/30 text-primary hover:bg-primary-soft">
