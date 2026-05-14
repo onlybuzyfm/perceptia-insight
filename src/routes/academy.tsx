@@ -3,6 +3,7 @@ import { PublicLayout, SectionHeader } from "@/components/PublicLayout";
 import { NodeBackdrop } from "@/components/NodeBackdrop";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import academyLogo from "@/assets/perceptia-academy-logo.svg";
 import {
   ArrowRight,
   Brain,
