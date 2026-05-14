@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
+import { BackToTop } from "./BackToTop";
 
 export function PublicLayout({ children }: { children: ReactNode }) {
   return (
@@ -8,6 +9,7 @@ export function PublicLayout({ children }: { children: ReactNode }) {
       <Header />
       <main className="flex-1">{children}</main>
       <Footer />
+      <BackToTop />
     </div>
   );
 }
