@@ -3,6 +3,7 @@ import { PublicLayout, SectionHeader } from "@/components/PublicLayout";
 import { Card } from "@/components/ui/card";
 import { ABOUT_PARAGRAPHS, ABOUT_FACTS, GENERAL_OBJECTIVE, SPECIFIC_OBJECTIVES } from "@/data/content";
 import { Target, Network, Microscope, Users2, Building2 } from "lucide-react";
+import lorenaMolina from "@/assets/lorena-molina.jpg";
 
 export const Route = createFileRoute("/sobre")({
   head: () => ({
@@ -55,8 +56,13 @@ function SobrePage() {
 
               <Card className="mt-6 border-primary/20 bg-background p-5 shadow-[var(--shadow-card)]">
                 <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground font-display text-base font-bold">
-                    LM
+                  <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border-2 border-primary/40 shadow-[0_8px_24px_-8px_oklch(0.38_0.16_305_/_0.45)] ring-2 ring-primary-soft">
+                    <img
+                      src={lorenaMolina}
+                      alt="Dra. Lorena Molina, jefa del Grupo de Investigación MODSIM"
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                    />
                   </div>
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-wider text-primary">Dirección del grupo</p>
