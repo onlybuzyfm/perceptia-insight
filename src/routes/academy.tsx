@@ -100,8 +100,15 @@ function AcademyPage() {
             <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
               <GraduationCap className="h-3.5 w-3.5" /> PerceptIA Academy
             </span>
-            <h1 className="mt-5 font-display text-4xl font-bold leading-[1.1] text-foreground sm:text-5xl lg:text-6xl">
-              Percept<span className="text-primary">IA</span> Academy
+            <div className="mt-6 flex justify-center">
+              <img
+                src={academyLogo}
+                alt="PerceptIA Academy logo"
+                className="h-32 w-32 sm:h-40 sm:w-40 drop-shadow-[0_8px_24px_oklch(0.38_0.16_305_/_0.35)]"
+              />
+            </div>
+            <h1 className="mt-5 font-display text-4xl font-bold leading-[1.1] sm:text-5xl lg:text-6xl bg-gradient-to-r from-[oklch(0.45_0.02_285)] via-[oklch(0.42_0.10_305)] to-[oklch(0.38_0.16_305)] bg-clip-text text-transparent">
+              PerceptIA Academy
             </h1>
             <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
               Potenciamos la formación universitaria mediante experiencias reales en
