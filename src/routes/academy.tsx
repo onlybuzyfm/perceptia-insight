@@ -46,7 +46,7 @@ export const Route = createFileRoute("/academy")({
 const PHILOSOPHY = [
   { icon: Brain, emoji: "🧠", title: "IA Aplicada", desc: "Modelos de Machine Learning, Deep Learning, LLMs y agentes inteligentes aplicados a escenarios reales." },
   { icon: Eye, emoji: "👁️", title: "Visión Artificial", desc: "Sistemas capaces de interpretar imágenes, video y datos visuales mediante percepción artificial moderna." },
-  { icon: Bot, emoji: "🤖", title: "Robótica con IA", desc: "Integración de sensores, automatización y sistemas inteligentes conectados con el mundo físico." },
+  { icon: Bot, emoji: "", title: "Robótica con IA", desc: "Integración de sensores, automatización y sistemas inteligentes conectados con el mundo físico." },
   { icon: BarChart3, emoji: "📊", title: "Ciencia de Datos", desc: "Análisis, visualización, predicción y soluciones basadas en información real." },
   { icon: Workflow, emoji: "", title: "Automatización Inteligente", desc: "Flujos automatizados, APIs, agentes IA y herramientas modernas para optimizar procesos." },
   { icon: Cloud, emoji: "☁️", title: "Desarrollo y Deploy", desc: "Infraestructura moderna, Docker, cloud, APIs y despliegue de soluciones tecnológicas." },
