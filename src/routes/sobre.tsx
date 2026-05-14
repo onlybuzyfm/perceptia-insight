@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PublicLayout, SectionHeader } from "@/components/PublicLayout";
 import { Card } from "@/components/ui/card";
 import { ABOUT_PARAGRAPHS, ABOUT_FACTS, GENERAL_OBJECTIVE, SPECIFIC_OBJECTIVES } from "@/data/content";
-import { Target } from "lucide-react";
+import { Target, Network, Microscope, Users2, Building2 } from "lucide-react";
 
 export const Route = createFileRoute("/sobre")({
   head: () => ({
@@ -32,6 +32,45 @@ function SobrePage() {
               <p className="mt-2 font-display text-base font-semibold text-foreground">{f.value}</p>
             </Card>
           ))}
+        </div>
+      </section>
+
+      {/* MODSIM — Grupo de investigación matriz */}
+      <section className="border-y border-border/60 bg-gradient-to-b from-primary-soft/40 to-background">
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+          <div className="grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:items-center">
+            <div>
+              <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-background px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
+                <Building2 className="h-3.5 w-3.5" /> Grupo de investigación matriz
+              </span>
+              <h2 className="mt-4 font-display text-3xl font-bold text-foreground sm:text-4xl">
+                Adscritos al Grupo MODSIM
+              </h2>
+              <p className="mt-4 text-base leading-relaxed text-muted-foreground">
+                PerceptIA nace y se desarrolla bajo el paraguas del <strong className="text-foreground">Grupo de Investigación MODSIM</strong> (Modelado y Simulación), espacio académico que articula la investigación formativa, la producción científica y la transferencia de conocimiento desde la carrera de Ciencia de Datos e Inteligencia Artificial.
+              </p>
+              <p className="mt-3 text-base leading-relaxed text-muted-foreground">
+                Esta adscripción nos da respaldo institucional, líneas de trabajo consolidadas, mentoría docente y acceso a redes de colaboración para llevar nuestros proyectos desde el aula hasta publicaciones, prototipos y eventos científicos.
+              </p>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              {[
+                { icon: Microscope, title: "Investigación aplicada", desc: "Proyectos con rigor metodológico y validación empírica." },
+                { icon: Network, title: "Redes y colaboración", desc: "Articulación con docentes, semilleros y aliados externos." },
+                { icon: Users2, title: "Formación de talento", desc: "Estudiantes investigadores guiados por el grupo." },
+                { icon: Target, title: "Producción científica", desc: "Artículos, ponencias, capítulos y prototipos." },
+              ].map(({ icon: Icon, title, desc }) => (
+                <Card key={title} className="border-border/70 p-5 shadow-[var(--shadow-card)]">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-soft text-primary">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <p className="mt-3 font-display text-sm font-semibold text-foreground">{title}</p>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{desc}</p>
+                </Card>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
