@@ -52,6 +52,19 @@ function SobrePage() {
               <p className="mt-3 text-base leading-relaxed text-muted-foreground">
                 Esta adscripción nos da respaldo institucional, líneas de trabajo consolidadas, mentoría docente y acceso a redes de colaboración para llevar nuestros proyectos desde el aula hasta publicaciones, prototipos y eventos científicos.
               </p>
+
+              <Card className="mt-6 border-primary/20 bg-background p-5 shadow-[var(--shadow-card)]">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground font-display text-base font-bold">
+                    LM
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-primary">Dirección del grupo</p>
+                    <p className="mt-0.5 font-display text-base font-semibold text-foreground">Dra. Lorena Molina</p>
+                    <p className="text-sm text-muted-foreground">Jefa del Grupo de Investigación MODSIM</p>
+                  </div>
+                </div>
+              </Card>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
