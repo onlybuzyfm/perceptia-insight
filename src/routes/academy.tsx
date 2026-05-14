@@ -179,13 +179,12 @@ function AcademyPage() {
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
         <SectionHeader eyebrow="Filosofía" title="Aprender construyendo" />
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {PHILOSOPHY.map(({ icon: Icon, emoji, title, desc }) => (
+          {PHILOSOPHY.map(({ icon: Icon, title, desc }) => (
             <Card key={title} className="group border-border/70 p-6 shadow-[var(--shadow-card)] transition-all hover:-translate-y-0.5 hover:border-primary/40">
               <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-soft text-primary">
                   <Icon className="h-5 w-5" />
                 </div>
-                <span className="text-2xl" aria-hidden="true">{emoji}</span>
               </div>
               <h3 className="mt-4 font-display text-lg font-semibold text-foreground">{title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{desc}</p>
