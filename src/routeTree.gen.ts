@@ -16,6 +16,7 @@ import { Route as LineasRouteImport } from './routes/lineas'
 import { Route as IntegrantesRouteImport } from './routes/integrantes'
 import { Route as ContactoRouteImport } from './routes/contacto'
 import { Route as ActividadesRouteImport } from './routes/actividades'
+import { Route as AcademyRouteImport } from './routes/academy'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedWeeklyUpdatesRouteImport } from './routes/_authenticated/weekly-updates'
@@ -67,6 +68,11 @@ const ContactoRoute = ContactoRouteImport.update({
 const ActividadesRoute = ActividadesRouteImport.update({
   id: '/actividades',
   path: '/actividades',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AcademyRoute = AcademyRouteImport.update({
+  id: '/academy',
+  path: '/academy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
@@ -170,6 +176,7 @@ const AuthenticatedDashboardAdminCompetitionsRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/academy': typeof AcademyRoute
   '/actividades': typeof ActividadesRoute
   '/contacto': typeof ContactoRoute
   '/integrantes': typeof IntegrantesRoute
@@ -195,6 +202,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/academy': typeof AcademyRoute
   '/actividades': typeof ActividadesRoute
   '/contacto': typeof ContactoRoute
   '/integrantes': typeof IntegrantesRoute
@@ -221,6 +229,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/academy': typeof AcademyRoute
   '/actividades': typeof ActividadesRoute
   '/contacto': typeof ContactoRoute
   '/integrantes': typeof IntegrantesRoute
@@ -248,6 +257,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/academy'
     | '/actividades'
     | '/contacto'
     | '/integrantes'
@@ -273,6 +283,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/academy'
     | '/actividades'
     | '/contacto'
     | '/integrantes'
@@ -298,6 +309,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/academy'
     | '/actividades'
     | '/contacto'
     | '/integrantes'
@@ -325,6 +337,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AcademyRoute: typeof AcademyRoute
   ActividadesRoute: typeof ActividadesRoute
   ContactoRoute: typeof ContactoRoute
   IntegrantesRoute: typeof IntegrantesRoute
@@ -383,6 +396,13 @@ declare module '@tanstack/react-router' {
       path: '/actividades'
       fullPath: '/actividades'
       preLoaderRoute: typeof ActividadesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/academy': {
+      id: '/academy'
+      path: '/academy'
+      fullPath: '/academy'
+      preLoaderRoute: typeof AcademyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -571,6 +591,7 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AcademyRoute: AcademyRoute,
   ActividadesRoute: ActividadesRoute,
   ContactoRoute: ContactoRoute,
   IntegrantesRoute: IntegrantesRoute,
