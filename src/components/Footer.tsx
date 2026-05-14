@@ -34,6 +34,20 @@ export function Footer() {
           <p className="mt-3 text-xs text-muted-foreground">
             Adscrito al grupo de investigación <span className="font-semibold text-foreground">MODSIM</span>.
           </p>
+          <div className="mt-5 flex items-center gap-3">
+            {SOCIAL.map((s) => (
+              <a
+                key={s.name}
+                href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={s.name}
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+              >
+                <s.icon className="h-4 w-4" />
+              </a>
+            ))}
+          </div>
         </div>
 
         <div>
