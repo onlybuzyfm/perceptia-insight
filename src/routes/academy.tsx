@@ -98,7 +98,7 @@ function AcademyPage() {
         <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
           <div className="mx-auto max-w-4xl text-center">
             <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
-              <GraduationCap className="h-3.5 w-3.5" /> PerceptIA Academy
+              <GraduationCap className="h-3.5 w-3.5" /> PERCEPTIA ACADEMY
             </span>
             <div className="mt-6 flex justify-center">
               <img
