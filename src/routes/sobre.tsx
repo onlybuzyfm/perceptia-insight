@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PublicLayout, SectionHeader } from "@/components/PublicLayout";
 import { Card } from "@/components/ui/card";
 import { ABOUT_PARAGRAPHS, ABOUT_FACTS, GENERAL_OBJECTIVE, SPECIFIC_OBJECTIVES } from "@/data/content";
-import { Target } from "lucide-react";
+import { Target, Network, Microscope, Users2, Building2 } from "lucide-react";
 
 export const Route = createFileRoute("/sobre")({
   head: () => ({
