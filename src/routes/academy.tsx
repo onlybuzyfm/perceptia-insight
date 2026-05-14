@@ -107,7 +107,7 @@ function AcademyPage() {
                 className="h-32 w-32 sm:h-40 sm:w-40 drop-shadow-[0_8px_24px_oklch(0.38_0.16_305_/_0.35)]"
               />
             </div>
-            <h1 className="mt-5 font-display text-4xl font-bold leading-[1.1] sm:text-5xl lg:text-6xl bg-gradient-to-r from-[oklch(0.45_0.02_285)] via-[oklch(0.42_0.10_305)] to-[oklch(0.38_0.16_305)] bg-clip-text text-transparent">
+            <h1 className="mt-5 font-display text-4xl font-bold leading-[1.1] sm:text-5xl lg:text-6xl bg-gradient-to-r from-[oklch(0.45_0.02_285)] via-[oklch(0.42_0.10_305)] to-[oklch(0.38_0.16_305)] bg-clip-text text-purple-800">
               PerceptIA Academy
             </h1>
             <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
