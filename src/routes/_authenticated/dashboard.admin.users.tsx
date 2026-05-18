@@ -174,6 +174,21 @@ function UsersAdmin() {
     load();
   };
 
+  const deleteUser = async (u: UserRow) => {
+    if (u.id === auth.user?.id) return toast.error("No puedes eliminarte a ti mismo.");
+    const first = window.prompt(
+      `⚠️ ELIMINACIÓN PERMANENTE\n\nVas a borrar a "${u.full_name}" (${u.email ?? "sin correo"}) y TODOS sus datos (perfil, roles, avances semanales, asignaciones, avatar y cuenta de acceso).\n\nEsta acción NO se puede deshacer.\n\nEscribe ELIMINAR para confirmar:`,
+    );
+    if (first !== "ELIMINAR") return;
+    try {
+      await deleteUserFn({ data: { userId: u.id } });
+      toast.success("Usuario eliminado completamente");
+      load();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Error al eliminar");
+    }
+  };
+
   return (
     <div className="space-y-4">
       <Card className="border-border/70 bg-white p-4">
