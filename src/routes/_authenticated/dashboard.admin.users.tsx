@@ -9,7 +9,9 @@ import { AdminShell } from "@/components/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, type AppRole } from "@/lib/auth-context";
 import { toast } from "sonner";
-import { Eye, EyeOff, Search, UserCheck, UserX } from "lucide-react";
+import { Eye, EyeOff, Search, Trash2, UserCheck, UserX } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { deleteUserCompletely } from "@/lib/admin-users.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/admin/users")({
   component: () => <AdminShell><UsersAdmin /></AdminShell>,
