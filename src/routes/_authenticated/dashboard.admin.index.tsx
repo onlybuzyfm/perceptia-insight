@@ -51,7 +51,7 @@ export function AdminOverview() {
         studentsActive = count ?? 0;
       }
 
-      const [projAct, projAll, appsPend, upWeek, upLast, res, prods] = await Promise.all([
+      const [projAct, projAll, appsPend, upWeek, upLast, res, prods, projMembers, activeProfiles] = await Promise.all([
         supabase.from("projects").select("id", { count: "exact", head: true }).eq("status", "activo"),
         supabase.from("projects").select("status"),
         supabase.from("applications").select("id", { count: "exact", head: true }).eq("status", "pendiente"),
@@ -59,11 +59,17 @@ export function AdminOverview() {
         supabase.from("weekly_updates").select("user_id").gte("week_start", lastWeekISO).lt("week_start", weekStart),
         supabase.from("resources").select("id", { count: "exact", head: true }),
         supabase.from("applications").select("id, full_name, email, status, created_at").order("created_at", { ascending: false }).limit(5),
+        supabase.from("project_members").select("user_id"),
+        supabase.from("profiles").select("id, created_at").in("id", ids.length ? ids : ["00000000-0000-0000-0000-000000000000"]).eq("is_active", true),
       ]);
 
-      // Avances atrasados: estudiantes activos sin avance la semana pasada
+      // Avances atrasados: estudiantes activos CON proyecto asignado Y creados antes del inicio de la semana evaluada, sin avance esa semana
       const reportedLast = new Set((upLast.data ?? []).map((r) => r.user_id));
-      const updatesLate = ids.filter((id) => !reportedLast.has(id)).length;
+      const withProject = new Set((projMembers.data ?? []).map((m) => m.user_id));
+      const eligible = (activeProfiles.data ?? []).filter(
+        (p) => withProject.has(p.id) && new Date(p.created_at) < new Date(lastWeekISO),
+      );
+      const updatesLate = eligible.filter((p) => !reportedLast.has(p.id)).length;
 
       // Distribución por estado de proyecto
       const status: Record<string, number> = {};
