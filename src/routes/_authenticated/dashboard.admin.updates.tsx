@@ -7,7 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { AdminShell } from "@/components/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, Download, FileCheck2 } from "lucide-react";
+import { Search, Download, FileCheck2, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard/admin/updates")({
   component: () => <AdminShell><UpdatesAdmin /></AdminShell>,
