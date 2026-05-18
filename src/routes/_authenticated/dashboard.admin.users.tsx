@@ -9,7 +9,9 @@ import { AdminShell } from "@/components/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, type AppRole } from "@/lib/auth-context";
 import { toast } from "sonner";
-import { Eye, EyeOff, Search, UserCheck, UserX } from "lucide-react";
+import { Eye, EyeOff, Search, Trash2, UserCheck, UserX } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { deleteUserCompletely } from "@/lib/admin-users.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/admin/users")({
   component: () => <AdminShell><UsersAdmin /></AdminShell>,
@@ -38,6 +40,7 @@ const MANAGED_ROLES: AppRole[] = ["estudiante", "coordinador", "admin"];
 
 function UsersAdmin() {
   const auth = useAuth();
+  const deleteUserFn = useServerFn(deleteUserCompletely);
   const [users, setUsers] = useState<UserRow[]>([]);
   const [lines, setLines] = useState<ResearchLine[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -171,6 +174,21 @@ function UsersAdmin() {
     load();
   };
 
+  const deleteUser = async (u: UserRow) => {
+    if (u.id === auth.user?.id) return toast.error("No puedes eliminarte a ti mismo.");
+    const first = window.prompt(
+      `⚠️ ELIMINACIÓN PERMANENTE\n\nVas a borrar a "${u.full_name}" (${u.email ?? "sin correo"}) y TODOS sus datos (perfil, roles, avances semanales, asignaciones, avatar y cuenta de acceso).\n\nEsta acción NO se puede deshacer.\n\nEscribe ELIMINAR para confirmar:`,
+    );
+    if (first !== "ELIMINAR") return;
+    try {
+      await deleteUserFn({ data: { userId: u.id } });
+      toast.success("Usuario eliminado completamente");
+      load();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Error al eliminar");
+    }
+  };
+
   return (
     <div className="space-y-4">
       <Card className="border-border/70 bg-white p-4">
@@ -243,6 +261,17 @@ function UsersAdmin() {
                     >
                       {u.is_active ? <><UserX className="mr-1.5 h-3.5 w-3.5" />Desactivar</> : <><UserCheck className="mr-1.5 h-3.5 w-3.5" />Activar</>}
                     </Button>
+                    {u.id !== auth.user?.id && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => deleteUser(u)}
+                        className="border-destructive/40 text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                        title="Eliminar permanentemente"
+                      >
+                        <Trash2 className="mr-1.5 h-3.5 w-3.5" />Eliminar
+                      </Button>
+                    )}
                   </div>
                 </div>
 
