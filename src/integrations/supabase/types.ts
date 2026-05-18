@@ -122,6 +122,88 @@ export type Database = {
         }
         Relationships: []
       }
+      meeting_attendance: {
+        Row: {
+          id: string
+          marked_at: string
+          marked_by: string | null
+          meeting_id: string
+          notes: string | null
+          status: Database["public"]["Enums"]["attendance_status"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          marked_at?: string
+          marked_by?: string | null
+          meeting_id: string
+          notes?: string | null
+          status?: Database["public"]["Enums"]["attendance_status"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          marked_at?: string
+          marked_by?: string | null
+          meeting_id?: string
+          notes?: string | null
+          status?: Database["public"]["Enums"]["attendance_status"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meeting_attendance_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "meetings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meetings: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string
+          id: string
+          location: string | null
+          meeting_date: string
+          research_line_id: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          id?: string
+          location?: string | null
+          meeting_date: string
+          research_line_id?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          id?: string
+          location?: string | null
+          meeting_date?: string
+          research_line_id?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meetings_research_line_id_fkey"
+            columns: ["research_line_id"]
+            isOneToOne: false
+            referencedRelation: "research_lines"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -598,6 +680,7 @@ export type Database = {
     Enums: {
       app_role: "visitante" | "estudiante" | "coordinador" | "admin"
       application_status: "pendiente" | "en_revision" | "aceptada" | "rechazada"
+      attendance_status: "presente" | "ausente" | "tardanza" | "justificado"
       project_status:
         | "propuesto"
         | "planificacion"
@@ -744,6 +827,7 @@ export const Constants = {
     Enums: {
       app_role: ["visitante", "estudiante", "coordinador", "admin"],
       application_status: ["pendiente", "en_revision", "aceptada", "rechazada"],
+      attendance_status: ["presente", "ausente", "tardanza", "justificado"],
       project_status: [
         "propuesto",
         "planificacion",

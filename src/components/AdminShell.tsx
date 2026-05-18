@@ -36,6 +36,7 @@ const ADMIN_NAV: AdminNavItem[] = [
   { to: "/dashboard/admin/competitions", icon: Trophy, label: "Competencias" },
   { to: "/dashboard/admin/applications", icon: Inbox, label: "Postulaciones", soon: true },
   { to: "/dashboard/admin/updates", icon: FileCheck2, label: "Avances" },
+  { to: "/dashboard/admin/meetings", icon: Calendar, label: "Reuniones" },
   { to: "/dashboard/admin/tools", icon: Wrench, label: "Herramientas" },
   { to: "/dashboard/admin/resources", icon: BookOpen, label: "Recursos", soon: true },
   { to: "/dashboard/admin/events", icon: Calendar, label: "Eventos", soon: true },
