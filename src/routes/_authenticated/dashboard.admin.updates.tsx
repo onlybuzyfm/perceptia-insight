@@ -79,6 +79,17 @@ function UpdatesAdmin() {
 
   const totalHours = useMemo(() => filtered.reduce((sum, r) => sum + Number(r.hours_spent ?? 0), 0), [filtered]);
 
+  const deleteUpdate = async (id: string, name: string, week: string) => {
+    if (!confirm(`¿Eliminar el avance de ${name} (semana ${week})? Esta acción no se puede deshacer.`)) return;
+    const { error } = await supabase.from("weekly_updates").delete().eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Avance eliminado");
+    setRows((prev) => prev.filter((r) => r.id !== id));
+  };
+
   const exportCSV = () => {
     const headers = ["Semana", "Estudiante", "Proyecto", "Resumen", "Logros", "Bloqueos", "Horas"];
     const data = filtered.map((r) => [
