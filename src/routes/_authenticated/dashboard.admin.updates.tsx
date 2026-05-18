@@ -152,6 +152,7 @@ function UpdatesAdmin() {
                 <th className="px-4 py-3">Logros</th>
                 <th className="px-4 py-3">Bloqueos</th>
                 <th className="px-4 py-3 text-right">Horas</th>
+                <th className="px-4 py-3 text-right">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/60">
@@ -166,6 +167,16 @@ function UpdatesAdmin() {
                   <td className="max-w-[200px] px-4 py-2.5 text-muted-foreground">{r.achievements ?? "—"}</td>
                   <td className="max-w-[200px] px-4 py-2.5 text-muted-foreground">{r.blockers ?? "—"}</td>
                   <td className="px-4 py-2.5 text-right font-mono">{Number(r.hours_spent ?? 0).toFixed(1)}</td>
+                  <td className="px-4 py-2.5 text-right">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => deleteUpdate(r.id, r.full_name, r.week_start)}
+                      className="h-7 border-destructive/40 px-2 text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </td>
                 </tr>
               ))}
             </tbody>
