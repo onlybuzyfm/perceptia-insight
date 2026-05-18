@@ -261,6 +261,17 @@ function UsersAdmin() {
                     >
                       {u.is_active ? <><UserX className="mr-1.5 h-3.5 w-3.5" />Desactivar</> : <><UserCheck className="mr-1.5 h-3.5 w-3.5" />Activar</>}
                     </Button>
+                    {u.id !== auth.user?.id && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => deleteUser(u)}
+                        className="border-destructive/40 text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                        title="Eliminar permanentemente"
+                      >
+                        <Trash2 className="mr-1.5 h-3.5 w-3.5" />Eliminar
+                      </Button>
+                    )}
                   </div>
                 </div>
 
