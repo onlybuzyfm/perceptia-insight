@@ -40,6 +40,7 @@ const MANAGED_ROLES: AppRole[] = ["estudiante", "coordinador", "admin"];
 
 function UsersAdmin() {
   const auth = useAuth();
+  const deleteUserFn = useServerFn(deleteUserCompletely);
   const [users, setUsers] = useState<UserRow[]>([]);
   const [lines, setLines] = useState<ResearchLine[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
