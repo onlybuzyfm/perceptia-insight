@@ -14,6 +14,35 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_assignees: {
+        Row: {
+          activity_id: string
+          assigned_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          activity_id: string
+          assigned_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          activity_id?: string
+          assigned_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_assignees_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "project_activities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       announcements: {
         Row: {
           audience: Database["public"]["Enums"]["app_role"]
@@ -274,6 +303,50 @@ export type Database = {
             columns: ["interest_line_id"]
             isOneToOne: false
             referencedRelation: "research_lines"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_activities: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          deadline: string
+          description: string
+          id: string
+          project_id: string
+          status: Database["public"]["Enums"]["activity_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          deadline: string
+          description?: string
+          id?: string
+          project_id: string
+          status?: Database["public"]["Enums"]["activity_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          deadline?: string
+          description?: string
+          id?: string
+          project_id?: string
+          status?: Database["public"]["Enums"]["activity_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_activities_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]
@@ -696,6 +769,7 @@ export type Database = {
       share_team: { Args: { _a: string; _b: string }; Returns: boolean }
     }
     Enums: {
+      activity_status: "pendiente" | "en_progreso" | "completada"
       app_role: "visitante" | "estudiante" | "coordinador" | "admin"
       application_status: "pendiente" | "en_revision" | "aceptada" | "rechazada"
       attendance_status: "presente" | "ausente" | "tardanza" | "justificado"
@@ -843,6 +917,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      activity_status: ["pendiente", "en_progreso", "completada"],
       app_role: ["visitante", "estudiante", "coordinador", "admin"],
       application_status: ["pendiente", "en_revision", "aceptada", "rechazada"],
       attendance_status: ["presente", "ausente", "tardanza", "justificado"],
