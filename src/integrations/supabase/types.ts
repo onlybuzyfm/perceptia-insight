@@ -693,6 +693,7 @@ export type Database = {
         Args: { _team_id: string; _user_id: string }
         Returns: boolean
       }
+      share_team: { Args: { _a: string; _b: string }; Returns: boolean }
     }
     Enums: {
       app_role: "visitante" | "estudiante" | "coordinador" | "admin"
