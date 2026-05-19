@@ -5,9 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { AdminShell } from "@/components/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, Download, FileCheck2, Trash2 } from "lucide-react";
+import { Search, Download, FileCheck2, Trash2, Eye, ExternalLink, Github, Paperclip } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard/admin/updates")({
@@ -24,6 +25,7 @@ interface Update {
   blockers: string | null;
   hours_spent: number | null;
   repo_url: string | null;
+  evidence_url: string | null;
   created_at: string;
   full_name: string;
   username: string | null;
@@ -36,6 +38,7 @@ function UpdatesAdmin() {
   const [q, setQ] = useState("");
   const [userFilter, setUserFilter] = useState("all");
   const [projectFilter, setProjectFilter] = useState("all");
+  const [detail, setDetail] = useState<Update | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -83,19 +86,30 @@ function UpdatesAdmin() {
   const deleteUpdate = async (id: string, name: string, week: string) => {
     if (!confirm(`¿Eliminar el avance de ${name} (semana ${week})? Esta acción no se puede deshacer.`)) return;
     const { error } = await supabase.from("weekly_updates").delete().eq("id", id);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
+    if (error) { toast.error(error.message); return; }
     toast.success("Avance eliminado");
     setRows((prev) => prev.filter((r) => r.id !== id));
+    setDetail(null);
+  };
+
+  const downloadEvidence = async (path: string) => {
+    const { data, error } = await supabase.storage.from("update-evidences").createSignedUrl(path, 600, { download: true });
+    if (error || !data) { toast.error("No se pudo generar el enlace de descarga"); return; }
+    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+  };
+
+  const openEvidence = async (path: string) => {
+    const { data, error } = await supabase.storage.from("update-evidences").createSignedUrl(path, 600);
+    if (error || !data) { toast.error("No se pudo abrir la evidencia"); return; }
+    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
   };
 
   const exportCSV = () => {
-    const headers = ["Semana", "Estudiante", "Proyecto", "Resumen", "Logros", "Bloqueos", "Horas"];
+    const headers = ["Semana", "Estudiante", "Proyecto", "Resumen", "Logros", "Bloqueos", "Horas", "Repositorio", "Evidencia"];
     const data = filtered.map((r) => [
       r.week_start, r.full_name, r.project_title ?? "—",
       r.summary, r.achievements ?? "", r.blockers ?? "", String(r.hours_spent ?? 0),
+      r.repo_url ?? "", r.evidence_url ?? "",
     ]);
     const csv = [headers, ...data].map((row) => row.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -150,8 +164,7 @@ function UpdatesAdmin() {
                 <th className="px-4 py-3">Estudiante</th>
                 <th className="px-4 py-3">Proyecto</th>
                 <th className="px-4 py-3">Resumen</th>
-                <th className="px-4 py-3">Logros</th>
-                <th className="px-4 py-3">Bloqueos</th>
+                <th className="px-4 py-3">Adjuntos</th>
                 <th className="px-4 py-3 text-right">Horas</th>
                 <th className="px-4 py-3 text-right">Acciones</th>
               </tr>
@@ -164,26 +177,39 @@ function UpdatesAdmin() {
                   <td className="px-4 py-2.5 text-muted-foreground">
                     {r.project_title ? <Badge variant="outline">{r.project_title}</Badge> : "—"}
                   </td>
-                  <td className="max-w-[260px] px-4 py-2.5 text-foreground/80">{r.summary}</td>
-                  <td className="max-w-[200px] px-4 py-2.5 text-muted-foreground">{r.achievements ?? "—"}</td>
-                  <td className="max-w-[200px] px-4 py-2.5 text-muted-foreground">
-                    {r.blockers ?? "—"}
-                    {r.repo_url && (
-                      <a href={r.repo_url} target="_blank" rel="noopener noreferrer" className="mt-1 block text-xs text-primary hover:underline">
-                        ↗ GitHub
-                      </a>
-                    )}
+                  <td className="max-w-[320px] px-4 py-2.5 text-foreground/80">
+                    <p className="line-clamp-2">{r.summary}</p>
+                  </td>
+                  <td className="px-4 py-2.5">
+                    <div className="flex flex-col gap-1 text-xs">
+                      {r.repo_url && (
+                        <a href={r.repo_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline">
+                          <Github className="h-3 w-3" /> Repo
+                        </a>
+                      )}
+                      {r.evidence_url && (
+                        <button type="button" onClick={() => openEvidence(r.evidence_url!)} className="inline-flex items-center gap-1 text-primary hover:underline">
+                          <Paperclip className="h-3 w-3" /> Evidencia
+                        </button>
+                      )}
+                      {!r.repo_url && !r.evidence_url && <span className="text-muted-foreground">—</span>}
+                    </div>
                   </td>
                   <td className="px-4 py-2.5 text-right font-mono">{Number(r.hours_spent ?? 0).toFixed(1)}</td>
                   <td className="px-4 py-2.5 text-right">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => deleteUpdate(r.id, r.full_name, r.week_start)}
-                      className="h-7 border-destructive/40 px-2 text-destructive hover:bg-destructive hover:text-destructive-foreground"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
+                    <div className="flex justify-end gap-1">
+                      <Button variant="outline" size="sm" className="h-7 px-2" onClick={() => setDetail(r)}>
+                        <Eye className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => deleteUpdate(r.id, r.full_name, r.week_start)}
+                        className="h-7 border-destructive/40 px-2 text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -191,6 +217,70 @@ function UpdatesAdmin() {
           </table>
         )}
       </Card>
+
+      <Dialog open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
+        <DialogContent className="max-w-2xl">
+          {detail && (
+            <>
+              <DialogHeader>
+                <DialogTitle>Avance — semana del {detail.week_start}</DialogTitle>
+                <DialogDescription>
+                  {detail.full_name}{detail.username ? ` · @${detail.username}` : ""}
+                  {detail.project_title ? ` · ${detail.project_title}` : ""}
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-4 text-sm">
+                <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+                  <Badge variant="outline">{Number(detail.hours_spent ?? 0).toFixed(1)} h dedicadas</Badge>
+                  <span>Registrado: {new Date(detail.created_at).toLocaleString()}</span>
+                </div>
+
+                <Section title="Resumen">{detail.summary}</Section>
+                <Section title="Logros">{detail.achievements || "—"}</Section>
+                <Section title="Bloqueos">{detail.blockers || "—"}</Section>
+
+                <div className="grid gap-3 sm:grid-cols-2 pt-2 border-t border-border/60">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Repositorio</p>
+                    {detail.repo_url ? (
+                      <a href={detail.repo_url} target="_blank" rel="noopener noreferrer" className="mt-1 inline-flex items-center gap-1 text-sm text-primary hover:underline break-all">
+                        <Github className="h-3.5 w-3.5 shrink-0" /> {detail.repo_url}
+                      </a>
+                    ) : (
+                      <p className="mt-1 text-sm text-muted-foreground">No adjuntó repositorio.</p>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Evidencia</p>
+                    {detail.evidence_url ? (
+                      <div className="mt-1 flex flex-wrap gap-2">
+                        <Button size="sm" variant="outline" onClick={() => openEvidence(detail.evidence_url!)}>
+                          <ExternalLink className="mr-1.5 h-3.5 w-3.5" /> Ver
+                        </Button>
+                        <Button size="sm" onClick={() => downloadEvidence(detail.evidence_url!)}>
+                          <Download className="mr-1.5 h-3.5 w-3.5" /> Descargar
+                        </Button>
+                      </div>
+                    ) : (
+                      <p className="mt-1 text-sm text-muted-foreground">No adjuntó evidencia.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</p>
+      <p className="mt-1 whitespace-pre-wrap text-foreground">{children}</p>
     </div>
   );
 }
