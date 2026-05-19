@@ -32,6 +32,7 @@ import { Route as AuthenticatedDashboardAdminUpdatesRouteImport } from './routes
 import { Route as AuthenticatedDashboardAdminToolsRouteImport } from './routes/_authenticated/dashboard.admin.tools'
 import { Route as AuthenticatedDashboardAdminTeamsRouteImport } from './routes/_authenticated/dashboard.admin.teams'
 import { Route as AuthenticatedDashboardAdminStudentsRouteImport } from './routes/_authenticated/dashboard.admin.students'
+import { Route as AuthenticatedDashboardAdminResourcesRouteImport } from './routes/_authenticated/dashboard.admin.resources'
 import { Route as AuthenticatedDashboardAdminProjectsRouteImport } from './routes/_authenticated/dashboard.admin.projects'
 import { Route as AuthenticatedDashboardAdminMeetingsRouteImport } from './routes/_authenticated/dashboard.admin.meetings'
 import { Route as AuthenticatedDashboardAdminCompetitionsRouteImport } from './routes/_authenticated/dashboard.admin.competitions'
@@ -162,6 +163,12 @@ const AuthenticatedDashboardAdminStudentsRoute =
     path: '/students',
     getParentRoute: () => AuthenticatedDashboardAdminRoute,
   } as any)
+const AuthenticatedDashboardAdminResourcesRoute =
+  AuthenticatedDashboardAdminResourcesRouteImport.update({
+    id: '/resources',
+    path: '/resources',
+    getParentRoute: () => AuthenticatedDashboardAdminRoute,
+  } as any)
 const AuthenticatedDashboardAdminProjectsRoute =
   AuthenticatedDashboardAdminProjectsRouteImport.update({
     id: '/projects',
@@ -201,6 +208,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin/competitions': typeof AuthenticatedDashboardAdminCompetitionsRoute
   '/dashboard/admin/meetings': typeof AuthenticatedDashboardAdminMeetingsRoute
   '/dashboard/admin/projects': typeof AuthenticatedDashboardAdminProjectsRoute
+  '/dashboard/admin/resources': typeof AuthenticatedDashboardAdminResourcesRoute
   '/dashboard/admin/students': typeof AuthenticatedDashboardAdminStudentsRoute
   '/dashboard/admin/teams': typeof AuthenticatedDashboardAdminTeamsRoute
   '/dashboard/admin/tools': typeof AuthenticatedDashboardAdminToolsRoute
@@ -227,6 +235,7 @@ export interface FileRoutesByTo {
   '/dashboard/admin/competitions': typeof AuthenticatedDashboardAdminCompetitionsRoute
   '/dashboard/admin/meetings': typeof AuthenticatedDashboardAdminMeetingsRoute
   '/dashboard/admin/projects': typeof AuthenticatedDashboardAdminProjectsRoute
+  '/dashboard/admin/resources': typeof AuthenticatedDashboardAdminResourcesRoute
   '/dashboard/admin/students': typeof AuthenticatedDashboardAdminStudentsRoute
   '/dashboard/admin/teams': typeof AuthenticatedDashboardAdminTeamsRoute
   '/dashboard/admin/tools': typeof AuthenticatedDashboardAdminToolsRoute
@@ -256,6 +265,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/admin/competitions': typeof AuthenticatedDashboardAdminCompetitionsRoute
   '/_authenticated/dashboard/admin/meetings': typeof AuthenticatedDashboardAdminMeetingsRoute
   '/_authenticated/dashboard/admin/projects': typeof AuthenticatedDashboardAdminProjectsRoute
+  '/_authenticated/dashboard/admin/resources': typeof AuthenticatedDashboardAdminResourcesRoute
   '/_authenticated/dashboard/admin/students': typeof AuthenticatedDashboardAdminStudentsRoute
   '/_authenticated/dashboard/admin/teams': typeof AuthenticatedDashboardAdminTeamsRoute
   '/_authenticated/dashboard/admin/tools': typeof AuthenticatedDashboardAdminToolsRoute
@@ -285,6 +295,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/competitions'
     | '/dashboard/admin/meetings'
     | '/dashboard/admin/projects'
+    | '/dashboard/admin/resources'
     | '/dashboard/admin/students'
     | '/dashboard/admin/teams'
     | '/dashboard/admin/tools'
@@ -311,6 +322,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/competitions'
     | '/dashboard/admin/meetings'
     | '/dashboard/admin/projects'
+    | '/dashboard/admin/resources'
     | '/dashboard/admin/students'
     | '/dashboard/admin/teams'
     | '/dashboard/admin/tools'
@@ -339,6 +351,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/admin/competitions'
     | '/_authenticated/dashboard/admin/meetings'
     | '/_authenticated/dashboard/admin/projects'
+    | '/_authenticated/dashboard/admin/resources'
     | '/_authenticated/dashboard/admin/students'
     | '/_authenticated/dashboard/admin/teams'
     | '/_authenticated/dashboard/admin/tools'
@@ -523,6 +536,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAdminStudentsRouteImport
       parentRoute: typeof AuthenticatedDashboardAdminRoute
     }
+    '/_authenticated/dashboard/admin/resources': {
+      id: '/_authenticated/dashboard/admin/resources'
+      path: '/resources'
+      fullPath: '/dashboard/admin/resources'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminResourcesRouteImport
+      parentRoute: typeof AuthenticatedDashboardAdminRoute
+    }
     '/_authenticated/dashboard/admin/projects': {
       id: '/_authenticated/dashboard/admin/projects'
       path: '/projects'
@@ -551,6 +571,7 @@ interface AuthenticatedDashboardAdminRouteChildren {
   AuthenticatedDashboardAdminCompetitionsRoute: typeof AuthenticatedDashboardAdminCompetitionsRoute
   AuthenticatedDashboardAdminMeetingsRoute: typeof AuthenticatedDashboardAdminMeetingsRoute
   AuthenticatedDashboardAdminProjectsRoute: typeof AuthenticatedDashboardAdminProjectsRoute
+  AuthenticatedDashboardAdminResourcesRoute: typeof AuthenticatedDashboardAdminResourcesRoute
   AuthenticatedDashboardAdminStudentsRoute: typeof AuthenticatedDashboardAdminStudentsRoute
   AuthenticatedDashboardAdminTeamsRoute: typeof AuthenticatedDashboardAdminTeamsRoute
   AuthenticatedDashboardAdminToolsRoute: typeof AuthenticatedDashboardAdminToolsRoute
@@ -567,6 +588,8 @@ const AuthenticatedDashboardAdminRouteChildren: AuthenticatedDashboardAdminRoute
       AuthenticatedDashboardAdminMeetingsRoute,
     AuthenticatedDashboardAdminProjectsRoute:
       AuthenticatedDashboardAdminProjectsRoute,
+    AuthenticatedDashboardAdminResourcesRoute:
+      AuthenticatedDashboardAdminResourcesRoute,
     AuthenticatedDashboardAdminStudentsRoute:
       AuthenticatedDashboardAdminStudentsRoute,
     AuthenticatedDashboardAdminTeamsRoute:
@@ -626,13 +649,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
