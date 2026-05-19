@@ -87,7 +87,7 @@ function MeetingsAdmin() {
               <tr>
                 <th className="px-4 py-3">Fecha</th>
                 <th className="px-4 py-3">Título</th>
-                <th className="px-4 py-3">Ubicación</th>
+                <th className="px-4 py-3">Enlace Zoom</th>
                 <th className="px-4 py-3">Estado</th>
                 <th className="px-4 py-3 text-right">Acciones</th>
               </tr>
@@ -102,7 +102,13 @@ function MeetingsAdmin() {
                       {date.toLocaleString("es-CO", { dateStyle: "short", timeStyle: "short" })}
                     </td>
                     <td className="px-4 py-3 font-medium text-foreground">{m.title}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{m.location || "—"}</td>
+                    <td className="px-4 py-3 text-muted-foreground">
+                      {m.location ? (
+                        <a href={m.location} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline">
+                          <Video className="h-3.5 w-3.5" /> Abrir <ExternalLink className="h-3 w-3" />
+                        </a>
+                      ) : "—"}
+                    </td>
                     <td className="px-4 py-3">
                       {past ? (
                         <Badge variant="outline" className="border-primary/40 text-primary">Realizada</Badge>
