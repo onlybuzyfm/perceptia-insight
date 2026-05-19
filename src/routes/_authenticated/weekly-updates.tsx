@@ -116,6 +116,10 @@ function WeeklyUpdatesPage() {
               <Label htmlFor="hours_spent">Horas dedicadas</Label>
               <Input id="hours_spent" name="hours_spent" type="number" min={0} max={168} step="0.5" defaultValue={0} className="mt-1.5" />
             </div>
+            <div>
+              <Label htmlFor="repo_url">Repositorio de GitHub</Label>
+              <Input id="repo_url" name="repo_url" type="url" placeholder="https://github.com/usuario/repo" maxLength={500} className="mt-1.5" />
+            </div>
             <Button type="submit" disabled={submitting} className="w-full bg-primary hover:bg-primary/90">
               {submitting ? "Guardando..." : "Guardar avance"}
             </Button>
