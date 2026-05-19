@@ -122,8 +122,7 @@ function MeetingsAdmin() {
                           variant="outline"
                           size="sm"
                           onClick={() => setSelected(m)}
-                          disabled={!past}
-                          title={past ? "Pasar asistencia" : "Disponible después de la fecha"}
+                          title="Pasar asistencia"
                           className="h-7 px-2"
                         >
                           <UsersIcon className="mr-1 h-3.5 w-3.5" /> Asistencia
