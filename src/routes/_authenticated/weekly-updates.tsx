@@ -22,6 +22,7 @@ interface Update {
   achievements: string | null;
   blockers: string | null;
   hours_spent: number | null;
+  repo_url: string | null;
   created_at: string;
 }
 
@@ -31,6 +32,7 @@ const schema = z.object({
   achievements: z.string().max(2000).optional(),
   blockers: z.string().max(2000).optional(),
   hours_spent: z.number().min(0).max(168),
+  repo_url: z.string().url("Debe ser un enlace válido").max(500).optional().or(z.literal("")),
 });
 
 function WeeklyUpdatesPage() {
@@ -65,15 +67,18 @@ function WeeklyUpdatesPage() {
       achievements: fd.get("achievements") || undefined,
       blockers: fd.get("blockers") || undefined,
       hours_spent: Number(fd.get("hours_spent") || 0),
+      repo_url: fd.get("repo_url") || "",
     });
     if (!parsed.success) {
       toast.error("Revisa los campos del formulario.");
       return;
     }
     setSubmitting(true);
+    const { repo_url, ...rest } = parsed.data;
     const { error } = await supabase.from("weekly_updates").insert({
       user_id: auth.user.id,
-      ...parsed.data,
+      ...rest,
+      repo_url: repo_url ? repo_url : null,
     });
     setSubmitting(false);
     if (error) {
@@ -111,6 +116,10 @@ function WeeklyUpdatesPage() {
               <Label htmlFor="hours_spent">Horas dedicadas</Label>
               <Input id="hours_spent" name="hours_spent" type="number" min={0} max={168} step="0.5" defaultValue={0} className="mt-1.5" />
             </div>
+            <div>
+              <Label htmlFor="repo_url">Repositorio de GitHub</Label>
+              <Input id="repo_url" name="repo_url" type="url" placeholder="https://github.com/usuario/repo" maxLength={500} className="mt-1.5" />
+            </div>
             <Button type="submit" disabled={submitting} className="w-full bg-primary hover:bg-primary/90">
               {submitting ? "Guardando..." : "Guardar avance"}
             </Button>
@@ -140,6 +149,13 @@ function WeeklyUpdatesPage() {
                   {u.blockers && (
                     <p className="mt-1 text-xs text-muted-foreground">
                       <span className="font-semibold text-foreground">Bloqueos:</span> {u.blockers}
+                    </p>
+                  )}
+                  {u.repo_url && (
+                    <p className="mt-1 text-xs">
+                      <a href={u.repo_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                        ↗ Repositorio GitHub
+                      </a>
                     </p>
                   )}
                 </li>

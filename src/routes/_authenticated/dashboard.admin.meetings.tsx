@@ -12,7 +12,7 @@ import { AdminShell } from "@/components/AdminShell";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Calendar, MapPin, Trash2, ChevronLeft, Users as UsersIcon, CheckCircle2, XCircle, Clock, FileText } from "lucide-react";
+import { Calendar, Video, Trash2, ChevronLeft, Users as UsersIcon, CheckCircle2, XCircle, Clock, FileText, ExternalLink } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/admin/meetings")({
   component: () => <AdminShell><MeetingsAdmin /></AdminShell>,
@@ -47,7 +47,7 @@ const meetingSchema = z.object({
   title: z.string().min(2).max(200),
   description: z.string().max(2000),
   meeting_date: z.string().min(1),
-  location: z.string().max(200).optional(),
+  location: z.string().url("Debe ser un enlace válido").max(500).optional().or(z.literal("")),
 });
 
 function MeetingsAdmin() {
@@ -87,7 +87,7 @@ function MeetingsAdmin() {
               <tr>
                 <th className="px-4 py-3">Fecha</th>
                 <th className="px-4 py-3">Título</th>
-                <th className="px-4 py-3">Ubicación</th>
+                <th className="px-4 py-3">Enlace Zoom</th>
                 <th className="px-4 py-3">Estado</th>
                 <th className="px-4 py-3 text-right">Acciones</th>
               </tr>
@@ -102,7 +102,13 @@ function MeetingsAdmin() {
                       {date.toLocaleString("es-CO", { dateStyle: "short", timeStyle: "short" })}
                     </td>
                     <td className="px-4 py-3 font-medium text-foreground">{m.title}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{m.location || "—"}</td>
+                    <td className="px-4 py-3 text-muted-foreground">
+                      {m.location ? (
+                        <a href={m.location} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline">
+                          <Video className="h-3.5 w-3.5" /> Abrir <ExternalLink className="h-3 w-3" />
+                        </a>
+                      ) : "—"}
+                    </td>
                     <td className="px-4 py-3">
                       {past ? (
                         <Badge variant="outline" className="border-primary/40 text-primary">Realizada</Badge>
@@ -195,8 +201,8 @@ function CreateMeetingCard({ onCreated }: { onCreated: () => void }) {
           <Input id="meeting_date" name="meeting_date" type="datetime-local" required className="mt-1.5" />
         </div>
         <div>
-          <Label htmlFor="location"><MapPin className="mr-1 inline h-3.5 w-3.5" /> Ubicación</Label>
-          <Input id="location" name="location" maxLength={200} className="mt-1.5" placeholder="Aula 301 / Meet" />
+          <Label htmlFor="location"><Video className="mr-1 inline h-3.5 w-3.5" /> Enlace de Zoom</Label>
+          <Input id="location" name="location" type="url" maxLength={500} className="mt-1.5" placeholder="https://zoom.us/j/..." />
         </div>
         <div className="sm:col-span-2">
           <Label htmlFor="description"><FileText className="mr-1 inline h-3.5 w-3.5" /> Descripción / agenda</Label>
@@ -287,8 +293,12 @@ function AttendanceView({ meeting, onBack }: { meeting: Meeting; onBack: () => v
             <h2 className="font-display text-xl font-semibold text-foreground">{meeting.title}</h2>
             <p className="mt-1 text-sm text-muted-foreground">
               {date.toLocaleString("es-CO", { dateStyle: "full", timeStyle: "short" })}
-              {meeting.location ? ` · ${meeting.location}` : ""}
             </p>
+            {meeting.location && (
+              <a href={meeting.location} target="_blank" rel="noopener noreferrer" className="mt-1 inline-flex items-center gap-1 text-sm text-primary hover:underline">
+                <Video className="h-3.5 w-3.5" /> Abrir Zoom <ExternalLink className="h-3 w-3" />
+              </a>
+            )}
             {meeting.description && (
               <p className="mt-2 max-w-2xl text-sm text-foreground/80">{meeting.description}</p>
             )}

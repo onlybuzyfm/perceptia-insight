@@ -1,0 +1,1 @@
+ALTER TABLE public.weekly_updates ADD COLUMN repo_url text;
