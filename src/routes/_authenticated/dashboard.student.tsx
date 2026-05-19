@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Pencil, Save, X, Network, Eye, Cpu, Brain, Users, Trophy, Tag, Upload, ExternalLink, Calendar, MapPin, Plus, ChevronUp, Megaphone, Video, BookOpen, Database, Github, FileText, Cloud, Workflow, Folder, type LucideIcon } from "lucide-react";
+import { Pencil, Save, X, Network, Eye, Cpu, Brain, Users, Trophy, Tag, Upload, ExternalLink, Calendar, MapPin, Plus, ChevronUp, Megaphone, Video, BookOpen, Database, Github, FileText, Cloud, Workflow, Folder, ListChecks, Clock, type LucideIcon } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/student")({
   component: StudentDashboard,
@@ -329,6 +329,8 @@ function StudentDashboard() {
 
 
       <ProjectsCard projects={projects} loading={loading} userId={auth.user?.id ?? null} />
+
+      <ActivitiesCard userId={auth.user?.id ?? null} />
 
       <CompetitionsCard competitions={competitions} loading={loading} hasTeam={!!team} />
 
@@ -974,6 +976,138 @@ function ResourcesCard() {
                     <Badge variant="outline" className="mt-1.5 text-[10px] capitalize">{r.category}</Badge>
                   </div>
                 </a>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </Card>
+  );
+}
+
+interface ActivityRow {
+  id: string;
+  project_id: string;
+  project_title: string;
+  title: string;
+  description: string;
+  deadline: string;
+  status: "pendiente" | "en_progreso" | "completada";
+  is_assigned: boolean;
+  assignee_count: number;
+}
+
+function ActivitiesCard({ userId }: { userId: string | null }) {
+  const [items, setItems] = useState<ActivityRow[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const load = async () => {
+    if (!userId) { setItems([]); setLoading(false); return; }
+    setLoading(true);
+    const { data: acts } = await supabase
+      .from("project_activities")
+      .select("id, project_id, title, description, deadline, status, projects(title)")
+      .order("deadline");
+    const ids = (acts ?? []).map((a) => a.id);
+    let assigneesByActivity = new Map<string, string[]>();
+    if (ids.length > 0) {
+      const { data: ass } = await supabase
+        .from("activity_assignees")
+        .select("activity_id, user_id")
+        .in("activity_id", ids);
+      (ass ?? []).forEach((a) => {
+        const arr = assigneesByActivity.get(a.activity_id) ?? [];
+        arr.push(a.user_id);
+        assigneesByActivity.set(a.activity_id, arr);
+      });
+    }
+    setItems(
+      (acts ?? []).map((a) => {
+        const assignees = assigneesByActivity.get(a.id) ?? [];
+        const proj = a.projects as { title: string } | null;
+        return {
+          id: a.id,
+          project_id: a.project_id,
+          project_title: proj?.title ?? "—",
+          title: a.title,
+          description: a.description,
+          deadline: a.deadline,
+          status: a.status,
+          is_assigned: assignees.length === 0 || assignees.includes(userId),
+          assignee_count: assignees.length,
+        };
+      }),
+    );
+    setLoading(false);
+  };
+
+  useEffect(() => { load(); }, [userId]);
+
+  const setStatus = async (id: string, status: ActivityRow["status"]) => {
+    const { error } = await supabase.from("project_activities").update({ status }).eq("id", id);
+    if (error) return toast.error("No se pudo actualizar: " + error.message);
+    toast.success("Estado actualizado");
+    load();
+  };
+
+  const visible = items.filter((i) => i.is_assigned);
+
+  return (
+    <Card className="mt-6 border-border/70 p-6">
+      <div className="flex items-center gap-2">
+        <ListChecks className="h-5 w-5 text-primary" />
+        <h2 className="font-display text-lg font-semibold text-foreground">Mis actividades</h2>
+      </div>
+      <p className="mt-1 text-xs text-muted-foreground">Tareas con fecha límite asignadas a ti o a todo tu equipo.</p>
+      {loading ? (
+        <p className="mt-3 text-sm text-muted-foreground">Cargando…</p>
+      ) : visible.length === 0 ? (
+        <p className="mt-3 text-sm text-muted-foreground">No tienes actividades pendientes.</p>
+      ) : (
+        <ul className="mt-4 space-y-3">
+          {visible.map((a) => {
+            const overdue = a.status !== "completada" && new Date(a.deadline) < new Date();
+            const styleByStatus: Record<ActivityRow["status"], string> = {
+              pendiente: "bg-amber-50 text-amber-700 border-amber-200",
+              en_progreso: "bg-sky-50 text-sky-700 border-sky-200",
+              completada: "bg-emerald-50 text-emerald-700 border-emerald-200",
+            };
+            const labelByStatus: Record<ActivityRow["status"], string> = {
+              pendiente: "Pendiente",
+              en_progreso: "En progreso",
+              completada: "Completada",
+            };
+            return (
+              <li key={a.id} className="rounded-lg border border-border/60 p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="font-semibold text-foreground">{a.title}</h3>
+                      <Badge variant="outline" className={styleByStatus[a.status]}>{labelByStatus[a.status]}</Badge>
+                      {overdue && <Badge variant="outline" className="border-destructive/40 text-destructive">Vencida</Badge>}
+                      {a.assignee_count === 0 && <Badge variant="outline" className="text-[10px]">Equipo</Badge>}
+                    </div>
+                    <p className="text-xs text-muted-foreground">{a.project_title}</p>
+                    {a.description && <p className="mt-1 text-sm text-foreground/80">{a.description}</p>}
+                    <p className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground">
+                      <Clock className="h-3.5 w-3.5" />
+                      {new Date(a.deadline).toLocaleString("es-EC")}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    {(["pendiente", "en_progreso", "completada"] as const).map((s) => (
+                      <Button
+                        key={s}
+                        size="sm"
+                        variant={a.status === s ? "default" : "outline"}
+                        className={`h-7 px-2 text-xs ${a.status === s ? "bg-primary hover:bg-primary/90" : ""}`}
+                        onClick={() => setStatus(a.id, s)}
+                      >
+                        {labelByStatus[s]}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
               </li>
             );
           })}

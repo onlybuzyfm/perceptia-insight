@@ -36,6 +36,7 @@ import { Route as AuthenticatedDashboardAdminResourcesRouteImport } from './rout
 import { Route as AuthenticatedDashboardAdminProjectsRouteImport } from './routes/_authenticated/dashboard.admin.projects'
 import { Route as AuthenticatedDashboardAdminMeetingsRouteImport } from './routes/_authenticated/dashboard.admin.meetings'
 import { Route as AuthenticatedDashboardAdminCompetitionsRouteImport } from './routes/_authenticated/dashboard.admin.competitions'
+import { Route as AuthenticatedDashboardAdminActivitiesRouteImport } from './routes/_authenticated/dashboard.admin.activities'
 
 const SobreRoute = SobreRouteImport.update({
   id: '/sobre',
@@ -187,6 +188,12 @@ const AuthenticatedDashboardAdminCompetitionsRoute =
     path: '/competitions',
     getParentRoute: () => AuthenticatedDashboardAdminRoute,
   } as any)
+const AuthenticatedDashboardAdminActivitiesRoute =
+  AuthenticatedDashboardAdminActivitiesRouteImport.update({
+    id: '/activities',
+    path: '/activities',
+    getParentRoute: () => AuthenticatedDashboardAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -205,6 +212,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/dashboard/student': typeof AuthenticatedDashboardStudentRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/dashboard/admin/activities': typeof AuthenticatedDashboardAdminActivitiesRoute
   '/dashboard/admin/competitions': typeof AuthenticatedDashboardAdminCompetitionsRoute
   '/dashboard/admin/meetings': typeof AuthenticatedDashboardAdminMeetingsRoute
   '/dashboard/admin/projects': typeof AuthenticatedDashboardAdminProjectsRoute
@@ -232,6 +240,7 @@ export interface FileRoutesByTo {
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/dashboard/student': typeof AuthenticatedDashboardStudentRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
+  '/dashboard/admin/activities': typeof AuthenticatedDashboardAdminActivitiesRoute
   '/dashboard/admin/competitions': typeof AuthenticatedDashboardAdminCompetitionsRoute
   '/dashboard/admin/meetings': typeof AuthenticatedDashboardAdminMeetingsRoute
   '/dashboard/admin/projects': typeof AuthenticatedDashboardAdminProjectsRoute
@@ -262,6 +271,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/_authenticated/dashboard/student': typeof AuthenticatedDashboardStudentRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/_authenticated/dashboard/admin/activities': typeof AuthenticatedDashboardAdminActivitiesRoute
   '/_authenticated/dashboard/admin/competitions': typeof AuthenticatedDashboardAdminCompetitionsRoute
   '/_authenticated/dashboard/admin/meetings': typeof AuthenticatedDashboardAdminMeetingsRoute
   '/_authenticated/dashboard/admin/projects': typeof AuthenticatedDashboardAdminProjectsRoute
@@ -292,6 +302,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/student'
     | '/dashboard/'
+    | '/dashboard/admin/activities'
     | '/dashboard/admin/competitions'
     | '/dashboard/admin/meetings'
     | '/dashboard/admin/projects'
@@ -319,6 +330,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/student'
     | '/dashboard'
+    | '/dashboard/admin/activities'
     | '/dashboard/admin/competitions'
     | '/dashboard/admin/meetings'
     | '/dashboard/admin/projects'
@@ -348,6 +360,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/settings'
     | '/_authenticated/dashboard/student'
     | '/_authenticated/dashboard/'
+    | '/_authenticated/dashboard/admin/activities'
     | '/_authenticated/dashboard/admin/competitions'
     | '/_authenticated/dashboard/admin/meetings'
     | '/_authenticated/dashboard/admin/projects'
@@ -564,10 +577,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAdminCompetitionsRouteImport
       parentRoute: typeof AuthenticatedDashboardAdminRoute
     }
+    '/_authenticated/dashboard/admin/activities': {
+      id: '/_authenticated/dashboard/admin/activities'
+      path: '/activities'
+      fullPath: '/dashboard/admin/activities'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminActivitiesRouteImport
+      parentRoute: typeof AuthenticatedDashboardAdminRoute
+    }
   }
 }
 
 interface AuthenticatedDashboardAdminRouteChildren {
+  AuthenticatedDashboardAdminActivitiesRoute: typeof AuthenticatedDashboardAdminActivitiesRoute
   AuthenticatedDashboardAdminCompetitionsRoute: typeof AuthenticatedDashboardAdminCompetitionsRoute
   AuthenticatedDashboardAdminMeetingsRoute: typeof AuthenticatedDashboardAdminMeetingsRoute
   AuthenticatedDashboardAdminProjectsRoute: typeof AuthenticatedDashboardAdminProjectsRoute
@@ -582,6 +603,8 @@ interface AuthenticatedDashboardAdminRouteChildren {
 
 const AuthenticatedDashboardAdminRouteChildren: AuthenticatedDashboardAdminRouteChildren =
   {
+    AuthenticatedDashboardAdminActivitiesRoute:
+      AuthenticatedDashboardAdminActivitiesRoute,
     AuthenticatedDashboardAdminCompetitionsRoute:
       AuthenticatedDashboardAdminCompetitionsRoute,
     AuthenticatedDashboardAdminMeetingsRoute:
