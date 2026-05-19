@@ -14,6 +14,7 @@ import {
   Inbox,
   Wrench,
   Trophy,
+  ListChecks,
   type LucideIcon,
 } from "lucide-react";
 import { DashboardShell } from "@/components/DashboardShell";
