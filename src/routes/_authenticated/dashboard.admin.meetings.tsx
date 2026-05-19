@@ -47,7 +47,7 @@ const meetingSchema = z.object({
   title: z.string().min(2).max(200),
   description: z.string().max(2000),
   meeting_date: z.string().min(1),
-  location: z.string().max(200).optional(),
+  location: z.string().url("Debe ser un enlace válido").max(500).optional().or(z.literal("")),
 });
 
 function MeetingsAdmin() {
