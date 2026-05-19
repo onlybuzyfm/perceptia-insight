@@ -136,8 +136,12 @@ function TeamsAdmin() {
                     <div>
                       <h3 className="font-semibold text-foreground">{team.name}</h3>
                       {team.focus && <p className="text-xs text-muted-foreground">{team.focus}</p>}
+                      {team.description && <p className="mt-0.5 text-xs text-muted-foreground">{team.description}</p>}
                     </div>
                   </div>
+                  <Button size="sm" variant="ghost" onClick={() => setEditingTeam(team)}>
+                    <Pencil className="mr-1 h-3.5 w-3.5" /> Editar
+                  </Button>
                 </div>
 
                 {/* Integrantes */}
