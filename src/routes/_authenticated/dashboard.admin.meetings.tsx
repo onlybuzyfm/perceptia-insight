@@ -171,16 +171,32 @@ function CreateMeetingCard({ onCreated }: { onCreated: () => void }) {
     });
     if (!parsed.success) { toast.error("Revisa los campos."); return; }
     setSubmitting(true);
+    const meetingDate = new Date(parsed.data.meeting_date);
     const { error } = await supabase.from("meetings").insert({
       title: parsed.data.title,
       description: parsed.data.description,
-      meeting_date: new Date(parsed.data.meeting_date).toISOString(),
+      meeting_date: meetingDate.toISOString(),
       location: parsed.data.location ?? null,
       created_by: auth.user.id,
     });
+    if (error) { setSubmitting(false); toast.error(error.message); return; }
+
+    // Anuncio automático para TODOS los estudiantes
+    const dateLabel = meetingDate.toLocaleString("es-CO", { dateStyle: "full", timeStyle: "short" });
+    const content = [
+      `📅 ${dateLabel}`,
+      parsed.data.location ? `🔗 Zoom: ${parsed.data.location}` : null,
+      parsed.data.description ? `\n${parsed.data.description}` : null,
+    ].filter(Boolean).join("\n");
+    const { error: annErr } = await supabase.from("announcements").insert({
+      title: `Nueva reunión: ${parsed.data.title}`,
+      content,
+      audience: "estudiante",
+      created_by: auth.user.id,
+    });
     setSubmitting(false);
-    if (error) { toast.error(error.message); return; }
-    toast.success("Reunión creada");
+    if (annErr) { toast.warning(`Reunión creada, pero falló el anuncio: ${annErr.message}`); }
+    else { toast.success("Reunión creada y anunciada a los estudiantes"); }
     (e.currentTarget as HTMLFormElement).reset();
     onCreated();
   };
