@@ -330,6 +330,8 @@ function StudentDashboard() {
 
       <ProjectsCard projects={projects} loading={loading} userId={auth.user?.id ?? null} />
 
+      <ActivitiesCard userId={auth.user?.id ?? null} />
+
       <CompetitionsCard competitions={competitions} loading={loading} hasTeam={!!team} />
 
       <ResourcesCard />
