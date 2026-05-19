@@ -34,6 +34,7 @@ const ADMIN_NAV: AdminNavItem[] = [
   { to: "/dashboard/admin/students", icon: GraduationCap, label: "Estudiantes" },
   { to: "/dashboard/admin/projects", icon: FolderKanban, label: "Proyectos" },
   { to: "/dashboard/admin/teams", icon: Users, label: "Equipos" },
+  { to: "/dashboard/admin/activities", icon: ListChecks, label: "Actividades" },
   { to: "/dashboard/admin/competitions", icon: Trophy, label: "Competencias" },
   { to: "/dashboard/admin/applications", icon: Inbox, label: "Postulaciones", soon: true },
   { to: "/dashboard/admin/updates", icon: FileCheck2, label: "Avances" },
