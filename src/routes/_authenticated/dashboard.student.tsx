@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Pencil, Save, X, Network, Eye, Cpu, Brain, Users, Trophy, Tag, Upload, ExternalLink, Calendar, MapPin, Plus, ChevronUp, type LucideIcon } from "lucide-react";
+import { Pencil, Save, X, Network, Eye, Cpu, Brain, Users, Trophy, Tag, Upload, ExternalLink, Calendar, MapPin, Plus, ChevronUp, Megaphone, Video, type LucideIcon } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/student")({
   component: StudentDashboard,
