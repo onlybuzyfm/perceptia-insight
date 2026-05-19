@@ -780,3 +780,111 @@ function ProjectsCard({ projects, loading, userId }: { projects: ProjectRow[]; l
     </Card>
   );
 }
+
+interface AnnouncementRow { id: string; title: string; content: string; created_at: string; }
+
+function AnnouncementsCard() {
+  const [items, setItems] = useState<AnnouncementRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("announcements")
+        .select("id, title, content, created_at")
+        .order("created_at", { ascending: false })
+        .limit(10);
+      setItems((data ?? []) as AnnouncementRow[]);
+      setLoading(false);
+    })();
+  }, []);
+  return (
+    <Card className="mt-6 border-border/70 p-6">
+      <div className="flex items-center gap-2">
+        <Megaphone className="h-4 w-4 text-primary" />
+        <h2 className="font-display text-lg font-semibold text-foreground">Anuncios</h2>
+      </div>
+      {loading ? (
+        <p className="mt-4 text-sm text-muted-foreground">Cargando...</p>
+      ) : items.length === 0 ? (
+        <p className="mt-4 text-sm text-muted-foreground">No hay anuncios por ahora.</p>
+      ) : (
+        <ul className="mt-4 space-y-3">
+          {items.map((a) => (
+            <li key={a.id} className="rounded-lg border border-border/60 bg-secondary/30 p-4">
+              <div className="flex items-start justify-between gap-2">
+                <p className="font-medium text-foreground">{a.title}</p>
+                <span className="shrink-0 text-xs text-muted-foreground">
+                  {new Date(a.created_at).toLocaleDateString("es-CO", { dateStyle: "medium" })}
+                </span>
+              </div>
+              {a.content && (
+                <p className="mt-1.5 whitespace-pre-wrap text-sm text-foreground/80">{a.content}</p>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </Card>
+  );
+}
+
+interface MeetingRow { id: string; title: string; description: string; meeting_date: string; location: string | null; }
+
+function UpcomingMeetingsCard() {
+  const [items, setItems] = useState<MeetingRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("meetings")
+        .select("id, title, description, meeting_date, location")
+        .gte("meeting_date", new Date().toISOString())
+        .order("meeting_date", { ascending: true })
+        .limit(10);
+      setItems((data ?? []) as MeetingRow[]);
+      setLoading(false);
+    })();
+  }, []);
+  return (
+    <Card className="mt-6 border-border/70 p-6">
+      <div className="flex items-center gap-2">
+        <Calendar className="h-4 w-4 text-primary" />
+        <h2 className="font-display text-lg font-semibold text-foreground">Próximas reuniones</h2>
+      </div>
+      {loading ? (
+        <p className="mt-4 text-sm text-muted-foreground">Cargando...</p>
+      ) : items.length === 0 ? (
+        <p className="mt-4 text-sm text-muted-foreground">No hay reuniones programadas.</p>
+      ) : (
+        <ul className="mt-4 space-y-3">
+          {items.map((m) => {
+            const d = new Date(m.meeting_date);
+            return (
+              <li key={m.id} className="rounded-lg border border-border/60 bg-secondary/30 p-4">
+                <div className="flex items-start justify-between gap-2">
+                  <p className="font-medium text-foreground">{m.title}</p>
+                  <span className="shrink-0 font-mono text-xs text-muted-foreground">
+                    {d.toLocaleString("es-CO", { dateStyle: "medium", timeStyle: "short" })}
+                  </span>
+                </div>
+                {m.description && (
+                  <p className="mt-1.5 whitespace-pre-wrap text-sm text-foreground/80">{m.description}</p>
+                )}
+                {m.location && (
+                  <a
+                    href={m.location}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 inline-flex items-center gap-1 text-sm text-primary hover:underline"
+                  >
+                    <Video className="h-3.5 w-3.5" /> Unirse por Zoom <ExternalLink className="h-3 w-3" />
+                  </a>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </Card>
+  );
+}
