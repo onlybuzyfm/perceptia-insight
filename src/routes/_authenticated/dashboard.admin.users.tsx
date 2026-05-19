@@ -179,13 +179,18 @@ function UsersAdmin() {
     const first = window.prompt(
       `⚠️ ELIMINACIÓN PERMANENTE\n\nVas a borrar a "${u.full_name}" (${u.email ?? "sin correo"}) y TODOS sus datos (perfil, roles, avances semanales, asignaciones, avatar y cuenta de acceso).\n\nEsta acción NO se puede deshacer.\n\nEscribe ELIMINAR para confirmar:`,
     );
-    if (first !== "ELIMINAR") return;
+    if (!first || first.trim().toLowerCase() !== "eliminar") {
+      if (first !== null) toast.error('Confirmación incorrecta: escribe "ELIMINAR".');
+      return;
+    }
+    const tId = toast.loading(`Eliminando a ${u.full_name}…`);
     try {
       await deleteUserFn({ data: { userId: u.id } });
-      toast.success("Usuario eliminado completamente");
+      toast.success("Usuario eliminado completamente", { id: tId });
       load();
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Error al eliminar");
+      console.error("deleteUser failed", e);
+      toast.error(e instanceof Error ? e.message : "Error al eliminar", { id: tId });
     }
   };
 
