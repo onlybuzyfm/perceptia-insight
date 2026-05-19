@@ -1,7 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
+import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import type { Database } from "@/integrations/supabase/types";
 
 export const deleteUserCompletely = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -23,6 +24,21 @@ export const deleteUserCompletely = createServerFn({ method: "POST" })
     if (!roles?.some((r) => r.role === "admin")) {
       throw new Error("Solo administradores pueden eliminar usuarios.");
     }
+
+    const supabaseUrl = process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !serviceRoleKey) {
+      throw new Error("No se pudo acceder a las credenciales administrativas del backend.");
+    }
+
+    const supabaseAdmin = createClient<Database>(supabaseUrl, serviceRoleKey, {
+      auth: {
+        storage: undefined,
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    });
 
     // Cleanup related rows first (no FK cascade defined)
     await supabaseAdmin.from("project_members").delete().eq("user_id", userId);
