@@ -7,10 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { AdminShell } from "@/components/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { UserPlus, Trash2, Users, FolderKanban, Trophy, Network, Eye, Cpu, Brain, type LucideIcon } from "lucide-react";
+import { UserPlus, Trash2, Users, FolderKanban, Trophy, Network, Eye, Cpu, Brain, Pencil, type LucideIcon } from "lucide-react";
 
 const TEAM_ICONS: Record<string, { icon: LucideIcon; color: string; bg: string }> = {
   nexus: { icon: Network, color: "text-violet-600", bg: "bg-violet-100" },
