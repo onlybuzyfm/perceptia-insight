@@ -23,6 +23,7 @@ interface Update {
   achievements: string | null;
   blockers: string | null;
   hours_spent: number | null;
+  repo_url: string | null;
   created_at: string;
   full_name: string;
   username: string | null;
