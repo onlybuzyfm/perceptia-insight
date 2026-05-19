@@ -589,6 +589,7 @@ export type Database = {
           achievements: string | null
           blockers: string | null
           created_at: string
+          evidence_url: string | null
           hours_spent: number | null
           id: string
           project_id: string | null
@@ -602,6 +603,7 @@ export type Database = {
           achievements?: string | null
           blockers?: string | null
           created_at?: string
+          evidence_url?: string | null
           hours_spent?: number | null
           id?: string
           project_id?: string | null
@@ -615,6 +617,7 @@ export type Database = {
           achievements?: string | null
           blockers?: string | null
           created_at?: string
+          evidence_url?: string | null
           hours_spent?: number | null
           id?: string
           project_id?: string | null
