@@ -38,7 +38,7 @@ const ADMIN_NAV: AdminNavItem[] = [
   { to: "/dashboard/admin/updates", icon: FileCheck2, label: "Avances" },
   { to: "/dashboard/admin/meetings", icon: Calendar, label: "Reuniones" },
   { to: "/dashboard/admin/tools", icon: Wrench, label: "Herramientas" },
-  { to: "/dashboard/admin/resources", icon: BookOpen, label: "Recursos", soon: true },
+  { to: "/dashboard/admin/resources", icon: BookOpen, label: "Recursos" },
   { to: "/dashboard/admin/events", icon: Calendar, label: "Eventos", soon: true },
   { to: "/dashboard/admin/production", icon: ScrollText, label: "Producción", soon: true },
   { to: "/dashboard/admin/indicators", icon: BarChart3, label: "Indicadores", soon: true },
