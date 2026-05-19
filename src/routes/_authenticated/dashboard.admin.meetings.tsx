@@ -12,7 +12,7 @@ import { AdminShell } from "@/components/AdminShell";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Calendar, MapPin, Trash2, ChevronLeft, Users as UsersIcon, CheckCircle2, XCircle, Clock, FileText } from "lucide-react";
+import { Calendar, Video, Trash2, ChevronLeft, Users as UsersIcon, CheckCircle2, XCircle, Clock, FileText, ExternalLink } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/admin/meetings")({
   component: () => <AdminShell><MeetingsAdmin /></AdminShell>,
