@@ -323,6 +323,8 @@ function StudentDashboard() {
 
       <CompetitionsCard competitions={competitions} loading={loading} hasTeam={!!team} />
 
+      <ResourcesCard />
+
       <ToolsCard />
     </DashboardShell>
   );
