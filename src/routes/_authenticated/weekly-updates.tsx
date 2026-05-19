@@ -151,6 +151,13 @@ function WeeklyUpdatesPage() {
                       <span className="font-semibold text-foreground">Bloqueos:</span> {u.blockers}
                     </p>
                   )}
+                  {u.repo_url && (
+                    <p className="mt-1 text-xs">
+                      <a href={u.repo_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                        ↗ Repositorio GitHub
+                      </a>
+                    </p>
+                  )}
                 </li>
               ))}
             </ul>
