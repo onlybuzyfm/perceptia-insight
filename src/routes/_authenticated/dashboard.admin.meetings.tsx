@@ -293,8 +293,12 @@ function AttendanceView({ meeting, onBack }: { meeting: Meeting; onBack: () => v
             <h2 className="font-display text-xl font-semibold text-foreground">{meeting.title}</h2>
             <p className="mt-1 text-sm text-muted-foreground">
               {date.toLocaleString("es-CO", { dateStyle: "full", timeStyle: "short" })}
-              {meeting.location ? ` · ${meeting.location}` : ""}
             </p>
+            {meeting.location && (
+              <a href={meeting.location} target="_blank" rel="noopener noreferrer" className="mt-1 inline-flex items-center gap-1 text-sm text-primary hover:underline">
+                <Video className="h-3.5 w-3.5" /> Abrir Zoom <ExternalLink className="h-3 w-3" />
+              </a>
+            )}
             {meeting.description && (
               <p className="mt-2 max-w-2xl text-sm text-foreground/80">{meeting.description}</p>
             )}
