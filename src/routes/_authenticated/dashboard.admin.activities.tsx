@@ -64,9 +64,7 @@ function ActivitiesAdmin() {
     setLoading(true);
     const [pr, acts, ass, profs] = await Promise.all([
       supabase.from("projects").select("id, title, status").in("status", ACTIVE_STATUSES).order("title"),
-      // @ts-expect-error new table not yet in generated types
       supabase.from("project_activities").select("id, project_id, title, description, deadline, status").order("deadline"),
-      // @ts-expect-error
       supabase.from("activity_assignees").select("activity_id, user_id"),
       supabase.from("profiles").select("id, full_name, username"),
     ]);
@@ -106,7 +104,6 @@ function ActivitiesAdmin() {
 
   const remove = async () => {
     if (!deleting) return;
-    // @ts-expect-error
     const { error } = await supabase.from("project_activities").delete().eq("id", deleting.id);
     if (error) return toast.error("No se pudo eliminar");
     toast.success("Actividad eliminada");
@@ -248,19 +245,15 @@ function ActivityDialog({
     };
     let activityId = activity?.id;
     if (isNew) {
-      // @ts-expect-error
       const { data, error } = await supabase.from("project_activities").insert(payload).select("id").single();
       if (error) { setSaving(false); return toast.error("No se pudo crear: " + error.message); }
       activityId = (data as { id: string }).id;
     } else {
-      // @ts-expect-error
       const { error } = await supabase.from("project_activities").update(payload).eq("id", activity!.id);
       if (error) { setSaving(false); return toast.error("No se pudo guardar: " + error.message); }
-      // @ts-expect-error
       await supabase.from("activity_assignees").delete().eq("activity_id", activity!.id);
     }
     if (activityId && assignees.length > 0) {
-      // @ts-expect-error
       const { error: assErr } = await supabase.from("activity_assignees")
         .insert(assignees.map((uid) => ({ activity_id: activityId!, user_id: uid })));
       if (assErr) { setSaving(false); return toast.error("Guardado pero falló asignación: " + assErr.message); }
