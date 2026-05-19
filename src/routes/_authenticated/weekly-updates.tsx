@@ -74,9 +74,11 @@ function WeeklyUpdatesPage() {
       return;
     }
     setSubmitting(true);
+    const { repo_url, ...rest } = parsed.data;
     const { error } = await supabase.from("weekly_updates").insert({
       user_id: auth.user.id,
-      ...parsed.data,
+      ...rest,
+      repo_url: repo_url ? repo_url : null,
     });
     setSubmitting(false);
     if (error) {
