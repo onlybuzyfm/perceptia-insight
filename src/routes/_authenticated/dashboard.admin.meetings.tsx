@@ -201,8 +201,8 @@ function CreateMeetingCard({ onCreated }: { onCreated: () => void }) {
           <Input id="meeting_date" name="meeting_date" type="datetime-local" required className="mt-1.5" />
         </div>
         <div>
-          <Label htmlFor="location"><MapPin className="mr-1 inline h-3.5 w-3.5" /> Ubicación</Label>
-          <Input id="location" name="location" maxLength={200} className="mt-1.5" placeholder="Aula 301 / Meet" />
+          <Label htmlFor="location"><Video className="mr-1 inline h-3.5 w-3.5" /> Enlace de Zoom</Label>
+          <Input id="location" name="location" type="url" maxLength={500} className="mt-1.5" placeholder="https://zoom.us/j/..." />
         </div>
         <div className="sm:col-span-2">
           <Label htmlFor="description"><FileText className="mr-1 inline h-3.5 w-3.5" /> Descripción / agenda</Label>
