@@ -312,7 +312,12 @@ function StudentDashboard() {
         )}
       </Card>
 
+      <AnnouncementsCard />
+
+      <UpcomingMeetingsCard />
+
       <TeamCard team={team} mates={mates} loading={loading} />
+
 
       <ProjectsCard projects={projects} loading={loading} userId={auth.user?.id ?? null} />
 
