@@ -22,6 +22,7 @@ interface Update {
   achievements: string | null;
   blockers: string | null;
   hours_spent: number | null;
+  repo_url: string | null;
   created_at: string;
 }
 
@@ -31,6 +32,7 @@ const schema = z.object({
   achievements: z.string().max(2000).optional(),
   blockers: z.string().max(2000).optional(),
   hours_spent: z.number().min(0).max(168),
+  repo_url: z.string().url("Debe ser un enlace válido").max(500).optional().or(z.literal("")),
 });
 
 function WeeklyUpdatesPage() {
