@@ -67,6 +67,7 @@ function WeeklyUpdatesPage() {
       achievements: fd.get("achievements") || undefined,
       blockers: fd.get("blockers") || undefined,
       hours_spent: Number(fd.get("hours_spent") || 0),
+      repo_url: fd.get("repo_url") || "",
     });
     if (!parsed.success) {
       toast.error("Revisa los campos del formulario.");
