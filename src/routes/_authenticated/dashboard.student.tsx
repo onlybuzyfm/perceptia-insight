@@ -119,7 +119,7 @@ function StudentDashboard() {
         const [tMembers, tProj, tComp] = await Promise.all([
           supabase
             .from("team_members")
-            .select("user_id, role_in_team, profiles:user_id(full_name, username, avatar_url)")
+            .select("user_id, role_in_team")
             .eq("team_id", teamData.id),
           supabase
             .from("team_projects")
@@ -130,11 +130,20 @@ function StudentDashboard() {
             .select("result, competitions(id, name, description, url, event_date, location)")
             .eq("team_id", teamData.id),
         ]);
+        const otherIds = (tMembers.data ?? []).filter((r) => r.user_id !== uid).map((r) => r.user_id);
+        let profMap = new Map<string, { full_name?: string; username?: string | null; avatar_url?: string | null }>();
+        if (otherIds.length > 0) {
+          const { data: profs } = await supabase
+            .from("profiles")
+            .select("id, full_name, username, avatar_url")
+            .in("id", otherIds);
+          profMap = new Map((profs ?? []).map((p) => [p.id, p]));
+        }
         setMates(
           (tMembers.data ?? [])
             .filter((r) => r.user_id !== uid)
             .map((r) => {
-              const p = (r.profiles ?? {}) as { full_name?: string; username?: string | null; avatar_url?: string | null };
+              const p = profMap.get(r.user_id) ?? {};
               return {
                 user_id: r.user_id,
                 full_name: p.full_name ?? "",
