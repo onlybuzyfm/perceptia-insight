@@ -499,19 +499,34 @@ interface UpdateRow {
   achievements: string | null;
   blockers: string | null;
   hours_spent: number | null;
+  repo_url: string | null;
+  evidence_url: string | null;
+}
+
+const EMPTY_FORM = { week_start: "", summary: "", achievements: "", blockers: "", hours_spent: "0", repo_url: "" };
+const MAX_EVIDENCE_BYTES = 5 * 1024 * 1024;
+
+function isWeekEditable(weekStart: string): boolean {
+  const start = new Date(weekStart + "T00:00:00");
+  const end = new Date(start);
+  end.setDate(end.getDate() + 7);
+  return new Date() < end;
 }
 
 function ProjectsCard({ projects, loading, userId }: { projects: ProjectRow[]; loading: boolean; userId: string | null }) {
   const [updatesByProject, setUpdatesByProject] = useState<Record<string, UpdateRow[]>>({});
   const [openId, setOpenId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [form, setForm] = useState({ week_start: "", summary: "", achievements: "", blockers: "", hours_spent: "0" });
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [evidence, setEvidence] = useState<File | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [existingEvidence, setExistingEvidence] = useState<string | null>(null);
 
   const loadUpdates = async (projectId: string) => {
     if (!userId) return;
     const { data } = await supabase
       .from("weekly_updates")
-      .select("id, week_start, summary, achievements, blockers, hours_spent")
+      .select("id, week_start, summary, achievements, blockers, hours_spent, repo_url, evidence_url")
       .eq("user_id", userId)
       .eq("project_id", projectId)
       .order("week_start", { ascending: false })
@@ -519,14 +534,57 @@ function ProjectsCard({ projects, loading, userId }: { projects: ProjectRow[]; l
     setUpdatesByProject((m) => ({ ...m, [projectId]: data ?? [] }));
   };
 
+  const resetForm = () => {
+    setForm({ ...EMPTY_FORM, week_start: new Date().toISOString().slice(0, 10) });
+    setEvidence(null);
+    setEditingId(null);
+    setExistingEvidence(null);
+  };
+
   const toggleOpen = (id: string) => {
     if (openId === id) {
       setOpenId(null);
+      resetForm();
       return;
     }
     setOpenId(id);
-    setForm({ week_start: new Date().toISOString().slice(0, 10), summary: "", achievements: "", blockers: "", hours_spent: "0" });
+    resetForm();
     if (!updatesByProject[id]) loadUpdates(id);
+  };
+
+  const startEditUpdate = (u: UpdateRow) => {
+    setEditingId(u.id);
+    setForm({
+      week_start: u.week_start,
+      summary: u.summary,
+      achievements: u.achievements ?? "",
+      blockers: u.blockers ?? "",
+      hours_spent: String(u.hours_spent ?? 0),
+      repo_url: u.repo_url ?? "",
+    });
+    setEvidence(null);
+    setExistingEvidence(u.evidence_url);
+  };
+
+  const onPickEvidence = (file: File | null) => {
+    if (!file) { setEvidence(null); return; }
+    if (file.size > MAX_EVIDENCE_BYTES) {
+      toast.error("La evidencia debe pesar menos de 5 MB");
+      return;
+    }
+    setEvidence(file);
+  };
+
+  const uploadEvidence = async (projectId: string): Promise<string | null> => {
+    if (!evidence || !userId) return null;
+    const ext = evidence.name.split(".").pop()?.toLowerCase() || "bin";
+    const path = `${userId}/${projectId}/${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("update-evidences").upload(path, evidence, {
+      contentType: evidence.type || undefined,
+      upsert: false,
+    });
+    if (error) { toast.error("No se pudo subir evidencia: " + error.message); return null; }
+    return path;
   };
 
   const submitUpdate = async (projectId: string) => {
@@ -535,21 +593,42 @@ function ProjectsCard({ projects, loading, userId }: { projects: ProjectRow[]; l
     if (form.summary.trim().length < 5) return toast.error("El resumen debe tener al menos 5 caracteres");
     const hours = Number(form.hours_spent || 0);
     if (Number.isNaN(hours) || hours < 0 || hours > 168) return toast.error("Horas inválidas");
+    if (form.repo_url && !/^https?:\/\//i.test(form.repo_url)) return toast.error("URL de repositorio inválida");
+    if (editingId && !isWeekEditable(form.week_start)) return toast.error("Ya no puedes editar: la semana terminó");
+
     setSubmitting(true);
-    const { error } = await supabase.from("weekly_updates").insert({
-      user_id: userId,
-      project_id: projectId,
+    let evidencePath: string | null = existingEvidence;
+    if (evidence) {
+      const uploaded = await uploadEvidence(projectId);
+      if (!uploaded) { setSubmitting(false); return; }
+      evidencePath = uploaded;
+    }
+
+    const payload = {
       week_start: form.week_start,
       summary: form.summary.trim(),
       achievements: form.achievements.trim() || null,
       blockers: form.blockers.trim() || null,
       hours_spent: hours,
-    });
+      repo_url: form.repo_url.trim() || null,
+      evidence_url: evidencePath,
+    };
+
+    const { error } = editingId
+      ? await supabase.from("weekly_updates").update(payload).eq("id", editingId)
+      : await supabase.from("weekly_updates").insert({ ...payload, user_id: userId, project_id: projectId });
+
     setSubmitting(false);
     if (error) return toast.error(error.message);
-    toast.success("Avance registrado");
-    setForm({ week_start: new Date().toISOString().slice(0, 10), summary: "", achievements: "", blockers: "", hours_spent: "0" });
+    toast.success(editingId ? "Avance actualizado" : "Avance registrado");
+    resetForm();
     loadUpdates(projectId);
+  };
+
+  const openEvidence = async (path: string) => {
+    const { data, error } = await supabase.storage.from("update-evidences").createSignedUrl(path, 600);
+    if (error || !data) { toast.error("No se pudo abrir la evidencia"); return; }
+    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -584,6 +663,12 @@ function ProjectsCard({ projects, loading, userId }: { projects: ProjectRow[]; l
                 </div>
                 {isOpen && (
                   <div className="mt-4 space-y-4 border-t border-border/60 pt-4">
+                    {editingId && (
+                      <div className="flex items-center justify-between rounded-md border border-primary/30 bg-primary-soft px-3 py-2 text-xs text-foreground">
+                        <span>Editando avance del {form.week_start}</span>
+                        <button type="button" className="text-primary hover:underline" onClick={resetForm}>Cancelar edición</button>
+                      </div>
+                    )}
                     <div className="grid gap-3 sm:grid-cols-2">
                       <div>
                         <Label className="text-muted-foreground">Semana del</Label>
@@ -605,11 +690,35 @@ function ProjectsCard({ projects, loading, userId }: { projects: ProjectRow[]; l
                         <Label className="text-muted-foreground">Bloqueos</Label>
                         <Textarea rows={2} className="mt-1.5" value={form.blockers} onChange={(e) => setForm((f) => ({ ...f, blockers: e.target.value }))} maxLength={2000} />
                       </div>
+                      <div className="sm:col-span-2">
+                        <Label className="text-muted-foreground">Repositorio de GitHub</Label>
+                        <Input type="url" className="mt-1.5" value={form.repo_url} onChange={(e) => setForm((f) => ({ ...f, repo_url: e.target.value }))} placeholder="https://github.com/usuario/repo" maxLength={500} />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <Label className="text-muted-foreground">Evidencia (máx. 5 MB)</Label>
+                        <Input
+                          type="file"
+                          className="mt-1.5"
+                          accept="image/*,.pdf,.zip,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
+                          onChange={(e) => onPickEvidence(e.target.files?.[0] ?? null)}
+                        />
+                        {existingEvidence && !evidence && (
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            Evidencia actual:{" "}
+                            <button type="button" onClick={() => openEvidence(existingEvidence)} className="text-primary hover:underline">
+                              ver archivo
+                            </button>
+                          </p>
+                        )}
+                        {evidence && (
+                          <p className="mt-1 text-xs text-muted-foreground">Nuevo archivo: {evidence.name} ({(evidence.size / 1024 / 1024).toFixed(2)} MB)</p>
+                        )}
+                      </div>
                     </div>
                     <div className="flex justify-end">
                       <Button size="sm" onClick={() => submitUpdate(p.id)} disabled={submitting}>
                         <Save className="mr-1.5 h-3.5 w-3.5" />
-                        {submitting ? "Guardando..." : "Guardar avance"}
+                        {submitting ? "Guardando..." : editingId ? "Actualizar avance" : "Guardar avance"}
                       </Button>
                     </div>
                     <div>
@@ -618,17 +727,41 @@ function ProjectsCard({ projects, loading, userId }: { projects: ProjectRow[]; l
                         <p className="mt-2 text-sm text-muted-foreground">Aún no has registrado avances en este proyecto.</p>
                       ) : (
                         <ul className="mt-2 space-y-2">
-                          {ups.map((u) => (
-                            <li key={u.id} className="rounded-md border border-border/60 p-3">
-                              <div className="flex items-center justify-between text-xs text-muted-foreground">
-                                <span>Semana del {u.week_start}</span>
-                                <span>{u.hours_spent ?? 0} h</span>
-                              </div>
-                              <p className="mt-1.5 text-sm text-foreground">{u.summary}</p>
-                              {u.achievements && <p className="mt-1 text-xs text-muted-foreground"><span className="font-semibold text-foreground">Logros:</span> {u.achievements}</p>}
-                              {u.blockers && <p className="mt-0.5 text-xs text-muted-foreground"><span className="font-semibold text-foreground">Bloqueos:</span> {u.blockers}</p>}
-                            </li>
-                          ))}
+                          {ups.map((u) => {
+                            const canEdit = isWeekEditable(u.week_start);
+                            return (
+                              <li key={u.id} className="rounded-md border border-border/60 p-3">
+                                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                  <span>Semana del {u.week_start}</span>
+                                  <div className="flex items-center gap-2">
+                                    <span>{u.hours_spent ?? 0} h</span>
+                                    {canEdit ? (
+                                      <Button variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={() => startEditUpdate(u)}>
+                                        <Pencil className="mr-1 h-3 w-3" /> Editar
+                                      </Button>
+                                    ) : (
+                                      <Badge variant="outline" className="text-[10px]">Cerrado</Badge>
+                                    )}
+                                  </div>
+                                </div>
+                                <p className="mt-1.5 text-sm text-foreground">{u.summary}</p>
+                                {u.achievements && <p className="mt-1 text-xs text-muted-foreground"><span className="font-semibold text-foreground">Logros:</span> {u.achievements}</p>}
+                                {u.blockers && <p className="mt-0.5 text-xs text-muted-foreground"><span className="font-semibold text-foreground">Bloqueos:</span> {u.blockers}</p>}
+                                <div className="mt-1.5 flex flex-wrap gap-3 text-xs">
+                                  {u.repo_url && (
+                                    <a href={u.repo_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline">
+                                      <ExternalLink className="h-3 w-3" /> Repositorio
+                                    </a>
+                                  )}
+                                  {u.evidence_url && (
+                                    <button type="button" onClick={() => openEvidence(u.evidence_url!)} className="inline-flex items-center gap-1 text-primary hover:underline">
+                                      <ExternalLink className="h-3 w-3" /> Evidencia
+                                    </button>
+                                  )}
+                                </div>
+                              </li>
+                            );
+                          })}
                         </ul>
                       )}
                     </div>
