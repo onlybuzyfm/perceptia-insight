@@ -592,6 +592,7 @@ export type Database = {
           hours_spent: number | null
           id: string
           project_id: string | null
+          repo_url: string | null
           summary: string
           updated_at: string
           user_id: string
@@ -604,6 +605,7 @@ export type Database = {
           hours_spent?: number | null
           id?: string
           project_id?: string | null
+          repo_url?: string | null
           summary?: string
           updated_at?: string
           user_id: string
@@ -616,6 +618,7 @@ export type Database = {
           hours_spent?: number | null
           id?: string
           project_id?: string | null
+          repo_url?: string | null
           summary?: string
           updated_at?: string
           user_id?: string
