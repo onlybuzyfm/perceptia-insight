@@ -49,7 +49,7 @@ interface Activity {
   assignee_names: string[];
 }
 
-const ACTIVE_STATUSES = ["activo", "planificacion"];
+const ACTIVE_STATUSES = ["activo", "planificacion"] as const;
 
 function ActivitiesAdmin() {
   const [projects, setProjects] = useState<ProjectLite[]>([]);
