@@ -7,10 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { AdminShell } from "@/components/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { UserPlus, Trash2, Users, FolderKanban, Trophy, Network, Eye, Cpu, Brain, type LucideIcon } from "lucide-react";
+import { UserPlus, Trash2, Users, FolderKanban, Trophy, Network, Eye, Cpu, Brain, Pencil, type LucideIcon } from "lucide-react";
 
 const TEAM_ICONS: Record<string, { icon: LucideIcon; color: string; bg: string }> = {
   nexus: { icon: Network, color: "text-violet-600", bg: "bg-violet-100" },
@@ -44,6 +45,8 @@ function TeamsAdmin() {
   const [addingMemberTo, setAddingMemberTo] = useState<Team | null>(null);
   const [assignProjectTo, setAssignProjectTo] = useState<Team | null>(null);
   const [assignCompTo, setAssignCompTo] = useState<Team | null>(null);
+  const [editingTeam, setEditingTeam] = useState<Team | null>(null);
+  
   
 
   const load = async () => {
@@ -133,8 +136,12 @@ function TeamsAdmin() {
                     <div>
                       <h3 className="font-semibold text-foreground">{team.name}</h3>
                       {team.focus && <p className="text-xs text-muted-foreground">{team.focus}</p>}
+                      {team.description && <p className="mt-0.5 text-xs text-muted-foreground">{team.description}</p>}
                     </div>
                   </div>
+                  <Button size="sm" variant="ghost" onClick={() => setEditingTeam(team)}>
+                    <Pencil className="mr-1 h-3.5 w-3.5" /> Editar
+                  </Button>
                 </div>
 
                 {/* Integrantes */}
@@ -218,7 +225,68 @@ function TeamsAdmin() {
       <AddMemberDialog team={addingMemberTo} profiles={profiles} existing={members} onClose={() => setAddingMemberTo(null)} onSaved={() => { setAddingMemberTo(null); load(); }} />
       <AssignProjectDialog team={assignProjectTo} projects={projects} existing={tProjects} onClose={() => setAssignProjectTo(null)} onSaved={() => { setAssignProjectTo(null); load(); }} />
       <AssignCompetitionDialog team={assignCompTo} competitions={competitions} existing={tComps} onClose={() => setAssignCompTo(null)} onSaved={() => { setAssignCompTo(null); load(); }} />
+      <EditTeamDialog team={editingTeam} onClose={() => setEditingTeam(null)} onSaved={() => { setEditingTeam(null); load(); }} />
     </div>
+  );
+}
+
+function EditTeamDialog({ team, onClose, onSaved }: { team: Team | null; onClose: () => void; onSaved: () => void }) {
+  const [name, setName] = useState("");
+  const [focus, setFocus] = useState("");
+  const [description, setDescription] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (team) {
+      setName(team.name);
+      setFocus(team.focus ?? "");
+      setDescription(team.description ?? "");
+    }
+  }, [team]);
+
+  if (!team) return null;
+
+  const save = async () => {
+    if (!name.trim()) return toast.error("El nombre es obligatorio");
+    setSaving(true);
+    const { error } = await supabase
+      .from("teams")
+      .update({
+        name: name.trim(),
+        focus: focus.trim() || null,
+        description: description.trim(),
+      })
+      .eq("id", team.id);
+    setSaving(false);
+    if (error) return toast.error(error.message);
+    toast.success("Equipo actualizado");
+    onSaved();
+  };
+
+  return (
+    <Dialog open={!!team} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="bg-white sm:max-w-md">
+        <DialogHeader><DialogTitle>Editar equipo</DialogTitle></DialogHeader>
+        <div className="grid gap-3">
+          <div>
+            <Label className="text-xs">Nombre *</Label>
+            <Input value={name} onChange={(e) => setName(e.target.value)} className="mt-1" maxLength={120} />
+          </div>
+          <div>
+            <Label className="text-xs">Enfoque</Label>
+            <Input value={focus} onChange={(e) => setFocus(e.target.value)} className="mt-1" maxLength={200} placeholder="Visión artificial, TinyML..." />
+          </div>
+          <div>
+            <Label className="text-xs">Descripción</Label>
+            <Textarea value={description} onChange={(e) => setDescription(e.target.value)} className="mt-1" rows={4} maxLength={500} />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose} disabled={saving}>Cancelar</Button>
+          <Button onClick={save} disabled={saving} className="bg-primary hover:bg-primary/90">{saving ? "Guardando..." : "Guardar"}</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
