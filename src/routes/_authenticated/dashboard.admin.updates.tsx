@@ -166,7 +166,14 @@ function UpdatesAdmin() {
                   </td>
                   <td className="max-w-[260px] px-4 py-2.5 text-foreground/80">{r.summary}</td>
                   <td className="max-w-[200px] px-4 py-2.5 text-muted-foreground">{r.achievements ?? "—"}</td>
-                  <td className="max-w-[200px] px-4 py-2.5 text-muted-foreground">{r.blockers ?? "—"}</td>
+                  <td className="max-w-[200px] px-4 py-2.5 text-muted-foreground">
+                    {r.blockers ?? "—"}
+                    {r.repo_url && (
+                      <a href={r.repo_url} target="_blank" rel="noopener noreferrer" className="mt-1 block text-xs text-primary hover:underline">
+                        ↗ GitHub
+                      </a>
+                    )}
+                  </td>
                   <td className="px-4 py-2.5 text-right font-mono">{Number(r.hours_spent ?? 0).toFixed(1)}</td>
                   <td className="px-4 py-2.5 text-right">
                     <Button
