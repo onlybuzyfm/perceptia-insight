@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Pencil, Save, X, Network, Eye, Cpu, Brain, Users, Trophy, Tag, Upload, ExternalLink, Calendar, MapPin, Plus, ChevronUp, Megaphone, Video, type LucideIcon } from "lucide-react";
+import { Pencil, Save, X, Network, Eye, Cpu, Brain, Users, Trophy, Tag, Upload, ExternalLink, Calendar, MapPin, Plus, ChevronUp, Megaphone, Video, BookOpen, Database, Github, FileText, Cloud, Workflow, Folder, type LucideIcon } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/student")({
   component: StudentDashboard,
@@ -322,6 +322,8 @@ function StudentDashboard() {
       <ProjectsCard projects={projects} loading={loading} userId={auth.user?.id ?? null} />
 
       <CompetitionsCard competitions={competitions} loading={loading} hasTeam={!!team} />
+
+      <ResourcesCard />
 
       <ToolsCard />
     </DashboardShell>
@@ -880,6 +882,89 @@ function UpcomingMeetingsCard() {
                     <Video className="h-3.5 w-3.5" /> Unirse por Zoom <ExternalLink className="h-3 w-3" />
                   </a>
                 )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </Card>
+  );
+}
+
+const RESOURCE_ICONS: Record<string, LucideIcon> = {
+  moodle: BookOpen,
+  dataset: Database,
+  cvat: FileText,
+  notion: FileText,
+  github: Github,
+  drive: Cloud,
+  n8n: Workflow,
+  otro: Folder,
+};
+
+interface ResourceRow {
+  id: string;
+  title: string;
+  description: string;
+  url: string;
+  category: string;
+  project_id: string | null;
+}
+
+function ResourcesCard() {
+  const [items, setItems] = useState<ResourceRow[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    supabase
+      .from("resources")
+      .select("id, title, description, url, category, project_id")
+      .order("display_order", { ascending: true })
+      .then(({ data }) => {
+        setItems((data ?? []) as ResourceRow[]);
+        setLoading(false);
+      });
+  }, []);
+
+  return (
+    <Card className="mt-6 border-border/70 p-6">
+      <div className="flex items-center gap-2">
+        <BookOpen className="h-5 w-5 text-primary" />
+        <h2 className="font-display text-lg font-semibold text-foreground">Recursos</h2>
+      </div>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Datasets, carpetas en la nube y enlaces de tus proyectos.
+      </p>
+      {loading ? (
+        <p className="mt-3 text-sm text-muted-foreground">Cargando...</p>
+      ) : items.length === 0 ? (
+        <p className="mt-3 text-sm text-muted-foreground">Aún no hay recursos disponibles para ti.</p>
+      ) : (
+        <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+          {items.map((r) => {
+            const Icon = RESOURCE_ICONS[r.category] ?? Folder;
+            return (
+              <li key={r.id}>
+                <a
+                  href={r.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex h-full items-start gap-3 rounded-lg border border-border/60 p-3 transition-colors hover:border-primary/40 hover:bg-primary-soft/30"
+                >
+                  <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md bg-primary-soft text-primary">
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <p className="truncate text-sm font-medium text-foreground">{r.title}</p>
+                      <ExternalLink className="h-3 w-3 flex-shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+                    </div>
+                    {r.description && (
+                      <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{r.description}</p>
+                    )}
+                    <Badge variant="outline" className="mt-1.5 text-[10px] capitalize">{r.category}</Badge>
+                  </div>
+                </a>
               </li>
             );
           })}
