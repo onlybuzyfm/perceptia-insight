@@ -1,0 +1,11 @@
+services:
+  perceptia-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: perceptia_web
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3005:3005"
+    environment:
+      NODE_ENV: production
