@@ -23,7 +23,7 @@ export const Route = createFileRoute("/postular")({
 
 function PostularPage() {
   return (
-    <Site>
+    <PublicLayout>
       <section className="mx-auto max-w-3xl px-4 py-12 sm:py-16">
         <header className="text-center">
           <h1 className="font-display text-3xl font-bold text-foreground sm:text-4xl">
@@ -37,7 +37,7 @@ function PostularPage() {
           <ApplicationForm />
         </Card>
       </section>
-    </Site>
+    </PublicLayout>
   );
 }
 
