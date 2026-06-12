@@ -34,7 +34,7 @@ interface ActivityRow {
 
 interface ProjectRow {
   id: string;
-  name: string;
+  title: string;
   status: string;
   research_line_id: string | null;
 }
@@ -46,13 +46,13 @@ interface AssigneeRow {
 
 interface ProfileRow {
   id: string;
-  full_name: string;
+  full_title: string;
   avatar_url: string | null;
 }
 
 interface ResearchLineRow {
   id: string;
-  name: string;
+  title: string;
 }
 
 function Indicators() {
@@ -67,9 +67,9 @@ function Indicators() {
     (async () => {
       const [actsRes, projRes, asgRes, linesRes] = await Promise.all([
         supabase.from("project_activities").select("id, title, status, deadline, project_id"),
-        supabase.from("projects").select("id, name, status, research_line_id"),
+        supabase.from("projects").select("id, title, status, research_line_id"),
         supabase.from("activity_assignees").select("activity_id, user_id"),
-        supabase.from("research_lines").select("id, name"),
+        supabase.from("research_lines").select("id, title"),
       ]);
       const acts = (actsRes.data ?? []) as ActivityRow[];
       const asg = (asgRes.data ?? []) as AssigneeRow[];
