@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as ProyectosRouteImport } from './routes/proyectos'
+import { Route as PostularRouteImport } from './routes/postular'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LineasRouteImport } from './routes/lineas'
 import { Route as IntegrantesRouteImport } from './routes/integrantes'
@@ -47,6 +48,11 @@ const SobreRoute = SobreRouteImport.update({
 const ProyectosRoute = ProyectosRouteImport.update({
   id: '/proyectos',
   path: '/proyectos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PostularRoute = PostularRouteImport.update({
+  id: '/postular',
+  path: '/postular',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -210,6 +216,7 @@ export interface FileRoutesByFullPath {
   '/integrantes': typeof IntegrantesRoute
   '/lineas': typeof LineasRoute
   '/login': typeof LoginRoute
+  '/postular': typeof PostularRoute
   '/proyectos': typeof ProyectosRoute
   '/sobre': typeof SobreRoute
   '/resources': typeof AuthenticatedResourcesRoute
@@ -240,6 +247,7 @@ export interface FileRoutesByTo {
   '/integrantes': typeof IntegrantesRoute
   '/lineas': typeof LineasRoute
   '/login': typeof LoginRoute
+  '/postular': typeof PostularRoute
   '/proyectos': typeof ProyectosRoute
   '/sobre': typeof SobreRoute
   '/resources': typeof AuthenticatedResourcesRoute
@@ -271,6 +279,7 @@ export interface FileRoutesById {
   '/integrantes': typeof IntegrantesRoute
   '/lineas': typeof LineasRoute
   '/login': typeof LoginRoute
+  '/postular': typeof PostularRoute
   '/proyectos': typeof ProyectosRoute
   '/sobre': typeof SobreRoute
   '/_authenticated/resources': typeof AuthenticatedResourcesRoute
@@ -303,6 +312,7 @@ export interface FileRouteTypes {
     | '/integrantes'
     | '/lineas'
     | '/login'
+    | '/postular'
     | '/proyectos'
     | '/sobre'
     | '/resources'
@@ -333,6 +343,7 @@ export interface FileRouteTypes {
     | '/integrantes'
     | '/lineas'
     | '/login'
+    | '/postular'
     | '/proyectos'
     | '/sobre'
     | '/resources'
@@ -363,6 +374,7 @@ export interface FileRouteTypes {
     | '/integrantes'
     | '/lineas'
     | '/login'
+    | '/postular'
     | '/proyectos'
     | '/sobre'
     | '/_authenticated/resources'
@@ -395,6 +407,7 @@ export interface RootRouteChildren {
   IntegrantesRoute: typeof IntegrantesRoute
   LineasRoute: typeof LineasRoute
   LoginRoute: typeof LoginRoute
+  PostularRoute: typeof PostularRoute
   ProyectosRoute: typeof ProyectosRoute
   SobreRoute: typeof SobreRoute
 }
@@ -413,6 +426,13 @@ declare module '@tanstack/react-router' {
       path: '/proyectos'
       fullPath: '/proyectos'
       preLoaderRoute: typeof ProyectosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/postular': {
+      id: '/postular'
+      path: '/postular'
+      fullPath: '/postular'
+      preLoaderRoute: typeof PostularRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -689,6 +709,7 @@ const rootRouteChildren: RootRouteChildren = {
   IntegrantesRoute: IntegrantesRoute,
   LineasRoute: LineasRoute,
   LoginRoute: LoginRoute,
+  PostularRoute: PostularRoute,
   ProyectosRoute: ProyectosRoute,
   SobreRoute: SobreRoute,
 }
