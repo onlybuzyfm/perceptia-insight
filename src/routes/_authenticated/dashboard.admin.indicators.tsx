@@ -46,7 +46,7 @@ interface AssigneeRow {
 
 interface ProfileRow {
   id: string;
-  full_title: string;
+  full_name: string;
   avatar_url: string | null;
 }
 
@@ -148,7 +148,7 @@ function Indicators() {
   // Distribución por línea de investigación
   const linesById: Record<string, string> = {};
   lines.forEach((l) => {
-    linesById[l.id] = l.name;
+    linesById[l.id] = l.title;
   });
   const projectsPerLine: Record<string, number> = {};
   projects.forEach((p) => {
@@ -218,7 +218,7 @@ function Indicators() {
                     <div className="min-w-0">
                       <p className="truncate font-medium text-foreground">{a.title}</p>
                       <p className="truncate text-xs text-muted-foreground">
-                        {projectsById[a.project_id]?.name ?? "—"}
+                        {projectsById[a.project_id]?.title ?? "—"}
                       </p>
                     </div>
                     <Badge variant={days <= 2 ? "destructive" : "outline"}>
@@ -250,7 +250,7 @@ function Indicators() {
                     <div className="min-w-0">
                       <p className="truncate font-medium text-foreground">{a.title}</p>
                       <p className="truncate text-xs text-muted-foreground">
-                        {projectsById[a.project_id]?.name ?? "—"}
+                        {projectsById[a.project_id]?.title ?? "—"}
                       </p>
                     </div>
                     <Badge variant="destructive">{days}d tarde</Badge>
@@ -304,7 +304,7 @@ function Indicators() {
               {projectProgress.slice(0, 6).map((p) => (
                 <li key={p.project.id}>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="truncate font-medium text-foreground">{p.project.name}</span>
+                    <span className="truncate font-medium text-foreground">{p.project.title}</span>
                     <span className="text-xs text-muted-foreground">
                       {p.done}/{p.total} · {p.pct}%
                     </span>
