@@ -38,6 +38,7 @@ import { Route as AuthenticatedDashboardAdminProjectsRouteImport } from './route
 import { Route as AuthenticatedDashboardAdminMeetingsRouteImport } from './routes/_authenticated/dashboard.admin.meetings'
 import { Route as AuthenticatedDashboardAdminIndicatorsRouteImport } from './routes/_authenticated/dashboard.admin.indicators'
 import { Route as AuthenticatedDashboardAdminCompetitionsRouteImport } from './routes/_authenticated/dashboard.admin.competitions'
+import { Route as AuthenticatedDashboardAdminApplicationsRouteImport } from './routes/_authenticated/dashboard.admin.applications'
 import { Route as AuthenticatedDashboardAdminActivitiesRouteImport } from './routes/_authenticated/dashboard.admin.activities'
 
 const SobreRoute = SobreRouteImport.update({
@@ -201,6 +202,12 @@ const AuthenticatedDashboardAdminCompetitionsRoute =
     path: '/competitions',
     getParentRoute: () => AuthenticatedDashboardAdminRoute,
   } as any)
+const AuthenticatedDashboardAdminApplicationsRoute =
+  AuthenticatedDashboardAdminApplicationsRouteImport.update({
+    id: '/applications',
+    path: '/applications',
+    getParentRoute: () => AuthenticatedDashboardAdminRoute,
+  } as any)
 const AuthenticatedDashboardAdminActivitiesRoute =
   AuthenticatedDashboardAdminActivitiesRouteImport.update({
     id: '/activities',
@@ -227,6 +234,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/student': typeof AuthenticatedDashboardStudentRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/admin/activities': typeof AuthenticatedDashboardAdminActivitiesRoute
+  '/dashboard/admin/applications': typeof AuthenticatedDashboardAdminApplicationsRoute
   '/dashboard/admin/competitions': typeof AuthenticatedDashboardAdminCompetitionsRoute
   '/dashboard/admin/indicators': typeof AuthenticatedDashboardAdminIndicatorsRoute
   '/dashboard/admin/meetings': typeof AuthenticatedDashboardAdminMeetingsRoute
@@ -257,6 +265,7 @@ export interface FileRoutesByTo {
   '/dashboard/student': typeof AuthenticatedDashboardStudentRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/admin/activities': typeof AuthenticatedDashboardAdminActivitiesRoute
+  '/dashboard/admin/applications': typeof AuthenticatedDashboardAdminApplicationsRoute
   '/dashboard/admin/competitions': typeof AuthenticatedDashboardAdminCompetitionsRoute
   '/dashboard/admin/indicators': typeof AuthenticatedDashboardAdminIndicatorsRoute
   '/dashboard/admin/meetings': typeof AuthenticatedDashboardAdminMeetingsRoute
@@ -290,6 +299,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/student': typeof AuthenticatedDashboardStudentRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/admin/activities': typeof AuthenticatedDashboardAdminActivitiesRoute
+  '/_authenticated/dashboard/admin/applications': typeof AuthenticatedDashboardAdminApplicationsRoute
   '/_authenticated/dashboard/admin/competitions': typeof AuthenticatedDashboardAdminCompetitionsRoute
   '/_authenticated/dashboard/admin/indicators': typeof AuthenticatedDashboardAdminIndicatorsRoute
   '/_authenticated/dashboard/admin/meetings': typeof AuthenticatedDashboardAdminMeetingsRoute
@@ -323,6 +333,7 @@ export interface FileRouteTypes {
     | '/dashboard/student'
     | '/dashboard/'
     | '/dashboard/admin/activities'
+    | '/dashboard/admin/applications'
     | '/dashboard/admin/competitions'
     | '/dashboard/admin/indicators'
     | '/dashboard/admin/meetings'
@@ -353,6 +364,7 @@ export interface FileRouteTypes {
     | '/dashboard/student'
     | '/dashboard'
     | '/dashboard/admin/activities'
+    | '/dashboard/admin/applications'
     | '/dashboard/admin/competitions'
     | '/dashboard/admin/indicators'
     | '/dashboard/admin/meetings'
@@ -385,6 +397,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/student'
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/admin/activities'
+    | '/_authenticated/dashboard/admin/applications'
     | '/_authenticated/dashboard/admin/competitions'
     | '/_authenticated/dashboard/admin/indicators'
     | '/_authenticated/dashboard/admin/meetings'
@@ -617,6 +630,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAdminCompetitionsRouteImport
       parentRoute: typeof AuthenticatedDashboardAdminRoute
     }
+    '/_authenticated/dashboard/admin/applications': {
+      id: '/_authenticated/dashboard/admin/applications'
+      path: '/applications'
+      fullPath: '/dashboard/admin/applications'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminApplicationsRouteImport
+      parentRoute: typeof AuthenticatedDashboardAdminRoute
+    }
     '/_authenticated/dashboard/admin/activities': {
       id: '/_authenticated/dashboard/admin/activities'
       path: '/activities'
@@ -629,6 +649,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedDashboardAdminRouteChildren {
   AuthenticatedDashboardAdminActivitiesRoute: typeof AuthenticatedDashboardAdminActivitiesRoute
+  AuthenticatedDashboardAdminApplicationsRoute: typeof AuthenticatedDashboardAdminApplicationsRoute
   AuthenticatedDashboardAdminCompetitionsRoute: typeof AuthenticatedDashboardAdminCompetitionsRoute
   AuthenticatedDashboardAdminIndicatorsRoute: typeof AuthenticatedDashboardAdminIndicatorsRoute
   AuthenticatedDashboardAdminMeetingsRoute: typeof AuthenticatedDashboardAdminMeetingsRoute
@@ -646,6 +667,8 @@ const AuthenticatedDashboardAdminRouteChildren: AuthenticatedDashboardAdminRoute
   {
     AuthenticatedDashboardAdminActivitiesRoute:
       AuthenticatedDashboardAdminActivitiesRoute,
+    AuthenticatedDashboardAdminApplicationsRoute:
+      AuthenticatedDashboardAdminApplicationsRoute,
     AuthenticatedDashboardAdminCompetitionsRoute:
       AuthenticatedDashboardAdminCompetitionsRoute,
     AuthenticatedDashboardAdminIndicatorsRoute:
@@ -716,3 +739,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
