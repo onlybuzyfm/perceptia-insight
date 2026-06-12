@@ -182,6 +182,28 @@ function WeeklyUpdatesPage() {
                       </a>
                     </p>
                   )}
+                  {(() => {
+                    const updateEvals = evals.filter((e) => e.weekly_update_id === u.id);
+                    if (updateEvals.length === 0) return null;
+                    return (
+                      <div className="mt-3 space-y-2 rounded-md border border-primary/20 bg-primary/5 p-3">
+                        <p className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
+                          <Star className="h-3.5 w-3.5 text-primary" /> Retroalimentación recibida
+                        </p>
+                        {updateEvals.map((e) => (
+                          <div key={e.id} className="text-xs">
+                            <div className="flex items-center justify-between">
+                              <span className="font-medium text-foreground">{e.evaluator_name}</span>
+                              <Badge variant="secondary" className="gap-1">
+                                <Star className="h-3 w-3 fill-current" /> {e.score}/5
+                              </Badge>
+                            </div>
+                            {e.comment && <p className="mt-1 text-muted-foreground">{e.comment}</p>}
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
                 </li>
               ))}
             </ul>
