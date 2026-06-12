@@ -10,10 +10,21 @@ import { DashboardShell } from "@/components/DashboardShell";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Star } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/_authenticated/weekly-updates")({
   component: WeeklyUpdatesPage,
 });
+
+interface Evaluation {
+  id: string;
+  weekly_update_id: string;
+  score: number;
+  comment: string | null;
+  evaluator_id: string;
+  evaluator_name?: string;
+}
 
 interface Update {
   id: string;
@@ -38,6 +49,7 @@ const schema = z.object({
 function WeeklyUpdatesPage() {
   const auth = useAuth();
   const [updates, setUpdates] = useState<Update[]>([]);
+  const [evals, setEvals] = useState<Evaluation[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
@@ -49,7 +61,19 @@ function WeeklyUpdatesPage() {
       .eq("user_id", auth.user.id)
       .order("week_start", { ascending: false })
       .limit(20);
-    setUpdates(data ?? []);
+    const rows = data ?? [];
+    setUpdates(rows);
+    const ids = rows.map((r) => r.id);
+    if (ids.length > 0) {
+      const [{ data: evs }, { data: profs }] = await Promise.all([
+        supabase.from("evaluations").select("*").in("weekly_update_id", ids),
+        supabase.from("profiles").select("id, full_name"),
+      ]);
+      const profMap = new Map((profs ?? []).map((p) => [p.id, p.full_name]));
+      setEvals((evs ?? []).map((e) => ({ ...e, evaluator_name: profMap.get(e.evaluator_id) || "Coordinador" })));
+    } else {
+      setEvals([]);
+    }
     setLoading(false);
   };
 
@@ -158,6 +182,28 @@ function WeeklyUpdatesPage() {
                       </a>
                     </p>
                   )}
+                  {(() => {
+                    const updateEvals = evals.filter((e) => e.weekly_update_id === u.id);
+                    if (updateEvals.length === 0) return null;
+                    return (
+                      <div className="mt-3 space-y-2 rounded-md border border-primary/20 bg-primary/5 p-3">
+                        <p className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
+                          <Star className="h-3.5 w-3.5 text-primary" /> Retroalimentación recibida
+                        </p>
+                        {updateEvals.map((e) => (
+                          <div key={e.id} className="text-xs">
+                            <div className="flex items-center justify-between">
+                              <span className="font-medium text-foreground">{e.evaluator_name}</span>
+                              <Badge variant="secondary" className="gap-1">
+                                <Star className="h-3 w-3 fill-current" /> {e.score}/5
+                              </Badge>
+                            </div>
+                            {e.comment && <p className="mt-1 text-muted-foreground">{e.comment}</p>}
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
                 </li>
               ))}
             </ul>

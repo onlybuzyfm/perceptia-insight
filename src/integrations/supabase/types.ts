@@ -151,6 +151,44 @@ export type Database = {
         }
         Relationships: []
       }
+      evaluations: {
+        Row: {
+          comment: string | null
+          created_at: string
+          evaluator_id: string
+          id: string
+          score: number
+          updated_at: string
+          weekly_update_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          evaluator_id: string
+          id?: string
+          score: number
+          updated_at?: string
+          weekly_update_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          evaluator_id?: string
+          id?: string
+          score?: number
+          updated_at?: string
+          weekly_update_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evaluations_weekly_update_id_fkey"
+            columns: ["weekly_update_id"]
+            isOneToOne: false
+            referencedRelation: "weekly_updates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       meeting_attendance: {
         Row: {
           id: string
