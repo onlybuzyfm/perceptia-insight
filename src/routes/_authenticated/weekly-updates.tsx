@@ -10,6 +10,8 @@ import { DashboardShell } from "@/components/DashboardShell";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Star } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/_authenticated/weekly-updates")({
   component: WeeklyUpdatesPage,
