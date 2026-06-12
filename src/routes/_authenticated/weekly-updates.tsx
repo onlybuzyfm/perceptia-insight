@@ -15,6 +15,15 @@ export const Route = createFileRoute("/_authenticated/weekly-updates")({
   component: WeeklyUpdatesPage,
 });
 
+interface Evaluation {
+  id: string;
+  weekly_update_id: string;
+  score: number;
+  comment: string | null;
+  evaluator_id: string;
+  evaluator_name?: string;
+}
+
 interface Update {
   id: string;
   week_start: string;
@@ -38,6 +47,7 @@ const schema = z.object({
 function WeeklyUpdatesPage() {
   const auth = useAuth();
   const [updates, setUpdates] = useState<Update[]>([]);
+  const [evals, setEvals] = useState<Evaluation[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
@@ -49,7 +59,19 @@ function WeeklyUpdatesPage() {
       .eq("user_id", auth.user.id)
       .order("week_start", { ascending: false })
       .limit(20);
-    setUpdates(data ?? []);
+    const rows = data ?? [];
+    setUpdates(rows);
+    const ids = rows.map((r) => r.id);
+    if (ids.length > 0) {
+      const [{ data: evs }, { data: profs }] = await Promise.all([
+        supabase.from("evaluations").select("*").in("weekly_update_id", ids),
+        supabase.from("profiles").select("id, full_name"),
+      ]);
+      const profMap = new Map((profs ?? []).map((p) => [p.id, p.full_name]));
+      setEvals((evs ?? []).map((e) => ({ ...e, evaluator_name: profMap.get(e.evaluator_id) || "Coordinador" })));
+    } else {
+      setEvals([]);
+    }
     setLoading(false);
   };
 
