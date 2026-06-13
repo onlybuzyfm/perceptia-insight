@@ -808,7 +808,12 @@ export type Database = {
     }
     Enums: {
       activity_status: "pendiente" | "en_progreso" | "completada"
-      app_role: "visitante" | "estudiante" | "coordinador" | "admin"
+      app_role:
+        | "visitante"
+        | "estudiante"
+        | "coordinador"
+        | "admin"
+        | "docente_asociado"
       application_status: "pendiente" | "en_revision" | "aceptada" | "rechazada"
       attendance_status: "presente" | "ausente" | "tardanza" | "justificado"
       project_status:
@@ -956,7 +961,13 @@ export const Constants = {
   public: {
     Enums: {
       activity_status: ["pendiente", "en_progreso", "completada"],
-      app_role: ["visitante", "estudiante", "coordinador", "admin"],
+      app_role: [
+        "visitante",
+        "estudiante",
+        "coordinador",
+        "admin",
+        "docente_asociado",
+      ],
       application_status: ["pendiente", "en_revision", "aceptada", "rechazada"],
       attendance_status: ["presente", "ausente", "tardanza", "justificado"],
       project_status: [
