@@ -799,7 +799,12 @@ export type Database = {
         Args: { _project_id: string; _user_id: string }
         Returns: boolean
       }
+      is_project_teacher: {
+        Args: { _project_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      is_teacher: { Args: { _user_id: string }; Returns: boolean }
       is_team_member: {
         Args: { _team_id: string; _user_id: string }
         Returns: boolean
@@ -808,7 +813,12 @@ export type Database = {
     }
     Enums: {
       activity_status: "pendiente" | "en_progreso" | "completada"
-      app_role: "visitante" | "estudiante" | "coordinador" | "admin"
+      app_role:
+        | "visitante"
+        | "estudiante"
+        | "coordinador"
+        | "admin"
+        | "docente_asociado"
       application_status: "pendiente" | "en_revision" | "aceptada" | "rechazada"
       attendance_status: "presente" | "ausente" | "tardanza" | "justificado"
       project_status:
@@ -956,7 +966,13 @@ export const Constants = {
   public: {
     Enums: {
       activity_status: ["pendiente", "en_progreso", "completada"],
-      app_role: ["visitante", "estudiante", "coordinador", "admin"],
+      app_role: [
+        "visitante",
+        "estudiante",
+        "coordinador",
+        "admin",
+        "docente_asociado",
+      ],
       application_status: ["pendiente", "en_revision", "aceptada", "rechazada"],
       attendance_status: ["presente", "ausente", "tardanza", "justificado"],
       project_status: [

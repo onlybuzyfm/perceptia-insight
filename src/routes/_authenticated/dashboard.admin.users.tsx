@@ -36,7 +36,7 @@ interface UserRow {
 interface ResearchLine { id: string; title: string }
 interface Project { id: string; title: string }
 
-const MANAGED_ROLES: AppRole[] = ["estudiante", "coordinador", "admin"];
+const MANAGED_ROLES: AppRole[] = ["estudiante", "docente_asociado", "coordinador", "admin"];
 
 function UsersAdmin() {
   const auth = useAuth();
@@ -207,6 +207,7 @@ function UsersAdmin() {
             <SelectContent>
               <SelectItem value="all">Todos los roles</SelectItem>
               <SelectItem value="estudiante">Estudiante</SelectItem>
+              <SelectItem value="docente_asociado">Docente asociado</SelectItem>
               <SelectItem value="coordinador">Coordinador</SelectItem>
               <SelectItem value="admin">Admin</SelectItem>
             </SelectContent>

@@ -23,6 +23,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedWeeklyUpdatesRouteImport } from './routes/_authenticated/weekly-updates'
 import { Route as AuthenticatedResourcesRouteImport } from './routes/_authenticated/resources'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
+import { Route as AuthenticatedDashboardTeacherRouteImport } from './routes/_authenticated/dashboard.teacher'
 import { Route as AuthenticatedDashboardStudentRouteImport } from './routes/_authenticated/dashboard.student'
 import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
 import { Route as AuthenticatedDashboardCoordinatorRouteImport } from './routes/_authenticated/dashboard.coordinator'
@@ -110,6 +111,12 @@ const AuthenticatedDashboardIndexRoute =
   AuthenticatedDashboardIndexRouteImport.update({
     id: '/dashboard/',
     path: '/dashboard/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardTeacherRoute =
+  AuthenticatedDashboardTeacherRouteImport.update({
+    id: '/dashboard/teacher',
+    path: '/dashboard/teacher',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardStudentRoute =
@@ -232,6 +239,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/coordinator': typeof AuthenticatedDashboardCoordinatorRoute
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/dashboard/student': typeof AuthenticatedDashboardStudentRoute
+  '/dashboard/teacher': typeof AuthenticatedDashboardTeacherRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/admin/activities': typeof AuthenticatedDashboardAdminActivitiesRoute
   '/dashboard/admin/applications': typeof AuthenticatedDashboardAdminApplicationsRoute
@@ -263,6 +271,7 @@ export interface FileRoutesByTo {
   '/dashboard/coordinator': typeof AuthenticatedDashboardCoordinatorRoute
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/dashboard/student': typeof AuthenticatedDashboardStudentRoute
+  '/dashboard/teacher': typeof AuthenticatedDashboardTeacherRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/admin/activities': typeof AuthenticatedDashboardAdminActivitiesRoute
   '/dashboard/admin/applications': typeof AuthenticatedDashboardAdminApplicationsRoute
@@ -297,6 +306,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/coordinator': typeof AuthenticatedDashboardCoordinatorRoute
   '/_authenticated/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/_authenticated/dashboard/student': typeof AuthenticatedDashboardStudentRoute
+  '/_authenticated/dashboard/teacher': typeof AuthenticatedDashboardTeacherRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/admin/activities': typeof AuthenticatedDashboardAdminActivitiesRoute
   '/_authenticated/dashboard/admin/applications': typeof AuthenticatedDashboardAdminApplicationsRoute
@@ -331,6 +341,7 @@ export interface FileRouteTypes {
     | '/dashboard/coordinator'
     | '/dashboard/settings'
     | '/dashboard/student'
+    | '/dashboard/teacher'
     | '/dashboard/'
     | '/dashboard/admin/activities'
     | '/dashboard/admin/applications'
@@ -362,6 +373,7 @@ export interface FileRouteTypes {
     | '/dashboard/coordinator'
     | '/dashboard/settings'
     | '/dashboard/student'
+    | '/dashboard/teacher'
     | '/dashboard'
     | '/dashboard/admin/activities'
     | '/dashboard/admin/applications'
@@ -395,6 +407,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/coordinator'
     | '/_authenticated/dashboard/settings'
     | '/_authenticated/dashboard/student'
+    | '/_authenticated/dashboard/teacher'
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/admin/activities'
     | '/_authenticated/dashboard/admin/applications'
@@ -523,6 +536,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard/'
       preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/teacher': {
+      id: '/_authenticated/dashboard/teacher'
+      path: '/dashboard/teacher'
+      fullPath: '/dashboard/teacher'
+      preLoaderRoute: typeof AuthenticatedDashboardTeacherRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/student': {
@@ -705,6 +725,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardCoordinatorRoute: typeof AuthenticatedDashboardCoordinatorRoute
   AuthenticatedDashboardSettingsRoute: typeof AuthenticatedDashboardSettingsRoute
   AuthenticatedDashboardStudentRoute: typeof AuthenticatedDashboardStudentRoute
+  AuthenticatedDashboardTeacherRoute: typeof AuthenticatedDashboardTeacherRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
 }
 
@@ -717,6 +738,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardCoordinatorRoute,
   AuthenticatedDashboardSettingsRoute: AuthenticatedDashboardSettingsRoute,
   AuthenticatedDashboardStudentRoute: AuthenticatedDashboardStudentRoute,
+  AuthenticatedDashboardTeacherRoute: AuthenticatedDashboardTeacherRoute,
   AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
 }
 
@@ -739,13 +761,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
