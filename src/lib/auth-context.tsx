@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
-export type AppRole = "visitante" | "estudiante" | "coordinador" | "admin";
+export type AppRole = "visitante" | "estudiante" | "coordinador" | "admin" | "docente_asociado";
 
 export interface AuthState {
   isAuthenticated: boolean;

@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { type ReactNode, useEffect, useState } from "react";
-import { LayoutDashboard, FileText, BookOpen, LogOut, Users, Settings, GraduationCap, User as UserIcon, ChevronDown } from "lucide-react";
+import { LayoutDashboard, FileText, BookOpen, LogOut, Users, Settings, GraduationCap, User as UserIcon, ChevronDown, Briefcase } from "lucide-react";
 import logo from "@/assets/perceptia-logo.svg";
 import { useAuth } from "@/lib/auth-context";
 
@@ -108,6 +108,9 @@ export function DashboardShell({ children, title }: { children: ReactNode; title
             <SideLink to="/dashboard/student" icon={GraduationCap} label="Mi espacio" />
             <SideLink to="/weekly-updates" icon={FileText} label="Avances semanales" />
             <SideLink to="/resources" icon={BookOpen} label="Recursos" />
+            {auth.hasRole("docente_asociado") && (
+              <SideLink to="/dashboard/teacher" icon={Briefcase} label="Mis proyectos" />
+            )}
             {isStaff && (
               <SideLink to="/dashboard/coordinator" icon={Users} label="Coordinación" />
             )}

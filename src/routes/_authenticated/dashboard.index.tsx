@@ -18,9 +18,12 @@ function DashboardHome() {
     ? "admin"
     : auth.hasRole("coordinador")
     ? "coordinador"
+    : auth.hasRole("docente_asociado")
+    ? "docente_asociado"
     : auth.hasRole("estudiante")
     ? "estudiante"
     : "sin rol";
+
 
   useEffect(() => {
     if (!auth.user) return;
@@ -38,6 +41,7 @@ function DashboardHome() {
   // Auto-redirect to role-specific dashboard
   if (primaryRole === "admin") return <Navigate to="/dashboard/admin" replace />;
   if (primaryRole === "coordinador") return <Navigate to="/dashboard/coordinator" replace />;
+  if (primaryRole === "docente_asociado") return <Navigate to="/dashboard/teacher" replace />;
   if (primaryRole === "estudiante") return <Navigate to="/dashboard/student" replace />;
 
   return (
