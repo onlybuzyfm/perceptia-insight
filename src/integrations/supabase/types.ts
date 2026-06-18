@@ -271,6 +271,45 @@ export type Database = {
           },
         ]
       }
+      notification_logs: {
+        Row: {
+          email_destino: string
+          estado_envio: string
+          fecha_creacion: string
+          id: string
+          notification_type: string
+          payload: Json | null
+          respuesta_webhook: Json | null
+          subject: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          email_destino: string
+          estado_envio?: string
+          fecha_creacion?: string
+          id?: string
+          notification_type: string
+          payload?: Json | null
+          respuesta_webhook?: Json | null
+          subject: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          email_destino?: string
+          estado_envio?: string
+          fecha_creacion?: string
+          id?: string
+          notification_type?: string
+          payload?: Json | null
+          respuesta_webhook?: Json | null
+          subject?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -279,6 +318,8 @@ export type Database = {
           codigo_estudiantil: string | null
           created_at: string
           email: string | null
+          email_secundario: string | null
+          fecha_verificacion_email_secundario: string | null
           full_name: string
           github_url: string | null
           id: string
@@ -286,6 +327,7 @@ export type Database = {
           is_active: boolean
           is_public_member: boolean
           linkedin_url: string | null
+          notificaciones_email_activas: boolean
           paralelo: string | null
           phone: string | null
           public_role: string | null
@@ -300,6 +342,8 @@ export type Database = {
           codigo_estudiantil?: string | null
           created_at?: string
           email?: string | null
+          email_secundario?: string | null
+          fecha_verificacion_email_secundario?: string | null
           full_name?: string
           github_url?: string | null
           id: string
@@ -307,6 +351,7 @@ export type Database = {
           is_active?: boolean
           is_public_member?: boolean
           linkedin_url?: string | null
+          notificaciones_email_activas?: boolean
           paralelo?: string | null
           phone?: string | null
           public_role?: string | null
@@ -321,6 +366,8 @@ export type Database = {
           codigo_estudiantil?: string | null
           created_at?: string
           email?: string | null
+          email_secundario?: string | null
+          fecha_verificacion_email_secundario?: string | null
           full_name?: string
           github_url?: string | null
           id?: string
@@ -328,6 +375,7 @@ export type Database = {
           is_active?: boolean
           is_public_member?: boolean
           linkedin_url?: string | null
+          notificaciones_email_activas?: boolean
           paralelo?: string | null
           phone?: string | null
           public_role?: string | null
