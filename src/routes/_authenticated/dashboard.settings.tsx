@@ -23,19 +23,51 @@ function SettingsPage() {
   const [pwd, setPwd] = useState("");
   const [pwd2, setPwd2] = useState("");
   const [savingPwd, setSavingPwd] = useState(false);
+  const [emailSecundario, setEmailSecundario] = useState("");
+  const [notifActivas, setNotifActivas] = useState(false);
+  const [savingEmail, setSavingEmail] = useState(false);
 
   useEffect(() => {
     if (!auth.user) return;
     supabase
       .from("profiles")
-      .select("avatar_url")
+      .select("avatar_url, email_secundario, notificaciones_email_activas")
       .eq("id", auth.user.id)
       .maybeSingle()
       .then(({ data }) => {
         setAvatarUrl(data?.avatar_url ?? null);
+        setEmailSecundario(data?.email_secundario ?? "");
+        setNotifActivas(data?.notificaciones_email_activas ?? false);
         setLoading(false);
       });
   }, [auth.user]);
+
+  const saveEmailPrefs = async () => {
+    if (!auth.user) return;
+    const trimmed = emailSecundario.trim();
+    if (trimmed && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      toast.error("Correo inválido");
+      return;
+    }
+    if (trimmed && notifActivas && !trimmed.toLowerCase().endsWith("@gmail.com")) {
+      toast.error("Por ahora solo se admiten correos @gmail.com para notificaciones");
+      return;
+    }
+    setSavingEmail(true);
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        email_secundario: trimmed || null,
+        notificaciones_email_activas: notifActivas && !!trimmed,
+      })
+      .eq("id", auth.user.id);
+    setSavingEmail(false);
+    if (error) {
+      toast.error("No se pudo guardar: " + error.message);
+      return;
+    }
+    toast.success("Preferencias de correo guardadas");
+  };
 
   const changePassword = async () => {
     if (pwd.length < 8) {
