@@ -138,6 +138,37 @@ function SettingsPage() {
           </Button>
         </div>
       </Card>
+      <Card className="mt-6 border-border/70 p-6">
+        <div className="flex items-center gap-2">
+          <Mail className="h-5 w-5 text-primary" />
+          <h2 className="font-display text-lg font-semibold text-foreground">Notificaciones por correo</h2>
+        </div>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Registra un correo secundario (preferentemente Gmail) para recibir avisos importantes del portal.
+        </p>
+        <div className="mt-4 grid gap-4 sm:max-w-md">
+          <div>
+            <Label className="text-muted-foreground">Correo secundario</Label>
+            <Input
+              type="email"
+              className="mt-1.5"
+              value={emailSecundario}
+              onChange={(e) => setEmailSecundario(e.target.value)}
+              placeholder="tu.correo@gmail.com"
+            />
+          </div>
+          <div className="flex items-center justify-between rounded-lg border border-border/60 px-4 py-3">
+            <div>
+              <p className="text-sm font-medium text-foreground">Activar notificaciones</p>
+              <p className="text-xs text-muted-foreground">Recibirás avisos automáticos en tu correo secundario.</p>
+            </div>
+            <Switch checked={notifActivas} onCheckedChange={setNotifActivas} />
+          </div>
+          <Button onClick={saveEmailPrefs} disabled={savingEmail}>
+            {savingEmail ? "Guardando..." : "Guardar preferencias"}
+          </Button>
+        </div>
+      </Card>
     </DashboardShell>
   );
 }
