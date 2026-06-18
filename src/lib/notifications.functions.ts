@@ -95,7 +95,7 @@ export const sendPerceptiaNotificationEmail = createServerFn({ method: "POST" })
         body: JSON.stringify(payload),
       });
       const text = await res.text();
-      let parsed: unknown = text;
+      let parsed: any = text;
       try { parsed = JSON.parse(text); } catch { /* keep text */ }
 
       await supabaseAdmin
