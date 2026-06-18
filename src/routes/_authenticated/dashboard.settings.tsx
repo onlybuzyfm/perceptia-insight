@@ -9,7 +9,8 @@ import { AvatarUploader } from "@/components/AvatarUploader";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { KeyRound } from "lucide-react";
+import { KeyRound, Mail } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 
 export const Route = createFileRoute("/_authenticated/dashboard/settings")({
   component: SettingsPage,
@@ -22,19 +23,51 @@ function SettingsPage() {
   const [pwd, setPwd] = useState("");
   const [pwd2, setPwd2] = useState("");
   const [savingPwd, setSavingPwd] = useState(false);
+  const [emailSecundario, setEmailSecundario] = useState("");
+  const [notifActivas, setNotifActivas] = useState(false);
+  const [savingEmail, setSavingEmail] = useState(false);
 
   useEffect(() => {
     if (!auth.user) return;
     supabase
       .from("profiles")
-      .select("avatar_url")
+      .select("avatar_url, email_secundario, notificaciones_email_activas")
       .eq("id", auth.user.id)
       .maybeSingle()
       .then(({ data }) => {
         setAvatarUrl(data?.avatar_url ?? null);
+        setEmailSecundario(data?.email_secundario ?? "");
+        setNotifActivas(data?.notificaciones_email_activas ?? false);
         setLoading(false);
       });
   }, [auth.user]);
+
+  const saveEmailPrefs = async () => {
+    if (!auth.user) return;
+    const trimmed = emailSecundario.trim();
+    if (trimmed && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      toast.error("Correo inválido");
+      return;
+    }
+    if (trimmed && notifActivas && !trimmed.toLowerCase().endsWith("@gmail.com")) {
+      toast.error("Por ahora solo se admiten correos @gmail.com para notificaciones");
+      return;
+    }
+    setSavingEmail(true);
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        email_secundario: trimmed || null,
+        notificaciones_email_activas: notifActivas && !!trimmed,
+      })
+      .eq("id", auth.user.id);
+    setSavingEmail(false);
+    if (error) {
+      toast.error("No se pudo guardar: " + error.message);
+      return;
+    }
+    toast.success("Preferencias de correo guardadas");
+  };
 
   const changePassword = async () => {
     if (pwd.length < 8) {
@@ -102,6 +135,37 @@ function SettingsPage() {
           </div>
           <Button onClick={changePassword} disabled={savingPwd || !pwd}>
             {savingPwd ? "Guardando..." : "Actualizar contraseña"}
+          </Button>
+        </div>
+      </Card>
+      <Card className="mt-6 border-border/70 p-6">
+        <div className="flex items-center gap-2">
+          <Mail className="h-5 w-5 text-primary" />
+          <h2 className="font-display text-lg font-semibold text-foreground">Notificaciones por correo</h2>
+        </div>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Registra un correo secundario (preferentemente Gmail) para recibir avisos importantes del portal.
+        </p>
+        <div className="mt-4 grid gap-4 sm:max-w-md">
+          <div>
+            <Label className="text-muted-foreground">Correo secundario</Label>
+            <Input
+              type="email"
+              className="mt-1.5"
+              value={emailSecundario}
+              onChange={(e) => setEmailSecundario(e.target.value)}
+              placeholder="tu.correo@gmail.com"
+            />
+          </div>
+          <div className="flex items-center justify-between rounded-lg border border-border/60 px-4 py-3">
+            <div>
+              <p className="text-sm font-medium text-foreground">Activar notificaciones</p>
+              <p className="text-xs text-muted-foreground">Recibirás avisos automáticos en tu correo secundario.</p>
+            </div>
+            <Switch checked={notifActivas} onCheckedChange={setNotifActivas} />
+          </div>
+          <Button onClick={saveEmailPrefs} disabled={savingEmail}>
+            {savingEmail ? "Guardando..." : "Guardar preferencias"}
           </Button>
         </div>
       </Card>
