@@ -21,6 +21,7 @@ interface Student {
   full_name: string;
   username: string | null;
   email: string | null;
+  email_secundario: string | null;
   carrera: string | null;
   semestre: string | null;
   paralelo: string | null;
@@ -58,7 +59,7 @@ function StudentsAdmin() {
       setStudents([]); setLoading(false); return;
     }
     const [profs, ls, members, projs] = await Promise.all([
-      supabase.from("profiles").select("id, full_name, username, email, carrera, semestre, paralelo, codigo_estudiantil, is_active, interest_line_id").in("id", ids),
+      supabase.from("profiles").select("id, full_name, username, email, email_secundario, carrera, semestre, paralelo, codigo_estudiantil, is_active, interest_line_id").in("id", ids),
       supabase.from("research_lines").select("id, title").order("display_order"),
       supabase.from("project_members").select("user_id, project_id").in("user_id", ids),
       supabase.from("projects").select("id, title"),
@@ -76,6 +77,7 @@ function StudentsAdmin() {
       full_name: p.full_name || "(sin nombre)",
       username: p.username,
       email: p.email,
+      email_secundario: p.email_secundario,
       carrera: p.carrera,
       semestre: p.semestre,
       paralelo: p.paralelo,
@@ -107,11 +109,12 @@ function StudentsAdmin() {
   }), [students, q, carreraFilter, semestreFilter, paraleloFilter, statusFilter, lineFilter]);
 
   const exportCSV = () => {
-    const headers = ["Nombre", "Username", "Correo", "Carrera", "Semestre", "Paralelo", "Código", "Estado", "Línea", "Proyectos"];
+    const headers = ["Nombre", "Username", "Correo", "Gmail notif.", "Carrera", "Semestre", "Paralelo", "Código", "Estado", "Línea", "Proyectos"];
     const rows = filtered.map((s) => [
       s.full_name,
       s.username ?? "",
       s.email ?? "",
+      s.email_secundario ?? "",
       s.carrera ?? "",
       s.semestre ?? "",
       s.paralelo ?? "",
@@ -173,6 +176,7 @@ function StudentsAdmin() {
                 <th className="px-4 py-3">Estudiante</th>
                 <th className="px-4 py-3">Username</th>
                 <th className="px-4 py-3">Correo</th>
+                <th className="px-4 py-3">Gmail (notif.)</th>
                 <th className="px-4 py-3">Carrera</th>
                 <th className="px-4 py-3">Sem.</th>
                 <th className="px-4 py-3">Par.</th>
@@ -189,6 +193,7 @@ function StudentsAdmin() {
                   <td className="px-4 py-2.5 font-medium text-foreground">{s.full_name}</td>
                   <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground">{s.username ? "@" + s.username : "—"}</td>
                   <td className="px-4 py-2.5 text-muted-foreground">{s.email ?? "—"}</td>
+                  <td className="px-4 py-2.5 text-muted-foreground">{s.email_secundario ?? "—"}</td>
                   <td className="px-4 py-2.5 text-muted-foreground">{s.carrera ?? "—"}</td>
                   <td className="px-4 py-2.5 text-muted-foreground">{s.semestre ?? "—"}</td>
                   <td className="px-4 py-2.5 text-muted-foreground">{s.paralelo ?? "—"}</td>
