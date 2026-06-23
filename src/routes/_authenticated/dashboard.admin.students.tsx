@@ -109,11 +109,12 @@ function StudentsAdmin() {
   }), [students, q, carreraFilter, semestreFilter, paraleloFilter, statusFilter, lineFilter]);
 
   const exportCSV = () => {
-    const headers = ["Nombre", "Username", "Correo", "Carrera", "Semestre", "Paralelo", "Código", "Estado", "Línea", "Proyectos"];
+    const headers = ["Nombre", "Username", "Correo", "Gmail notif.", "Carrera", "Semestre", "Paralelo", "Código", "Estado", "Línea", "Proyectos"];
     const rows = filtered.map((s) => [
       s.full_name,
       s.username ?? "",
       s.email ?? "",
+      s.email_secundario ?? "",
       s.carrera ?? "",
       s.semestre ?? "",
       s.paralelo ?? "",
