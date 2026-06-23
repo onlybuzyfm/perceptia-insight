@@ -21,6 +21,7 @@ interface Student {
   full_name: string;
   username: string | null;
   email: string | null;
+  email_secundario: string | null;
   carrera: string | null;
   semestre: string | null;
   paralelo: string | null;
@@ -58,7 +59,7 @@ function StudentsAdmin() {
       setStudents([]); setLoading(false); return;
     }
     const [profs, ls, members, projs] = await Promise.all([
-      supabase.from("profiles").select("id, full_name, username, email, carrera, semestre, paralelo, codigo_estudiantil, is_active, interest_line_id").in("id", ids),
+      supabase.from("profiles").select("id, full_name, username, email, email_secundario, carrera, semestre, paralelo, codigo_estudiantil, is_active, interest_line_id").in("id", ids),
       supabase.from("research_lines").select("id, title").order("display_order"),
       supabase.from("project_members").select("user_id, project_id").in("user_id", ids),
       supabase.from("projects").select("id, title"),
@@ -76,6 +77,7 @@ function StudentsAdmin() {
       full_name: p.full_name || "(sin nombre)",
       username: p.username,
       email: p.email,
+      email_secundario: p.email_secundario,
       carrera: p.carrera,
       semestre: p.semestre,
       paralelo: p.paralelo,

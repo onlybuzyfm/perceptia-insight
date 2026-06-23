@@ -23,6 +23,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedWeeklyUpdatesRouteImport } from './routes/_authenticated/weekly-updates'
 import { Route as AuthenticatedResourcesRouteImport } from './routes/_authenticated/resources'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
+import { Route as ApiPublicSeedTestStudentRouteImport } from './routes/api/public/seed-test-student'
 import { Route as AuthenticatedDashboardTeacherRouteImport } from './routes/_authenticated/dashboard.teacher'
 import { Route as AuthenticatedDashboardStudentRouteImport } from './routes/_authenticated/dashboard.student'
 import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
@@ -112,6 +113,12 @@ const AuthenticatedDashboardIndexRoute =
     id: '/dashboard/',
     path: '/dashboard/',
     getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const ApiPublicSeedTestStudentRoute =
+  ApiPublicSeedTestStudentRouteImport.update({
+    id: '/api/public/seed-test-student',
+    path: '/api/public/seed-test-student',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const AuthenticatedDashboardTeacherRoute =
   AuthenticatedDashboardTeacherRouteImport.update({
@@ -240,6 +247,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/dashboard/student': typeof AuthenticatedDashboardStudentRoute
   '/dashboard/teacher': typeof AuthenticatedDashboardTeacherRoute
+  '/api/public/seed-test-student': typeof ApiPublicSeedTestStudentRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/admin/activities': typeof AuthenticatedDashboardAdminActivitiesRoute
   '/dashboard/admin/applications': typeof AuthenticatedDashboardAdminApplicationsRoute
@@ -272,6 +280,7 @@ export interface FileRoutesByTo {
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/dashboard/student': typeof AuthenticatedDashboardStudentRoute
   '/dashboard/teacher': typeof AuthenticatedDashboardTeacherRoute
+  '/api/public/seed-test-student': typeof ApiPublicSeedTestStudentRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/admin/activities': typeof AuthenticatedDashboardAdminActivitiesRoute
   '/dashboard/admin/applications': typeof AuthenticatedDashboardAdminApplicationsRoute
@@ -307,6 +316,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/_authenticated/dashboard/student': typeof AuthenticatedDashboardStudentRoute
   '/_authenticated/dashboard/teacher': typeof AuthenticatedDashboardTeacherRoute
+  '/api/public/seed-test-student': typeof ApiPublicSeedTestStudentRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/admin/activities': typeof AuthenticatedDashboardAdminActivitiesRoute
   '/_authenticated/dashboard/admin/applications': typeof AuthenticatedDashboardAdminApplicationsRoute
@@ -342,6 +352,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/student'
     | '/dashboard/teacher'
+    | '/api/public/seed-test-student'
     | '/dashboard/'
     | '/dashboard/admin/activities'
     | '/dashboard/admin/applications'
@@ -374,6 +385,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/student'
     | '/dashboard/teacher'
+    | '/api/public/seed-test-student'
     | '/dashboard'
     | '/dashboard/admin/activities'
     | '/dashboard/admin/applications'
@@ -408,6 +420,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/settings'
     | '/_authenticated/dashboard/student'
     | '/_authenticated/dashboard/teacher'
+    | '/api/public/seed-test-student'
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/admin/activities'
     | '/_authenticated/dashboard/admin/applications'
@@ -436,6 +449,7 @@ export interface RootRouteChildren {
   PostularRoute: typeof PostularRoute
   ProyectosRoute: typeof ProyectosRoute
   SobreRoute: typeof SobreRoute
+  ApiPublicSeedTestStudentRoute: typeof ApiPublicSeedTestStudentRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -537,6 +551,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/'
       preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/public/seed-test-student': {
+      id: '/api/public/seed-test-student'
+      path: '/api/public/seed-test-student'
+      fullPath: '/api/public/seed-test-student'
+      preLoaderRoute: typeof ApiPublicSeedTestStudentRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard/teacher': {
       id: '/_authenticated/dashboard/teacher'
@@ -757,17 +778,8 @@ const rootRouteChildren: RootRouteChildren = {
   PostularRoute: PostularRoute,
   ProyectosRoute: ProyectosRoute,
   SobreRoute: SobreRoute,
+  ApiPublicSeedTestStudentRoute: ApiPublicSeedTestStudentRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
