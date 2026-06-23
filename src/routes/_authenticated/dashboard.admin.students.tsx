@@ -175,6 +175,7 @@ function StudentsAdmin() {
                 <th className="px-4 py-3">Estudiante</th>
                 <th className="px-4 py-3">Username</th>
                 <th className="px-4 py-3">Correo</th>
+                <th className="px-4 py-3">Gmail (notif.)</th>
                 <th className="px-4 py-3">Carrera</th>
                 <th className="px-4 py-3">Sem.</th>
                 <th className="px-4 py-3">Par.</th>
@@ -191,6 +192,7 @@ function StudentsAdmin() {
                   <td className="px-4 py-2.5 font-medium text-foreground">{s.full_name}</td>
                   <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground">{s.username ? "@" + s.username : "—"}</td>
                   <td className="px-4 py-2.5 text-muted-foreground">{s.email ?? "—"}</td>
+                  <td className="px-4 py-2.5 text-muted-foreground">{s.email_secundario ?? "—"}</td>
                   <td className="px-4 py-2.5 text-muted-foreground">{s.carrera ?? "—"}</td>
                   <td className="px-4 py-2.5 text-muted-foreground">{s.semestre ?? "—"}</td>
                   <td className="px-4 py-2.5 text-muted-foreground">{s.paralelo ?? "—"}</td>
