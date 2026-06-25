@@ -51,7 +51,7 @@ export function AdminOverview() {
         studentsActive = count ?? 0;
       }
 
-      const [projAct, projAll, appsPend, upWeek, upLast, res, prods, projMembers, activeProfiles] = await Promise.all([
+      const [projAct, projAll, appsPend, upWeek, upLast, res, prods, activeAssignees, activeProfiles, excused] = await Promise.all([
         supabase.from("projects").select("id", { count: "exact", head: true }).eq("status", "activo"),
         supabase.from("projects").select("status"),
         supabase.from("applications").select("id", { count: "exact", head: true }).eq("status", "pendiente"),
@@ -59,17 +59,21 @@ export function AdminOverview() {
         supabase.from("weekly_updates").select("user_id").gte("week_start", lastWeekISO).lt("week_start", weekStart),
         supabase.from("resources").select("id", { count: "exact", head: true }),
         supabase.from("applications").select("id, full_name, email, status, created_at").order("created_at", { ascending: false }).limit(5),
-        supabase.from("project_members").select("user_id"),
+        // Estudiantes con al menos una actividad activa (pendiente/en_progreso) asignada
+        supabase.from("activity_assignees").select("user_id, project_activities!inner(status)").in("project_activities.status", ["pendiente", "en_progreso"]),
         supabase.from("profiles").select("id, created_at").in("id", ids.length ? ids : ["00000000-0000-0000-0000-000000000000"]).eq("is_active", true),
+        supabase.from("excused_late_updates").select("user_id").eq("week_start", lastWeekISO),
       ]);
 
-      // Avances atrasados: estudiantes activos CON proyecto asignado Y creados antes del inicio de la semana evaluada, sin avance esa semana
+      // Avances atrasados: estudiantes activos CON actividad activa asignada,
+      // creados antes del inicio de la semana evaluada, sin avance esa semana y no excusados.
       const reportedLast = new Set((upLast.data ?? []).map((r) => r.user_id));
-      const withProject = new Set((projMembers.data ?? []).map((m) => m.user_id));
+      const withActiveActivity = new Set((activeAssignees.data ?? []).map((m: any) => m.user_id));
+      const excusedSet = new Set((excused.data ?? []).map((e) => e.user_id));
       const eligible = (activeProfiles.data ?? []).filter(
-        (p) => withProject.has(p.id) && new Date(p.created_at) < new Date(lastWeekISO),
+        (p) => withActiveActivity.has(p.id) && new Date(p.created_at) < new Date(lastWeekISO),
       );
-      const updatesLate = eligible.filter((p) => !reportedLast.has(p.id)).length;
+      const updatesLate = eligible.filter((p) => !reportedLast.has(p.id) && !excusedSet.has(p.id)).length;
 
       // Distribución por estado de proyecto
       const status: Record<string, number> = {};
