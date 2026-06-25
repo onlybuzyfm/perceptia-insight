@@ -61,6 +61,85 @@ function SettingsPage() {
       });
   }, [auth.user]);
 
+  const loadTelegram = async () => {
+    setTgLoading(true);
+    try {
+      const res = await fnGetLinkCode();
+      setTgCode(res.code);
+      setTgBot(res.botUsername);
+      setTgChatId(res.chatId);
+      setTgUsername(res.telegramUsername);
+      setTgNotify(res.notifyTelegram);
+    } catch (e) {
+      toast.error("No se pudo cargar Telegram: " + (e instanceof Error ? e.message : ""));
+    } finally {
+      setTgLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (auth.user) loadTelegram();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth.user]);
+
+  // Polling cuando el usuario está esperando vincular
+  useEffect(() => {
+    if (!polling || tgChatId || !auth.user) return;
+    const t = setInterval(async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("telegram_chat_id, telegram_username")
+        .eq("id", auth.user!.id)
+        .maybeSingle();
+      if (data?.telegram_chat_id) {
+        setTgChatId(Number(data.telegram_chat_id));
+        setTgUsername(data.telegram_username);
+        setPolling(false);
+        toast.success("¡Telegram vinculado!");
+      }
+    }, 3000);
+    return () => clearInterval(t);
+  }, [polling, tgChatId, auth.user]);
+
+  const copyCode = async () => {
+    if (!tgCode) return;
+    await navigator.clipboard.writeText(`/start ${tgCode}`);
+    toast.success("Comando copiado");
+  };
+
+  const openBot = () => {
+    if (!tgBot || !tgCode) return;
+    window.open(`https://t.me/${tgBot}?start=${tgCode}`, "_blank");
+    setPolling(true);
+  };
+
+  const handleUnlink = async () => {
+    if (!confirm("¿Desvincular tu Telegram?")) return;
+    await fnUnlink();
+    setTgChatId(null);
+    setTgUsername(null);
+    toast.success("Telegram desvinculado");
+  };
+
+  const handleTest = async () => {
+    const res = await fnTest();
+    if (res.ok) toast.success("Mensaje de prueba enviado");
+    else toast.error("No se pudo enviar (" + (res.reason ?? "error") + ")");
+  };
+
+  const toggleTgNotify = async (val: boolean) => {
+    if (!auth.user) return;
+    setTgSavingNotify(true);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ notify_telegram: val })
+      .eq("id", auth.user.id);
+    setTgSavingNotify(false);
+    if (error) { toast.error("No se pudo guardar"); return; }
+    setTgNotify(val);
+    toast.success("Preferencia actualizada");
+  };
+
   const saveEmailPrefs = async () => {
     if (!auth.user) return;
     const trimmed = emailSecundario.trim();
