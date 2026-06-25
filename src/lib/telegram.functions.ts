@@ -264,3 +264,54 @@ export const broadcastTelegram = createServerFn({ method: "POST" })
     }
     return { ok: true, sent, failed };
   });
+
+/**
+ * Publica un aviso en TODOS los grupos de Telegram registrados (solo staff).
+ */
+const groupBroadcastSchema = z.object({
+  kind: z.string().min(1).max(80),
+  title: z.string().min(1).max(200),
+  body: z.string().min(1).max(3500),
+  url: z.string().url().optional(),
+});
+
+export const broadcastTelegramToGroups = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => groupBroadcastSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const { data: isStaff } = await context.supabase.rpc("is_staff", { _user_id: context.userId });
+    if (!isStaff) throw new Error("Forbidden");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: groups } = await supabaseAdmin
+      .from("telegram_groups")
+      .select("chat_id")
+      .eq("is_active", true);
+
+    const text =
+      `📣 <b>${escapeHtml(data.title)}</b>\n\n${escapeHtml(data.body)}` +
+      (data.url ? `\n\n🔗 ${data.url}` : "");
+
+    let sent = 0, failed = 0;
+    for (const g of groups ?? []) {
+      try {
+        await callTelegram("sendMessage", {
+          chat_id: g.chat_id,
+          text,
+          parse_mode: "HTML",
+          disable_web_page_preview: false,
+        });
+        sent++;
+        await supabaseAdmin.from("telegram_notification_logs").insert({
+          user_id: null, chat_id: g.chat_id, kind: `group:${data.kind}`, status: "sent", message: text,
+        });
+      } catch (e) {
+        failed++;
+        await supabaseAdmin.from("telegram_notification_logs").insert({
+          user_id: null, chat_id: g.chat_id, kind: `group:${data.kind}`, status: "error",
+          message: text, error: e instanceof Error ? e.message : String(e),
+        });
+      }
+    }
+    return { ok: true, sent, failed };
+  });
