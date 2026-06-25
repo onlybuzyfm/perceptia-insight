@@ -33,6 +33,19 @@ function SettingsPage() {
   const [notifActivas, setNotifActivas] = useState(false);
   const [savingEmail, setSavingEmail] = useState(false);
 
+  // Telegram state
+  const fnGetLinkCode = useServerFn(getOrCreateMyTelegramLinkCode);
+  const fnUnlink = useServerFn(unlinkMyTelegram);
+  const fnTest = useServerFn(sendMyTelegramTest);
+  const [tgLoading, setTgLoading] = useState(false);
+  const [tgCode, setTgCode] = useState<string | null>(null);
+  const [tgBot, setTgBot] = useState<string | null>(null);
+  const [tgChatId, setTgChatId] = useState<number | null>(null);
+  const [tgUsername, setTgUsername] = useState<string | null>(null);
+  const [tgNotify, setTgNotify] = useState(true);
+  const [tgSavingNotify, setTgSavingNotify] = useState(false);
+  const [polling, setPolling] = useState(false);
+
   useEffect(() => {
     if (!auth.user) return;
     supabase
