@@ -212,7 +212,7 @@ function StudentDashboard() {
       .update({
         full_name: draft.full_name.trim(),
         username: uname,
-        carrera: draft.carrera?.trim() || null,
+        carrera: "Ciencia de Datos e Inteligencia Artificial",
         semestre: draft.semestre?.trim() || null,
         phone: draft.phone?.trim() || null,
         bio: draft.bio?.trim() || null,
