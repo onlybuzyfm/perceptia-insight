@@ -30,6 +30,7 @@ import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_au
 import { Route as AuthenticatedDashboardCoordinatorRouteImport } from './routes/_authenticated/dashboard.coordinator'
 import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated/dashboard.admin'
 import { Route as AuthenticatedDashboardAdminIndexRouteImport } from './routes/_authenticated/dashboard.admin.index'
+import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
 import { Route as AuthenticatedDashboardAdminUsersRouteImport } from './routes/_authenticated/dashboard.admin.users'
 import { Route as AuthenticatedDashboardAdminUpdatesRouteImport } from './routes/_authenticated/dashboard.admin.updates'
 import { Route as AuthenticatedDashboardAdminToolsRouteImport } from './routes/_authenticated/dashboard.admin.tools'
@@ -156,6 +157,12 @@ const AuthenticatedDashboardAdminIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedDashboardAdminRoute,
   } as any)
+const ApiPublicTelegramWebhookRoute =
+  ApiPublicTelegramWebhookRouteImport.update({
+    id: '/api/public/telegram/webhook',
+    path: '/api/public/telegram/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedDashboardAdminUsersRoute =
   AuthenticatedDashboardAdminUsersRouteImport.update({
     id: '/users',
@@ -261,6 +268,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin/tools': typeof AuthenticatedDashboardAdminToolsRoute
   '/dashboard/admin/updates': typeof AuthenticatedDashboardAdminUpdatesRoute
   '/dashboard/admin/users': typeof AuthenticatedDashboardAdminUsersRoute
+  '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
   '/dashboard/admin/': typeof AuthenticatedDashboardAdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -294,6 +302,7 @@ export interface FileRoutesByTo {
   '/dashboard/admin/tools': typeof AuthenticatedDashboardAdminToolsRoute
   '/dashboard/admin/updates': typeof AuthenticatedDashboardAdminUpdatesRoute
   '/dashboard/admin/users': typeof AuthenticatedDashboardAdminUsersRoute
+  '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminIndexRoute
 }
 export interface FileRoutesById {
@@ -330,6 +339,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/admin/tools': typeof AuthenticatedDashboardAdminToolsRoute
   '/_authenticated/dashboard/admin/updates': typeof AuthenticatedDashboardAdminUpdatesRoute
   '/_authenticated/dashboard/admin/users': typeof AuthenticatedDashboardAdminUsersRoute
+  '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
   '/_authenticated/dashboard/admin/': typeof AuthenticatedDashboardAdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -366,6 +376,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/tools'
     | '/dashboard/admin/updates'
     | '/dashboard/admin/users'
+    | '/api/public/telegram/webhook'
     | '/dashboard/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -399,6 +410,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/tools'
     | '/dashboard/admin/updates'
     | '/dashboard/admin/users'
+    | '/api/public/telegram/webhook'
     | '/dashboard/admin'
   id:
     | '__root__'
@@ -434,6 +446,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/admin/tools'
     | '/_authenticated/dashboard/admin/updates'
     | '/_authenticated/dashboard/admin/users'
+    | '/api/public/telegram/webhook'
     | '/_authenticated/dashboard/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -450,6 +463,7 @@ export interface RootRouteChildren {
   ProyectosRoute: typeof ProyectosRoute
   SobreRoute: typeof SobreRoute
   ApiPublicSeedTestStudentRoute: typeof ApiPublicSeedTestStudentRoute
+  ApiPublicTelegramWebhookRoute: typeof ApiPublicTelegramWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -600,6 +614,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/admin/'
       preLoaderRoute: typeof AuthenticatedDashboardAdminIndexRouteImport
       parentRoute: typeof AuthenticatedDashboardAdminRoute
+    }
+    '/api/public/telegram/webhook': {
+      id: '/api/public/telegram/webhook'
+      path: '/api/public/telegram/webhook'
+      fullPath: '/api/public/telegram/webhook'
+      preLoaderRoute: typeof ApiPublicTelegramWebhookRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard/admin/users': {
       id: '/_authenticated/dashboard/admin/users'
@@ -779,17 +800,8 @@ const rootRouteChildren: RootRouteChildren = {
   ProyectosRoute: ProyectosRoute,
   SobreRoute: SobreRoute,
   ApiPublicSeedTestStudentRoute: ApiPublicSeedTestStudentRoute,
+  ApiPublicTelegramWebhookRoute: ApiPublicTelegramWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

@@ -258,6 +258,27 @@ function ActivityDialog({
         .insert(assignees.map((uid) => ({ activity_id: activityId!, user_id: uid })));
       if (assErr) { setSaving(false); return toast.error("Guardado pero falló asignación: " + assErr.message); }
     }
+
+    // Notificación Telegram a los asignados (solo en creación o cambios de asignados)
+    if (activityId && assignees.length > 0) {
+      try {
+        const { sendTelegramNotification } = await import("@/lib/telegram.functions");
+        const dlLabel = new Date(deadline).toLocaleString("es-CO", { dateStyle: "full", timeStyle: "short" });
+        await Promise.all(
+          assignees.map((uid) =>
+            sendTelegramNotification({
+              data: {
+                targetUserId: uid,
+                kind: "activity_assigned",
+                title: `📝 Nueva actividad: ${title.trim()}`,
+                body: `Fecha límite: ${dlLabel}${description ? `\n\n${description}` : ""}`,
+              },
+            }).catch(() => null),
+          ),
+        );
+      } catch { /* ignore */ }
+    }
+
     setSaving(false);
     toast.success(isNew ? "Actividad creada" : "Cambios guardados");
     onSaved();

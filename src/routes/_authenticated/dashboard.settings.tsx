@@ -9,8 +9,14 @@ import { AvatarUploader } from "@/components/AvatarUploader";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { KeyRound, Mail } from "lucide-react";
+import { KeyRound, Mail, Send, CheckCircle2, Copy, Unlink } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { useServerFn } from "@tanstack/react-start";
+import {
+  getOrCreateMyTelegramLinkCode,
+  unlinkMyTelegram,
+  sendMyTelegramTest,
+} from "@/lib/telegram.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/settings")({
   component: SettingsPage,
@@ -27,6 +33,19 @@ function SettingsPage() {
   const [notifActivas, setNotifActivas] = useState(false);
   const [savingEmail, setSavingEmail] = useState(false);
 
+  // Telegram state
+  const fnGetLinkCode = useServerFn(getOrCreateMyTelegramLinkCode);
+  const fnUnlink = useServerFn(unlinkMyTelegram);
+  const fnTest = useServerFn(sendMyTelegramTest);
+  const [tgLoading, setTgLoading] = useState(false);
+  const [tgCode, setTgCode] = useState<string | null>(null);
+  const [tgBot, setTgBot] = useState<string | null>(null);
+  const [tgChatId, setTgChatId] = useState<number | null>(null);
+  const [tgUsername, setTgUsername] = useState<string | null>(null);
+  const [tgNotify, setTgNotify] = useState(true);
+  const [tgSavingNotify, setTgSavingNotify] = useState(false);
+  const [polling, setPolling] = useState(false);
+
   useEffect(() => {
     if (!auth.user) return;
     supabase
@@ -41,6 +60,85 @@ function SettingsPage() {
         setLoading(false);
       });
   }, [auth.user]);
+
+  const loadTelegram = async () => {
+    setTgLoading(true);
+    try {
+      const res = await fnGetLinkCode();
+      setTgCode(res.code);
+      setTgBot(res.botUsername);
+      setTgChatId(res.chatId);
+      setTgUsername(res.telegramUsername);
+      setTgNotify(res.notifyTelegram);
+    } catch (e) {
+      toast.error("No se pudo cargar Telegram: " + (e instanceof Error ? e.message : ""));
+    } finally {
+      setTgLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (auth.user) loadTelegram();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth.user]);
+
+  // Polling cuando el usuario está esperando vincular
+  useEffect(() => {
+    if (!polling || tgChatId || !auth.user) return;
+    const t = setInterval(async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("telegram_chat_id, telegram_username")
+        .eq("id", auth.user!.id)
+        .maybeSingle();
+      if (data?.telegram_chat_id) {
+        setTgChatId(Number(data.telegram_chat_id));
+        setTgUsername(data.telegram_username);
+        setPolling(false);
+        toast.success("¡Telegram vinculado!");
+      }
+    }, 3000);
+    return () => clearInterval(t);
+  }, [polling, tgChatId, auth.user]);
+
+  const copyCode = async () => {
+    if (!tgCode) return;
+    await navigator.clipboard.writeText(`/start ${tgCode}`);
+    toast.success("Comando copiado");
+  };
+
+  const openBot = () => {
+    if (!tgBot || !tgCode) return;
+    window.open(`https://t.me/${tgBot}?start=${tgCode}`, "_blank");
+    setPolling(true);
+  };
+
+  const handleUnlink = async () => {
+    if (!confirm("¿Desvincular tu Telegram?")) return;
+    await fnUnlink();
+    setTgChatId(null);
+    setTgUsername(null);
+    toast.success("Telegram desvinculado");
+  };
+
+  const handleTest = async () => {
+    const res = await fnTest();
+    if (res.ok) toast.success("Mensaje de prueba enviado");
+    else toast.error("No se pudo enviar (" + (res.reason ?? "error") + ")");
+  };
+
+  const toggleTgNotify = async (val: boolean) => {
+    if (!auth.user) return;
+    setTgSavingNotify(true);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ notify_telegram: val })
+      .eq("id", auth.user.id);
+    setTgSavingNotify(false);
+    if (error) { toast.error("No se pudo guardar"); return; }
+    setTgNotify(val);
+    toast.success("Preferencia actualizada");
+  };
 
   const saveEmailPrefs = async () => {
     if (!auth.user) return;
@@ -168,6 +266,66 @@ function SettingsPage() {
             {savingEmail ? "Guardando..." : "Guardar preferencias"}
           </Button>
         </div>
+      </Card>
+
+      <Card className="mt-6 border-border/70 p-6">
+        <div className="flex items-center gap-2">
+          <Send className="h-5 w-5 text-primary" />
+          <h2 className="font-display text-lg font-semibold text-foreground">Notificaciones por Telegram</h2>
+        </div>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Vincula tu cuenta para recibir avisos instantáneos de reuniones, actividades, evaluaciones y anuncios.
+        </p>
+
+        {tgLoading ? (
+          <p className="mt-4 text-sm text-muted-foreground">Cargando...</p>
+        ) : tgChatId ? (
+          <div className="mt-4 space-y-3">
+            <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-800">
+              <CheckCircle2 className="h-5 w-5" />
+              <div className="text-sm">
+                Cuenta vinculada{tgUsername ? <> como <b>@{tgUsername}</b></> : null}
+              </div>
+            </div>
+            <div className="flex items-center justify-between rounded-lg border border-border/60 px-4 py-3">
+              <div>
+                <p className="text-sm font-medium text-foreground">Activar avisos en Telegram</p>
+                <p className="text-xs text-muted-foreground">Recibirás notificaciones automáticas del portal.</p>
+              </div>
+              <Switch checked={tgNotify} disabled={tgSavingNotify} onCheckedChange={toggleTgNotify} />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" onClick={handleTest}>Enviar prueba</Button>
+              <Button variant="outline" onClick={handleUnlink}>
+                <Unlink className="mr-2 h-4 w-4" /> Desvincular
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="mt-4 space-y-4 sm:max-w-md">
+            <ol className="list-decimal space-y-2 pl-5 text-sm text-foreground">
+              <li>Abre el bot {tgBot ? <a className="text-primary underline" href={`https://t.me/${tgBot}?start=${tgCode ?? ""}`} target="_blank" rel="noreferrer">@{tgBot}</a> : "de PerceptIA"} en Telegram.</li>
+              <li>Envíale el siguiente comando para vincular tu cuenta:</li>
+            </ol>
+            <div className="flex items-center gap-2 rounded-lg border border-border/60 bg-muted/40 px-3 py-2 font-mono text-sm">
+              <span className="flex-1">/start {tgCode ?? "..."}</span>
+              <Button size="sm" variant="ghost" onClick={copyCode}>
+                <Copy className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="flex gap-2">
+              {tgBot && (
+                <Button onClick={openBot}>
+                  <Send className="mr-2 h-4 w-4" /> Abrir bot
+                </Button>
+              )}
+              <Button variant="outline" onClick={loadTelegram}>Refrescar estado</Button>
+            </div>
+            {polling && (
+              <p className="text-xs text-muted-foreground">Esperando vinculación desde Telegram...</p>
+            )}
+          </div>
+        )}
       </Card>
     </DashboardShell>
   );

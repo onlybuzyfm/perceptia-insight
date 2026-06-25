@@ -193,6 +193,20 @@ function CreateMeetingCard({ onCreated }: { onCreated: () => void }) {
       audience: "estudiante",
       created_by: auth.user.id,
     });
+    // Notificación por Telegram a todos los estudiantes vinculados
+    try {
+      const { broadcastTelegram } = await import("@/lib/telegram.functions");
+      await broadcastTelegram({
+        data: {
+          kind: "meeting_created",
+          title: `📅 Nueva reunión: ${parsed.data.title}`,
+          body: `${dateLabel}${parsed.data.location ? `\n\nZoom: ${parsed.data.location}` : ""}${parsed.data.description ? `\n\n${parsed.data.description}` : ""}`,
+          url: parsed.data.location ?? undefined,
+          onlyRole: "estudiante",
+        },
+      });
+    } catch { /* no romper flujo */ }
+
     setSubmitting(false);
     if (annErr) { toast.warning(`Reunión creada, pero falló el anuncio: ${annErr.message}`); }
     else { toast.success("Reunión creada y anunciada a los estudiantes"); }
