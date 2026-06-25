@@ -299,7 +299,10 @@ function StudentDashboard() {
               <Label className="text-muted-foreground">Correo</Label>
               <Input value={auth.user?.email ?? ""} disabled className="mt-1.5" />
             </div>
-            <FieldInput label="Carrera" value={draft.carrera ?? ""} onChange={(v) => set("carrera", v)} maxLength={120} />
+            <div>
+              <Label className="text-muted-foreground">Carrera</Label>
+              <Input value="Ciencia de Datos e Inteligencia Artificial" disabled className="mt-1.5" />
+            </div>
             <FieldInput label="Semestre" value={draft.semestre ?? ""} onChange={(v) => set("semestre", v)} maxLength={20} />
             <FieldInput label="Teléfono" value={draft.phone ?? ""} onChange={(v) => set("phone", v)} maxLength={30} />
             <FieldInput label="GitHub URL" value={draft.github_url ?? ""} onChange={(v) => set("github_url", v)} placeholder="https://github.com/usuario" />
