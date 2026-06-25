@@ -9,8 +9,14 @@ import { AvatarUploader } from "@/components/AvatarUploader";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { KeyRound, Mail } from "lucide-react";
+import { KeyRound, Mail, Send, CheckCircle2, Copy, Unlink } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { useServerFn } from "@tanstack/react-start";
+import {
+  getOrCreateMyTelegramLinkCode,
+  unlinkMyTelegram,
+  sendMyTelegramTest,
+} from "@/lib/telegram.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/settings")({
   component: SettingsPage,
