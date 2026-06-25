@@ -189,6 +189,33 @@ export type Database = {
           },
         ]
       }
+      excused_late_updates: {
+        Row: {
+          created_at: string
+          excused_by: string | null
+          id: string
+          reason: string | null
+          user_id: string
+          week_start: string
+        }
+        Insert: {
+          created_at?: string
+          excused_by?: string | null
+          id?: string
+          reason?: string | null
+          user_id: string
+          week_start: string
+        }
+        Update: {
+          created_at?: string
+          excused_by?: string | null
+          id?: string
+          reason?: string | null
+          user_id?: string
+          week_start?: string
+        }
+        Relationships: []
+      }
       meeting_attendance: {
         Row: {
           id: string
