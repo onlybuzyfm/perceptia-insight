@@ -48,7 +48,7 @@ function ApplicationForm() {
     full_name: "",
     email: "",
     phone: "",
-    carrera: "",
+    carrera: "Ciencia de Datos e Inteligencia Artificial",
     semestre: "",
     interest_area: "",
     message: "",
@@ -109,7 +109,7 @@ function ApplicationForm() {
           <Input id="phone" value={form.phone} onChange={update("phone")} maxLength={50} />
         </Field>
         <Field label="Carrera" id="carrera">
-          <Input id="carrera" value={form.carrera} onChange={update("carrera")} maxLength={200} />
+          <Input id="carrera" value="Ciencia de Datos e Inteligencia Artificial" readOnly disabled />
         </Field>
         <Field label="Semestre" id="semestre">
           <Input id="semestre" value={form.semestre} onChange={update("semestre")} maxLength={50} />
