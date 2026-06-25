@@ -103,7 +103,9 @@ export function AdminOverview() {
         <Stat icon={FolderKanban} label="Proyectos activos" value={m?.projectsActive} />
         <Stat icon={Inbox} label="Postulaciones pendientes" value={m?.applicationsPending} accent={(m?.applicationsPending ?? 0) > 0} />
         <Stat icon={FileCheck2} label="Avances esta semana" value={m?.updatesThisWeek} />
-        <Stat icon={AlertTriangle} label="Avances atrasados" value={m?.updatesLate} accent={(m?.updatesLate ?? 0) > 0} />
+        <Link to="/dashboard/admin/late-updates" className="block">
+          <Stat icon={AlertTriangle} label="Avances atrasados" value={m?.updatesLate} accent={(m?.updatesLate ?? 0) > 0} />
+        </Link>
         <Stat icon={BookOpen} label="Recursos internos" value={m?.resources} />
         <Stat icon={Calendar} label="Eventos próximos" value={m?.eventsUpcoming} muted />
         <Stat icon={ScrollText} label="Producción académica" value={m?.production} muted />
