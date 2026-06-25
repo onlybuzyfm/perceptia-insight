@@ -328,10 +328,15 @@ export type Database = {
           is_public_member: boolean
           linkedin_url: string | null
           notificaciones_email_activas: boolean
+          notify_telegram: boolean
           paralelo: string | null
           phone: string | null
           public_role: string | null
           semestre: string | null
+          telegram_chat_id: number | null
+          telegram_link_code: string | null
+          telegram_linked_at: string | null
+          telegram_username: string | null
           updated_at: string
           username: string
         }
@@ -352,10 +357,15 @@ export type Database = {
           is_public_member?: boolean
           linkedin_url?: string | null
           notificaciones_email_activas?: boolean
+          notify_telegram?: boolean
           paralelo?: string | null
           phone?: string | null
           public_role?: string | null
           semestre?: string | null
+          telegram_chat_id?: number | null
+          telegram_link_code?: string | null
+          telegram_linked_at?: string | null
+          telegram_username?: string | null
           updated_at?: string
           username: string
         }
@@ -376,10 +386,15 @@ export type Database = {
           is_public_member?: boolean
           linkedin_url?: string | null
           notificaciones_email_activas?: boolean
+          notify_telegram?: boolean
           paralelo?: string | null
           phone?: string | null
           public_role?: string | null
           semestre?: string | null
+          telegram_chat_id?: number | null
+          telegram_link_code?: string | null
+          telegram_linked_at?: string | null
+          telegram_username?: string | null
           updated_at?: string
           username?: string
         }
@@ -730,6 +745,39 @@ export type Database = {
           name?: string
           slug?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      telegram_notification_logs: {
+        Row: {
+          chat_id: number | null
+          created_at: string
+          error: string | null
+          id: string
+          kind: string
+          message: string | null
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          chat_id?: number | null
+          created_at?: string
+          error?: string | null
+          id?: string
+          kind: string
+          message?: string | null
+          status: string
+          user_id?: string | null
+        }
+        Update: {
+          chat_id?: number | null
+          created_at?: string
+          error?: string | null
+          id?: string
+          kind?: string
+          message?: string | null
+          status?: string
+          user_id?: string | null
         }
         Relationships: []
       }
