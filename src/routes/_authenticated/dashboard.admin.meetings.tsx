@@ -193,18 +193,19 @@ function CreateMeetingCard({ onCreated }: { onCreated: () => void }) {
       audience: "estudiante",
       created_by: auth.user.id,
     });
-    // Notificación por Telegram a todos los estudiantes vinculados
+    // Notificación por Telegram a todos los estudiantes vinculados + grupos
     try {
-      const { broadcastTelegram } = await import("@/lib/telegram.functions");
-      await broadcastTelegram({
-        data: {
-          kind: "meeting_created",
-          title: `📅 Nueva reunión: ${parsed.data.title}`,
-          body: `${dateLabel}${parsed.data.location ? `\n\nZoom: ${parsed.data.location}` : ""}${parsed.data.description ? `\n\n${parsed.data.description}` : ""}`,
-          url: parsed.data.location ?? undefined,
-          onlyRole: "estudiante",
-        },
-      });
+      const { broadcastTelegram, broadcastTelegramToGroups } = await import("@/lib/telegram.functions");
+      const payload = {
+        kind: "meeting_created",
+        title: `📅 Nueva reunión: ${parsed.data.title}`,
+        body: `${dateLabel}${parsed.data.location ? `\n\nZoom: ${parsed.data.location}` : ""}${parsed.data.description ? `\n\n${parsed.data.description}` : ""}`,
+        url: parsed.data.location ?? undefined,
+      };
+      await Promise.allSettled([
+        broadcastTelegram({ data: { ...payload, onlyRole: "estudiante" } }),
+        broadcastTelegramToGroups({ data: payload }),
+      ]);
     } catch { /* no romper flujo */ }
 
     setSubmitting(false);
