@@ -39,6 +39,7 @@ import { Route as AuthenticatedDashboardAdminStudentsRouteImport } from './route
 import { Route as AuthenticatedDashboardAdminResourcesRouteImport } from './routes/_authenticated/dashboard.admin.resources'
 import { Route as AuthenticatedDashboardAdminProjectsRouteImport } from './routes/_authenticated/dashboard.admin.projects'
 import { Route as AuthenticatedDashboardAdminMeetingsRouteImport } from './routes/_authenticated/dashboard.admin.meetings'
+import { Route as AuthenticatedDashboardAdminLateUpdatesRouteImport } from './routes/_authenticated/dashboard.admin.late-updates'
 import { Route as AuthenticatedDashboardAdminIndicatorsRouteImport } from './routes/_authenticated/dashboard.admin.indicators'
 import { Route as AuthenticatedDashboardAdminCompetitionsRouteImport } from './routes/_authenticated/dashboard.admin.competitions'
 import { Route as AuthenticatedDashboardAdminApplicationsRouteImport } from './routes/_authenticated/dashboard.admin.applications'
@@ -211,6 +212,12 @@ const AuthenticatedDashboardAdminMeetingsRoute =
     path: '/meetings',
     getParentRoute: () => AuthenticatedDashboardAdminRoute,
   } as any)
+const AuthenticatedDashboardAdminLateUpdatesRoute =
+  AuthenticatedDashboardAdminLateUpdatesRouteImport.update({
+    id: '/late-updates',
+    path: '/late-updates',
+    getParentRoute: () => AuthenticatedDashboardAdminRoute,
+  } as any)
 const AuthenticatedDashboardAdminIndicatorsRoute =
   AuthenticatedDashboardAdminIndicatorsRouteImport.update({
     id: '/indicators',
@@ -260,6 +267,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin/applications': typeof AuthenticatedDashboardAdminApplicationsRoute
   '/dashboard/admin/competitions': typeof AuthenticatedDashboardAdminCompetitionsRoute
   '/dashboard/admin/indicators': typeof AuthenticatedDashboardAdminIndicatorsRoute
+  '/dashboard/admin/late-updates': typeof AuthenticatedDashboardAdminLateUpdatesRoute
   '/dashboard/admin/meetings': typeof AuthenticatedDashboardAdminMeetingsRoute
   '/dashboard/admin/projects': typeof AuthenticatedDashboardAdminProjectsRoute
   '/dashboard/admin/resources': typeof AuthenticatedDashboardAdminResourcesRoute
@@ -294,6 +302,7 @@ export interface FileRoutesByTo {
   '/dashboard/admin/applications': typeof AuthenticatedDashboardAdminApplicationsRoute
   '/dashboard/admin/competitions': typeof AuthenticatedDashboardAdminCompetitionsRoute
   '/dashboard/admin/indicators': typeof AuthenticatedDashboardAdminIndicatorsRoute
+  '/dashboard/admin/late-updates': typeof AuthenticatedDashboardAdminLateUpdatesRoute
   '/dashboard/admin/meetings': typeof AuthenticatedDashboardAdminMeetingsRoute
   '/dashboard/admin/projects': typeof AuthenticatedDashboardAdminProjectsRoute
   '/dashboard/admin/resources': typeof AuthenticatedDashboardAdminResourcesRoute
@@ -331,6 +340,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/admin/applications': typeof AuthenticatedDashboardAdminApplicationsRoute
   '/_authenticated/dashboard/admin/competitions': typeof AuthenticatedDashboardAdminCompetitionsRoute
   '/_authenticated/dashboard/admin/indicators': typeof AuthenticatedDashboardAdminIndicatorsRoute
+  '/_authenticated/dashboard/admin/late-updates': typeof AuthenticatedDashboardAdminLateUpdatesRoute
   '/_authenticated/dashboard/admin/meetings': typeof AuthenticatedDashboardAdminMeetingsRoute
   '/_authenticated/dashboard/admin/projects': typeof AuthenticatedDashboardAdminProjectsRoute
   '/_authenticated/dashboard/admin/resources': typeof AuthenticatedDashboardAdminResourcesRoute
@@ -368,6 +378,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/applications'
     | '/dashboard/admin/competitions'
     | '/dashboard/admin/indicators'
+    | '/dashboard/admin/late-updates'
     | '/dashboard/admin/meetings'
     | '/dashboard/admin/projects'
     | '/dashboard/admin/resources'
@@ -402,6 +413,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/applications'
     | '/dashboard/admin/competitions'
     | '/dashboard/admin/indicators'
+    | '/dashboard/admin/late-updates'
     | '/dashboard/admin/meetings'
     | '/dashboard/admin/projects'
     | '/dashboard/admin/resources'
@@ -438,6 +450,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/admin/applications'
     | '/_authenticated/dashboard/admin/competitions'
     | '/_authenticated/dashboard/admin/indicators'
+    | '/_authenticated/dashboard/admin/late-updates'
     | '/_authenticated/dashboard/admin/meetings'
     | '/_authenticated/dashboard/admin/projects'
     | '/_authenticated/dashboard/admin/resources'
@@ -678,6 +691,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAdminMeetingsRouteImport
       parentRoute: typeof AuthenticatedDashboardAdminRoute
     }
+    '/_authenticated/dashboard/admin/late-updates': {
+      id: '/_authenticated/dashboard/admin/late-updates'
+      path: '/late-updates'
+      fullPath: '/dashboard/admin/late-updates'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminLateUpdatesRouteImport
+      parentRoute: typeof AuthenticatedDashboardAdminRoute
+    }
     '/_authenticated/dashboard/admin/indicators': {
       id: '/_authenticated/dashboard/admin/indicators'
       path: '/indicators'
@@ -714,6 +734,7 @@ interface AuthenticatedDashboardAdminRouteChildren {
   AuthenticatedDashboardAdminApplicationsRoute: typeof AuthenticatedDashboardAdminApplicationsRoute
   AuthenticatedDashboardAdminCompetitionsRoute: typeof AuthenticatedDashboardAdminCompetitionsRoute
   AuthenticatedDashboardAdminIndicatorsRoute: typeof AuthenticatedDashboardAdminIndicatorsRoute
+  AuthenticatedDashboardAdminLateUpdatesRoute: typeof AuthenticatedDashboardAdminLateUpdatesRoute
   AuthenticatedDashboardAdminMeetingsRoute: typeof AuthenticatedDashboardAdminMeetingsRoute
   AuthenticatedDashboardAdminProjectsRoute: typeof AuthenticatedDashboardAdminProjectsRoute
   AuthenticatedDashboardAdminResourcesRoute: typeof AuthenticatedDashboardAdminResourcesRoute
@@ -735,6 +756,8 @@ const AuthenticatedDashboardAdminRouteChildren: AuthenticatedDashboardAdminRoute
       AuthenticatedDashboardAdminCompetitionsRoute,
     AuthenticatedDashboardAdminIndicatorsRoute:
       AuthenticatedDashboardAdminIndicatorsRoute,
+    AuthenticatedDashboardAdminLateUpdatesRoute:
+      AuthenticatedDashboardAdminLateUpdatesRoute,
     AuthenticatedDashboardAdminMeetingsRoute:
       AuthenticatedDashboardAdminMeetingsRoute,
     AuthenticatedDashboardAdminProjectsRoute:
