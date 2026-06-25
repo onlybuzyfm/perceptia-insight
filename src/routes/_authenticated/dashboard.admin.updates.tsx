@@ -176,6 +176,30 @@ function UpdatesAdmin() {
       if (error) { toast.error(error.message); return; }
     }
     toast.success("Evaluación guardada");
+
+    // Notificar al estudiante por Telegram + publicar en grupos registrados
+    const row = filtered.find((r) => r.id === updateId);
+    if (row) {
+      try {
+        const { sendTelegramNotification, broadcastTelegramToGroups } = await import("@/lib/telegram.functions");
+        const title = `Nueva evaluación · ${row.project_title ?? "Avance"}`;
+        const body =
+          `Semana del ${row.week_start}\n` +
+          `Puntaje: ${score}/5\n` +
+          (comment ? `Comentario: ${comment}` : "Sin comentario adicional.");
+        await Promise.all([
+          sendTelegramNotification({ data: { targetUserId: row.user_id, kind: "evaluation", title, body } }),
+          broadcastTelegramToGroups({ data: {
+            kind: "evaluation",
+            title: "📝 Avance evaluado",
+            body: `${row.full_name} · ${row.project_title ?? "Avance"} (semana ${row.week_start})\nPuntaje: ${score}/5`,
+          } }),
+        ]);
+      } catch (e) {
+        console.warn("telegram evaluation notify failed", e);
+      }
+    }
+
     load();
   };
 
