@@ -267,6 +267,66 @@ function SettingsPage() {
           </Button>
         </div>
       </Card>
+
+      <Card className="mt-6 border-border/70 p-6">
+        <div className="flex items-center gap-2">
+          <Send className="h-5 w-5 text-primary" />
+          <h2 className="font-display text-lg font-semibold text-foreground">Notificaciones por Telegram</h2>
+        </div>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Vincula tu cuenta para recibir avisos instantáneos de reuniones, actividades, evaluaciones y anuncios.
+        </p>
+
+        {tgLoading ? (
+          <p className="mt-4 text-sm text-muted-foreground">Cargando...</p>
+        ) : tgChatId ? (
+          <div className="mt-4 space-y-3">
+            <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-800">
+              <CheckCircle2 className="h-5 w-5" />
+              <div className="text-sm">
+                Cuenta vinculada{tgUsername ? <> como <b>@{tgUsername}</b></> : null}
+              </div>
+            </div>
+            <div className="flex items-center justify-between rounded-lg border border-border/60 px-4 py-3">
+              <div>
+                <p className="text-sm font-medium text-foreground">Activar avisos en Telegram</p>
+                <p className="text-xs text-muted-foreground">Recibirás notificaciones automáticas del portal.</p>
+              </div>
+              <Switch checked={tgNotify} disabled={tgSavingNotify} onCheckedChange={toggleTgNotify} />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" onClick={handleTest}>Enviar prueba</Button>
+              <Button variant="outline" onClick={handleUnlink}>
+                <Unlink className="mr-2 h-4 w-4" /> Desvincular
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="mt-4 space-y-4 sm:max-w-md">
+            <ol className="list-decimal space-y-2 pl-5 text-sm text-foreground">
+              <li>Abre el bot {tgBot ? <a className="text-primary underline" href={`https://t.me/${tgBot}?start=${tgCode ?? ""}`} target="_blank" rel="noreferrer">@{tgBot}</a> : "de PerceptIA"} en Telegram.</li>
+              <li>Envíale el siguiente comando para vincular tu cuenta:</li>
+            </ol>
+            <div className="flex items-center gap-2 rounded-lg border border-border/60 bg-muted/40 px-3 py-2 font-mono text-sm">
+              <span className="flex-1">/start {tgCode ?? "..."}</span>
+              <Button size="sm" variant="ghost" onClick={copyCode}>
+                <Copy className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="flex gap-2">
+              {tgBot && (
+                <Button onClick={openBot}>
+                  <Send className="mr-2 h-4 w-4" /> Abrir bot
+                </Button>
+              )}
+              <Button variant="outline" onClick={loadTelegram}>Refrescar estado</Button>
+            </div>
+            {polling && (
+              <p className="text-xs text-muted-foreground">Esperando vinculación desde Telegram...</p>
+            )}
+          </div>
+        )}
+      </Card>
     </DashboardShell>
   );
 }
