@@ -165,6 +165,28 @@
   }
 }
 
+/* Admin module scope: overrides the primary accent to an elegant blue.
+   Applied via the `.admin-scope` class on AdminShell only — keeps the rest
+   of the portal on the original purple identity. */
+.admin-scope {
+  --primary: oklch(0.45 0.14 250);
+  --primary-foreground: oklch(0.99 0 0);
+  --primary-soft: oklch(0.95 0.04 250);
+  --primary-glow: oklch(0.60 0.16 250);
+  --accent: oklch(0.95 0.04 250);
+  --accent-foreground: oklch(0.45 0.14 250);
+  --ring: oklch(0.55 0.15 250);
+}
+.dark .admin-scope {
+  --primary: oklch(0.65 0.14 250);
+  --primary-foreground: oklch(0.15 0.02 250);
+  --primary-soft: oklch(0.28 0.08 250);
+  --primary-glow: oklch(0.72 0.15 250);
+  --accent: oklch(0.28 0.08 250);
+  --accent-foreground: oklch(0.90 0.05 250);
+  --ring: oklch(0.65 0.14 250);
+}
+
 @layer utilities {
   .bg-grid-soft {
     background-image:

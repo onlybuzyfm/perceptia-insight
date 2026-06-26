@@ -67,7 +67,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
   return (
     <DashboardShell title={title}>
-      <div className="grid gap-6 lg:grid-cols-[220px_1fr]">
+      <div className="admin-scope grid gap-6 lg:grid-cols-[220px_1fr]">
         <nav className="flex flex-wrap gap-1 lg:flex-col lg:gap-0.5">
           {ADMIN_NAV.map((item) => {
             const Icon = item.icon;
