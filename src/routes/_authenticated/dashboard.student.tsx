@@ -303,7 +303,7 @@ function StudentDashboard() {
               <Label className="text-muted-foreground">Carrera</Label>
               <Input value="Ciencia de Datos e Inteligencia Artificial" disabled className="mt-1.5" />
             </div>
-            <FieldInput label="Semestre" value={draft.semestre ?? ""} onChange={(v) => set("semestre", v)} maxLength={20} />
+            <FieldInput label="Semestre" value={draft.semestre ?? ""} onChange={(v) => set("semestre", v.replace(/[^0-9]/g, ""))} maxLength={2} placeholder="Ej: 5" />
             <FieldInput label="Teléfono" value={draft.phone ?? ""} onChange={(v) => set("phone", v)} maxLength={30} />
             <FieldInput label="GitHub URL" value={draft.github_url ?? ""} onChange={(v) => set("github_url", v)} placeholder="https://github.com/usuario" />
             <FieldInput label="LinkedIn URL" value={draft.linkedin_url ?? ""} onChange={(v) => set("linkedin_url", v)} placeholder="https://linkedin.com/in/usuario" />

@@ -98,7 +98,7 @@ function StudentsAdmin() {
   const paralelos = useMemo(() => Array.from(new Set(students.map((s) => s.paralelo).filter(Boolean) as string[])), [students]);
 
   const filtered = useMemo(() => students.filter((s) => {
-    if (q && !`${s.full_name} ${s.email} ${s.codigo_estudiantil} ${s.username ?? ""}`.toLowerCase().includes(q.toLowerCase())) return false;
+    if (q && !`${s.full_name} ${s.email} ${s.username ?? ""}`.toLowerCase().includes(q.toLowerCase())) return false;
     if (carreraFilter !== "all" && s.carrera !== carreraFilter) return false;
     if (semestreFilter !== "all" && s.semestre !== semestreFilter) return false;
     if (paraleloFilter !== "all" && s.paralelo !== paraleloFilter) return false;
@@ -109,7 +109,7 @@ function StudentsAdmin() {
   }), [students, q, carreraFilter, semestreFilter, paraleloFilter, statusFilter, lineFilter]);
 
   const exportCSV = () => {
-    const headers = ["Nombre", "Username", "Correo", "Gmail notif.", "Carrera", "Semestre", "Paralelo", "Código", "Estado", "Línea", "Proyectos"];
+    const headers = ["Nombre", "Username", "Correo", "Gmail notif.", "Carrera", "Semestre", "Paralelo", "Estado", "Línea", "Proyectos"];
     const rows = filtered.map((s) => [
       s.full_name,
       s.username ?? "",
@@ -118,7 +118,6 @@ function StudentsAdmin() {
       s.carrera ?? "",
       s.semestre ?? "",
       s.paralelo ?? "",
-      s.codigo_estudiantil ?? "",
       s.is_active ? "Activo" : "Inactivo",
       lines.find((l) => l.id === s.interest_line_id)?.title ?? "",
       s.project_titles.join(" | "),
@@ -131,13 +130,14 @@ function StudentsAdmin() {
     URL.revokeObjectURL(url);
   };
 
+
   return (
     <div className="space-y-4">
       <Card className="border-border/70 bg-white p-4">
         <div className="flex flex-wrap items-center gap-2">
           <div className="relative min-w-[200px] flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Buscar nombre, username, correo o código..." value={q} onChange={(e) => setQ(e.target.value)} className="pl-9" />
+            <Input placeholder="Buscar nombre, username o correo..." value={q} onChange={(e) => setQ(e.target.value)} className="pl-9" />
           </div>
           <FilterSelect value={carreraFilter} onChange={setCarreraFilter} placeholder="Carrera" all="Todas las carreras" options={carreras} />
           <FilterSelect value={semestreFilter} onChange={setSemestreFilter} placeholder="Semestre" all="Todos" options={semestres} />
@@ -180,7 +180,7 @@ function StudentsAdmin() {
                 <th className="px-4 py-3">Carrera</th>
                 <th className="px-4 py-3">Sem.</th>
                 <th className="px-4 py-3">Par.</th>
-                <th className="px-4 py-3">Código</th>
+                
                 <th className="px-4 py-3">Línea</th>
                 <th className="px-4 py-3">Proyectos</th>
                 <th className="px-4 py-3">Estado</th>
@@ -197,7 +197,7 @@ function StudentsAdmin() {
                   <td className="px-4 py-2.5 text-muted-foreground">{s.carrera ?? "—"}</td>
                   <td className="px-4 py-2.5 text-muted-foreground">{s.semestre ?? "—"}</td>
                   <td className="px-4 py-2.5 text-muted-foreground">{s.paralelo ?? "—"}</td>
-                  <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground">{s.codigo_estudiantil ?? "—"}</td>
+                  
                   <td className="px-4 py-2.5 text-muted-foreground">
                     {lines.find((l) => l.id === s.interest_line_id)?.title ?? "—"}
                   </td>
@@ -255,7 +255,7 @@ function EditDialog({ student, lines, onClose, onSaved }: { student: Student | n
       carrera: form.carrera || null,
       semestre: form.semestre || null,
       paralelo: form.paralelo || null,
-      codigo_estudiantil: form.codigo_estudiantil || null,
+
       interest_line_id: form.interest_line_id || null,
       is_active: form.is_active ?? true,
     }).eq("id", student.id);
@@ -296,14 +296,19 @@ function EditDialog({ student, lines, onClose, onSaved }: { student: Student | n
               <Input value={form.carrera ?? ""} onChange={(e) => setForm({ ...form, carrera: e.target.value })} />
             </Field>
             <Field label="Semestre">
-              <Input value={form.semestre ?? ""} onChange={(e) => setForm({ ...form, semestre: e.target.value })} />
+              <Input
+                type="number"
+                min={1}
+                max={12}
+                inputMode="numeric"
+                value={form.semestre ?? ""}
+                onChange={(e) => setForm({ ...form, semestre: e.target.value.replace(/[^0-9]/g, "") })}
+              />
             </Field>
             <Field label="Paralelo">
               <Input value={form.paralelo ?? ""} onChange={(e) => setForm({ ...form, paralelo: e.target.value })} />
             </Field>
-            <Field label="Código estudiantil">
-              <Input value={form.codigo_estudiantil ?? ""} onChange={(e) => setForm({ ...form, codigo_estudiantil: e.target.value })} />
-            </Field>
+
           </div>
           <Field label="Línea de interés">
             <Select value={form.interest_line_id ?? "none"} onValueChange={(v) => setForm({ ...form, interest_line_id: v === "none" ? null : v })}>
