@@ -375,7 +375,21 @@ function StudentDashboard() {
           <TeamCard team={team} mates={mates} loading={loading} />
         </TabsContent>
 
-        <TabsContent value="proyectos" className="mt-5">
+        <TabsContent value="proyectos" className="mt-5 space-y-4">
+          {auth.hasRole("docente_asociado") && (
+            <Card className="flex flex-wrap items-center gap-3 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 p-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500 text-white">
+                <Folder className="h-5 w-5" />
+              </div>
+              <div className="flex-1 min-w-[200px]">
+                <p className="text-sm font-semibold text-amber-900">Gestión docente</p>
+                <p className="text-xs text-amber-800/80">Crea, gestiona y evalúa tus proyectos propios o compartidos.</p>
+              </div>
+              <a href="/dashboard/teacher" className="inline-flex items-center gap-1.5 rounded-md bg-amber-600 px-3 py-2 text-sm font-medium text-white hover:bg-amber-700">
+                <Plus className="h-4 w-4" /> Gestionar mis proyectos
+              </a>
+            </Card>
+          )}
           <ProjectsCard projects={projects} loading={loading} userId={auth.user?.id ?? null} />
         </TabsContent>
 
