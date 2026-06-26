@@ -84,7 +84,21 @@ export function DashboardShell({ children, title }: { children: ReactNode; title
               </span>
             </span>
           </Link>
-          <DropdownMenu>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/dashboard"
+              aria-label="Notificaciones"
+              className="relative flex h-9 w-9 items-center justify-center rounded-full border border-border/60 bg-background text-primary transition-colors hover:bg-primary-soft"
+            >
+              <Bell className="h-4 w-4" />
+              {hasNotifications && (
+                <span className="absolute right-1.5 top-1.5 flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+                </span>
+              )}
+            </Link>
+            <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="flex items-center gap-2 rounded-full border border-border/60 bg-background px-1.5 py-1 pr-2.5 text-sm transition-colors hover:bg-secondary">
                 <Avatar className="h-7 w-7">
