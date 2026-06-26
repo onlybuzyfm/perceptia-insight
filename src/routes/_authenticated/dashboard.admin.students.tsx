@@ -137,7 +137,7 @@ function StudentsAdmin() {
         <div className="flex flex-wrap items-center gap-2">
           <div className="relative min-w-[200px] flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Buscar nombre, username, correo o código..." value={q} onChange={(e) => setQ(e.target.value)} className="pl-9" />
+            <Input placeholder="Buscar nombre, username o correo..." value={q} onChange={(e) => setQ(e.target.value)} className="pl-9" />
           </div>
           <FilterSelect value={carreraFilter} onChange={setCarreraFilter} placeholder="Carrera" all="Todas las carreras" options={carreras} />
           <FilterSelect value={semestreFilter} onChange={setSemestreFilter} placeholder="Semestre" all="Todos" options={semestres} />
