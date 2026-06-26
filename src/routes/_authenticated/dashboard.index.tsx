@@ -41,7 +41,7 @@ function DashboardHome() {
   // Auto-redirect to role-specific dashboard
   if (primaryRole === "admin") return <Navigate to="/dashboard/admin" replace />;
   if (primaryRole === "coordinador") return <Navigate to="/dashboard/coordinator" replace />;
-  if (primaryRole === "docente_asociado") return <Navigate to="/dashboard/teacher" replace />;
+  if (primaryRole === "docente_asociado") return <Navigate to="/dashboard/student" replace />;
   if (primaryRole === "estudiante") return <Navigate to="/dashboard/student" replace />;
 
   return (
