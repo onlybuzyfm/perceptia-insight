@@ -143,9 +143,30 @@ function WeeklyUpdatesPage() {
     load();
   }, [auth.user]);
 
+  const activeProjectId = selectedProject;
+  useEffect(() => {
+    setSelectedActivity("");
+    if (!activeProjectId) { setActivities([]); return; }
+    let cancelled = false;
+    (async () => {
+      setLoadingActivities(true);
+      const { data } = await supabase
+        .from("project_activities")
+        .select("id, title, project_id, status, deadline")
+        .eq("project_id", activeProjectId)
+        .order("deadline", { ascending: true });
+      if (!cancelled) {
+        setActivities((data ?? []) as ActivityOption[]);
+        setLoadingActivities(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [activeProjectId]);
+
   const hasProjects = projects.length > 0;
   const showSelector = isStaff || projects.length > 1;
   const autoProjectId = !isStaff && projects.length === 1 ? projects[0].id : null;
+  const hasActivities = activities.length > 0;
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
