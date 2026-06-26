@@ -98,7 +98,7 @@ function StudentsAdmin() {
   const paralelos = useMemo(() => Array.from(new Set(students.map((s) => s.paralelo).filter(Boolean) as string[])), [students]);
 
   const filtered = useMemo(() => students.filter((s) => {
-    if (q && !`${s.full_name} ${s.email} ${s.codigo_estudiantil} ${s.username ?? ""}`.toLowerCase().includes(q.toLowerCase())) return false;
+    if (q && !`${s.full_name} ${s.email} ${s.username ?? ""}`.toLowerCase().includes(q.toLowerCase())) return false;
     if (carreraFilter !== "all" && s.carrera !== carreraFilter) return false;
     if (semestreFilter !== "all" && s.semestre !== semestreFilter) return false;
     if (paraleloFilter !== "all" && s.paralelo !== paraleloFilter) return false;
@@ -109,7 +109,7 @@ function StudentsAdmin() {
   }), [students, q, carreraFilter, semestreFilter, paraleloFilter, statusFilter, lineFilter]);
 
   const exportCSV = () => {
-    const headers = ["Nombre", "Username", "Correo", "Gmail notif.", "Carrera", "Semestre", "Paralelo", "Código", "Estado", "Línea", "Proyectos"];
+    const headers = ["Nombre", "Username", "Correo", "Gmail notif.", "Carrera", "Semestre", "Paralelo", "Estado", "Línea", "Proyectos"];
     const rows = filtered.map((s) => [
       s.full_name,
       s.username ?? "",
@@ -118,7 +118,6 @@ function StudentsAdmin() {
       s.carrera ?? "",
       s.semestre ?? "",
       s.paralelo ?? "",
-      s.codigo_estudiantil ?? "",
       s.is_active ? "Activo" : "Inactivo",
       lines.find((l) => l.id === s.interest_line_id)?.title ?? "",
       s.project_titles.join(" | "),
@@ -130,6 +129,7 @@ function StudentsAdmin() {
     a.href = url; a.download = `estudiantes-${new Date().toISOString().slice(0,10)}.csv`; a.click();
     URL.revokeObjectURL(url);
   };
+
 
   return (
     <div className="space-y-4">
