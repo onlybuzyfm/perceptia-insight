@@ -352,6 +352,18 @@ function SettingsPage() {
             )}
           </div>
         )}
+
+        {isStaff && (
+          <div className="mt-6 rounded-lg border border-dashed border-border/60 p-4">
+            <p className="text-sm font-medium text-foreground">Grupos de Telegram (admin)</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Para registrar un grupo: agrega el bot {tgBot ? <b>@{tgBot}</b> : "de PerceptIA"} al grupo y envía <code className="rounded bg-muted px-1">/registrar_grupo</code>. Debes estar vinculado y ser admin/coordinador.
+            </p>
+            <Button className="mt-3" variant="outline" onClick={handleGroupTest}>
+              <Send className="mr-2 h-4 w-4" /> Enviar mensaje de prueba al grupo
+            </Button>
+          </div>
+        )}
       </Card>
     </DashboardShell>
   );
