@@ -195,6 +195,9 @@ function ActivitiesAdmin() {
                       </div>
                     </div>
                     <div className="flex gap-1">
+                      <Button variant="ghost" size="sm" onClick={() => resend(a)} title="Reenviar a Telegram">
+                        <Send className="h-4 w-4" />
+                      </Button>
                       <Button variant="ghost" size="sm" onClick={() => setEditing(a)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
