@@ -865,6 +865,7 @@ export type Database = {
       weekly_updates: {
         Row: {
           achievements: string | null
+          activity_id: string | null
           blockers: string | null
           created_at: string
           evidence_url: string | null
@@ -879,6 +880,7 @@ export type Database = {
         }
         Insert: {
           achievements?: string | null
+          activity_id?: string | null
           blockers?: string | null
           created_at?: string
           evidence_url?: string | null
@@ -893,6 +895,7 @@ export type Database = {
         }
         Update: {
           achievements?: string | null
+          activity_id?: string | null
           blockers?: string | null
           created_at?: string
           evidence_url?: string | null
@@ -906,6 +909,13 @@ export type Database = {
           week_start?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "weekly_updates_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "project_activities"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "weekly_updates_project_id_fkey"
             columns: ["project_id"]
