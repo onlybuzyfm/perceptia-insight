@@ -45,6 +45,7 @@ export type Database = {
       }
       announcements: {
         Row: {
+          archived: boolean
           audience: Database["public"]["Enums"]["app_role"]
           content: string
           created_at: string
@@ -54,6 +55,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          archived?: boolean
           audience?: Database["public"]["Enums"]["app_role"]
           content?: string
           created_at?: string
@@ -63,6 +65,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          archived?: boolean
           audience?: Database["public"]["Enums"]["app_role"]
           content?: string
           created_at?: string

@@ -15,6 +15,7 @@ import {
   Wrench,
   Trophy,
   ListChecks,
+  Megaphone,
   type LucideIcon,
 } from "lucide-react";
 import { DashboardShell } from "@/components/DashboardShell";
@@ -40,6 +41,7 @@ const ADMIN_NAV: AdminNavItem[] = [
   { to: "/dashboard/admin/updates", icon: FileCheck2, label: "Avances" },
   { to: "/dashboard/admin/late-updates", icon: ListChecks, label: "Atrasados" },
   { to: "/dashboard/admin/meetings", icon: Calendar, label: "Reuniones" },
+  { to: "/dashboard/admin/announcements", icon: Megaphone, label: "Anuncios" },
   { to: "/dashboard/admin/tools", icon: Wrench, label: "Herramientas" },
   { to: "/dashboard/admin/resources", icon: BookOpen, label: "Recursos" },
   { to: "/dashboard/admin/events", icon: Calendar, label: "Eventos", soon: true },
