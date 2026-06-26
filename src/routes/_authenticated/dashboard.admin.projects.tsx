@@ -273,6 +273,30 @@ function ProjectDialog({ project, lines, onClose, onSaved }: { project: Project 
       return toast.error("No se pudo guardar");
     }
     toast.success(isNew ? "Proyecto creado" : "Cambios guardados");
+
+    if (isNew) {
+      try {
+        const portalUrl = `${window.location.origin}/dashboard`;
+        const shortDesc = description.trim() ? `\n\n${description.trim().slice(0, 400)}` : "";
+        const { broadcastTelegramToGroups } = await import("@/lib/telegram.functions");
+        const res = await broadcastTelegramToGroups({
+          data: {
+            kind: "project_created",
+            title: `🚀 Nuevo proyecto creado: ${title.trim()}`,
+            body: `Estado: ${status}${shortDesc}`,
+            url: portalUrl,
+          },
+        });
+        const r = res as { sent: number; failed: number };
+        if (r.sent === 0 && r.failed === 0) {
+          toast.warning("No hay grupos de Telegram registrados.");
+        } else if (r.failed > 0) {
+          toast.warning(`Telegram: ${r.sent} grupo(s) notificados, ${r.failed} fallaron.`);
+        }
+      } catch (e) {
+        toast.error("Telegram: " + (e instanceof Error ? e.message : "error"));
+      }
+    }
     onSaved();
   };
 

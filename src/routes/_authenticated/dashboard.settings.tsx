@@ -16,6 +16,7 @@ import {
   getOrCreateMyTelegramLinkCode,
   unlinkMyTelegram,
   sendMyTelegramTest,
+  broadcastTelegramToGroups,
 } from "@/lib/telegram.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/settings")({
@@ -37,6 +38,8 @@ function SettingsPage() {
   const fnGetLinkCode = useServerFn(getOrCreateMyTelegramLinkCode);
   const fnUnlink = useServerFn(unlinkMyTelegram);
   const fnTest = useServerFn(sendMyTelegramTest);
+  const fnGroupTest = useServerFn(broadcastTelegramToGroups);
+  const isStaff = auth.isStaff();
   const [tgLoading, setTgLoading] = useState(false);
   const [tgCode, setTgCode] = useState<string | null>(null);
   const [tgBot, setTgBot] = useState<string | null>(null);
@@ -126,6 +129,29 @@ function SettingsPage() {
     if (res.ok) toast.success("Mensaje de prueba enviado");
     else toast.error("No se pudo enviar (" + (res.reason ?? "error") + ")");
   };
+
+  const handleGroupTest = async () => {
+    try {
+      const res = await fnGroupTest({
+        data: {
+          kind: "test_group",
+          title: "Prueba de notificación",
+          body: "Este es un mensaje de prueba desde el portal PerceptIA. Si lo ves, las notificaciones de grupo están funcionando correctamente. ✅",
+        },
+      });
+      const r = res as { sent: number; failed: number };
+      if (r.sent === 0 && r.failed === 0) {
+        toast.warning("No hay grupos registrados. Agrega el bot a un grupo y envía /registrar_grupo.");
+      } else if (r.failed > 0) {
+        toast.warning(`Enviado a ${r.sent} grupo(s), ${r.failed} fallaron.`);
+      } else {
+        toast.success(`Mensaje enviado a ${r.sent} grupo(s).`);
+      }
+    } catch (e) {
+      toast.error("Error: " + (e instanceof Error ? e.message : "fallo"));
+    }
+  };
+
 
   const toggleTgNotify = async (val: boolean) => {
     if (!auth.user) return;
@@ -324,6 +350,18 @@ function SettingsPage() {
             {polling && (
               <p className="text-xs text-muted-foreground">Esperando vinculación desde Telegram...</p>
             )}
+          </div>
+        )}
+
+        {isStaff && (
+          <div className="mt-6 rounded-lg border border-dashed border-border/60 p-4">
+            <p className="text-sm font-medium text-foreground">Grupos de Telegram (admin)</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Para registrar un grupo: agrega el bot {tgBot ? <b>@{tgBot}</b> : "de PerceptIA"} al grupo y envía <code className="rounded bg-muted px-1">/registrar_grupo</code>. Debes estar vinculado y ser admin/coordinador.
+            </p>
+            <Button className="mt-3" variant="outline" onClick={handleGroupTest}>
+              <Send className="mr-2 h-4 w-4" /> Enviar mensaje de prueba al grupo
+            </Button>
           </div>
         )}
       </Card>
