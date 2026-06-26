@@ -16,7 +16,7 @@ import {
 import { AdminShell } from "@/components/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Calendar as CalIcon, Users as UsersIcon } from "lucide-react";
+import { Plus, Pencil, Trash2, Calendar as CalIcon, Users as UsersIcon, Send } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/admin/activities")({
   component: () => <AdminShell><ActivitiesAdmin /></AdminShell>,
@@ -111,6 +111,38 @@ function ActivitiesAdmin() {
     load();
   };
 
+  const resend = async (a: Activity) => {
+    try {
+      const { sendTelegramNotification, broadcastTelegramToGroups } = await import("@/lib/telegram.functions");
+      const portalUrl = `${window.location.origin}/dashboard`;
+      const dlLabel = new Date(a.deadline).toLocaleString("es-CO", { dateStyle: "full", timeStyle: "short" });
+      const shortDesc = a.description?.trim() ? `\n\n${a.description.trim().slice(0, 400)}` : "";
+      const groupBody = `📂 Proyecto: ${a.project_title}\n🗓 Fecha límite: ${dlLabel}${shortDesc}\n👥 Asignados: ${a.assignee_ids.length || "todo el equipo"}.`;
+      const dmBody = `Proyecto: ${a.project_title}\nFecha límite: ${dlLabel}${shortDesc}`;
+      const results = await Promise.allSettled([
+        broadcastTelegramToGroups({
+          data: { kind: "activity_resend", title: `📝 Recordatorio: ${a.title}`, body: groupBody, url: portalUrl },
+        }),
+        ...a.assignee_ids.map((uid) =>
+          sendTelegramNotification({
+            data: { targetUserId: uid, kind: "activity_resend", title: `📝 Recordatorio: ${a.title}`, body: dmBody, url: portalUrl },
+          }),
+        ),
+      ]);
+      const g = results[0];
+      if (g.status === "fulfilled") {
+        const r = g.value as { sent: number; failed: number };
+        if (r.sent === 0 && r.failed === 0) toast.warning("No hay grupos de Telegram registrados.");
+        else if (r.failed > 0) toast.warning(`Telegram: ${r.sent} grupo(s) enviados, ${r.failed} fallaron.`);
+        else toast.success(`Reenviado a ${r.sent} grupo(s).`);
+      } else {
+        toast.error("Telegram (grupo): " + (g.reason instanceof Error ? g.reason.message : "fallo"));
+      }
+    } catch (e) {
+      toast.error("Telegram: " + (e instanceof Error ? e.message : "error"));
+    }
+  };
+
   return (
     <div className="space-y-4">
       <Card className="border-border/70 bg-white p-4">
@@ -163,6 +195,9 @@ function ActivitiesAdmin() {
                       </div>
                     </div>
                     <div className="flex gap-1">
+                      <Button variant="ghost" size="sm" onClick={() => resend(a)} title="Reenviar a Telegram">
+                        <Send className="h-4 w-4" />
+                      </Button>
                       <Button variant="ghost" size="sm" onClick={() => setEditing(a)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
