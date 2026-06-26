@@ -337,7 +337,7 @@ function StudentDashboard() {
                   <Label className="text-muted-foreground">Carrera</Label>
                   <Input value="Ciencia de Datos e Inteligencia Artificial" disabled className="mt-1.5" />
                 </div>
-                <FieldInput label="Semestre" value={draft.semestre ?? ""} onChange={(v) => set("semestre", v.replace(/[^0-9]/g, ""))} maxLength={2} placeholder="Ej: 5" />
+                {!auth.hasRole("docente_asociado") && <FieldInput label="Semestre" value={draft.semestre ?? ""} onChange={(v) => set("semestre", v.replace(/[^0-9]/g, ""))} maxLength={2} placeholder="Ej: 5" />}
                 <div>
                   <Label className="text-muted-foreground">Línea de interés</Label>
                   <select
