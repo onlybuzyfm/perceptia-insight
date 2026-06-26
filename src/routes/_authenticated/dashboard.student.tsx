@@ -57,6 +57,7 @@ interface ProfileData {
   github_url: string | null;
   linkedin_url: string | null;
   avatar_url: string | null;
+  interest_line_id: string | null;
 }
 
 const EMPTY_PROFILE: ProfileData = {
@@ -69,7 +70,9 @@ const EMPTY_PROFILE: ProfileData = {
   github_url: "",
   linkedin_url: "",
   avatar_url: null,
+  interest_line_id: null,
 };
+
 
 const USERNAME_RE = /^[a-z0-9_.]{3,30}$/;
 
@@ -81,22 +84,24 @@ function StudentDashboard() {
   const [competitions, setCompetitions] = useState<CompetitionRow[]>([]);
   const [profile, setProfile] = useState<ProfileData>(EMPTY_PROFILE);
   const [draft, setDraft] = useState<ProfileData>(EMPTY_PROFILE);
+  const [lines, setLines] = useState<{ id: string; title: string }[]>([]);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
+
 
   useEffect(() => {
     if (!auth.user) return;
     (async () => {
       const uid = auth.user!.id;
-      const [pm, prof, tm] = await Promise.all([
+      const [pm, prof, tm, rl] = await Promise.all([
         supabase
           .from("project_members")
           .select("project_id, projects(id, title, description, status)")
           .eq("user_id", uid),
         supabase
           .from("profiles")
-          .select("full_name, username, carrera, semestre, phone, bio, github_url, linkedin_url, avatar_url")
+          .select("full_name, username, carrera, semestre, phone, bio, github_url, linkedin_url, avatar_url, interest_line_id")
           .eq("id", uid)
           .maybeSingle(),
         supabase
@@ -104,7 +109,10 @@ function StudentDashboard() {
           .select("team_id, teams(id, name, slug, focus, description)")
           .eq("user_id", uid)
           .maybeSingle(),
+        supabase.from("research_lines").select("id, title").order("display_order"),
       ]);
+      setLines(rl.data ?? []);
+
 
       const projMap = new Map<string, ProjectRow>();
       (pm.data ?? []).forEach((r) => {
@@ -178,7 +186,9 @@ function StudentDashboard() {
         github_url: prof.data?.github_url ?? "",
         linkedin_url: prof.data?.linkedin_url ?? "",
         avatar_url: prof.data?.avatar_url ?? null,
+        interest_line_id: prof.data?.interest_line_id ?? null,
       };
+
       setProfile(data);
       setDraft(data);
       setLoading(false);
@@ -218,8 +228,10 @@ function StudentDashboard() {
         bio: draft.bio?.trim() || null,
         github_url: draft.github_url?.trim() || null,
         linkedin_url: draft.linkedin_url?.trim() || null,
+        interest_line_id: draft.interest_line_id || null,
       })
       .eq("id", auth.user.id);
+
     setSaving(false);
     if (error) {
       const msg = error.message.includes("profiles_username_key") || error.code === "23505"
@@ -283,8 +295,11 @@ function StudentDashboard() {
             <Field label="Correo" value={auth.user?.email ?? "—"} />
             <Field label="Carrera" value={profile.carrera} />
             <Field label="Semestre" value={profile.semestre} />
+            <Field label="Línea de interés" value={lines.find((l) => l.id === profile.interest_line_id)?.title ?? null} />
+
             <Field label="Teléfono" value={profile.phone} />
             <Field label="GitHub" value={profile.github_url} />
+
             <Field label="LinkedIn" value={profile.linkedin_url} />
             <div className="sm:col-span-2">
               <dt className="text-muted-foreground">Bio</dt>
@@ -304,6 +319,18 @@ function StudentDashboard() {
               <Input value="Ciencia de Datos e Inteligencia Artificial" disabled className="mt-1.5" />
             </div>
             <FieldInput label="Semestre" value={draft.semestre ?? ""} onChange={(v) => set("semestre", v.replace(/[^0-9]/g, ""))} maxLength={2} placeholder="Ej: 5" />
+            <div>
+              <Label className="text-muted-foreground">Línea de interés</Label>
+              <select
+                className="mt-1.5 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={draft.interest_line_id ?? ""}
+                onChange={(e) => set("interest_line_id", e.target.value || null)}
+              >
+                <option value="">— Selecciona una línea —</option>
+                {lines.map((l) => <option key={l.id} value={l.id}>{l.title}</option>)}
+              </select>
+            </div>
+
             <FieldInput label="Teléfono" value={draft.phone ?? ""} onChange={(v) => set("phone", v)} maxLength={30} />
             <FieldInput label="GitHub URL" value={draft.github_url ?? ""} onChange={(v) => set("github_url", v)} placeholder="https://github.com/usuario" />
             <FieldInput label="LinkedIn URL" value={draft.linkedin_url ?? ""} onChange={(v) => set("linkedin_url", v)} placeholder="https://linkedin.com/in/usuario" />
