@@ -15,6 +15,7 @@ import {
   Wrench,
   Trophy,
   ListChecks,
+  Megaphone,
   type LucideIcon,
 } from "lucide-react";
 import { DashboardShell } from "@/components/DashboardShell";
