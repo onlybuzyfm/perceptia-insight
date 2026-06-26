@@ -44,6 +44,14 @@ interface ProjectOption {
   title: string;
 }
 
+interface ActivityOption {
+  id: string;
+  title: string;
+  project_id: string;
+  status: string;
+  deadline: string;
+}
+
 const schema = z.object({
   week_start: z.string().min(1),
   summary: z.string().min(5).max(2000),
@@ -52,6 +60,7 @@ const schema = z.object({
   hours_spent: z.number().min(0).max(168),
   repo_url: z.string().url("Debe ser un enlace válido").max(500).optional().or(z.literal("")),
   project_id: z.string().uuid("Debes seleccionar un proyecto válido"),
+  activity_id: z.string().uuid("Debes seleccionar una actividad del proyecto"),
 });
 
 function WeeklyUpdatesPage() {
@@ -59,7 +68,10 @@ function WeeklyUpdatesPage() {
   const [updates, setUpdates] = useState<Update[]>([]);
   const [evals, setEvals] = useState<Evaluation[]>([]);
   const [projects, setProjects] = useState<ProjectOption[]>([]);
+  const [activities, setActivities] = useState<ActivityOption[]>([]);
   const [selectedProject, setSelectedProject] = useState<string>("");
+  const [selectedActivity, setSelectedActivity] = useState<string>("");
+  const [loadingActivities, setLoadingActivities] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
@@ -101,7 +113,8 @@ function WeeklyUpdatesPage() {
     }
     const projList = Array.from(projMap, ([id, title]) => ({ id, title }));
     setProjects(projList);
-    if (projList.length === 1 && !isStaff) setSelectedProject(projList[0].id);
+    setSelectedProject(projList.length === 1 && !isStaff ? projList[0].id : "");
+    setSelectedActivity("");
 
 
     const { data } = await supabase
@@ -130,9 +143,30 @@ function WeeklyUpdatesPage() {
     load();
   }, [auth.user]);
 
+  const activeProjectId = selectedProject;
+  useEffect(() => {
+    setSelectedActivity("");
+    if (!activeProjectId) { setActivities([]); return; }
+    let cancelled = false;
+    (async () => {
+      setLoadingActivities(true);
+      const { data } = await supabase
+        .from("project_activities")
+        .select("id, title, project_id, status, deadline")
+        .eq("project_id", activeProjectId)
+        .order("deadline", { ascending: true });
+      if (!cancelled) {
+        setActivities((data ?? []) as ActivityOption[]);
+        setLoadingActivities(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [activeProjectId]);
+
   const hasProjects = projects.length > 0;
   const showSelector = isStaff || projects.length > 1;
   const autoProjectId = !isStaff && projects.length === 1 ? projects[0].id : null;
+  const hasActivities = activities.length > 0;
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -152,6 +186,10 @@ function WeeklyUpdatesPage() {
       toast.error("Selecciona el proyecto al que pertenece este avance.");
       return;
     }
+    if (!selectedActivity) {
+      toast.error("Selecciona la actividad sobre la que estás reportando.");
+      return;
+    }
     const parsed = schema.safeParse({
       week_start: fd.get("week_start"),
       summary: fd.get("summary"),
@@ -160,6 +198,7 @@ function WeeklyUpdatesPage() {
       hours_spent: Number(fd.get("hours_spent") || 0),
       repo_url: fd.get("repo_url") || "",
       project_id: projectId,
+      activity_id: selectedActivity,
     });
 
     if (!parsed.success) {
@@ -167,10 +206,11 @@ function WeeklyUpdatesPage() {
       return;
     }
     setSubmitting(true);
-    const { repo_url, project_id, ...rest } = parsed.data;
+    const { repo_url, project_id, activity_id, ...rest } = parsed.data;
     const { error } = await supabase.from("weekly_updates").insert({
       user_id: auth.user.id,
       project_id,
+      activity_id,
       ...rest,
       repo_url: repo_url ? repo_url : null,
     });
@@ -182,6 +222,7 @@ function WeeklyUpdatesPage() {
     toast.success("Avance registrado");
     e.currentTarget.reset();
     if (showSelector) setSelectedProject("");
+    setSelectedActivity("");
     load();
   };
 
@@ -224,6 +265,29 @@ function WeeklyUpdatesPage() {
                   Proyecto: <span className="font-medium text-foreground">{projects[0].title}</span>
                 </div>
               )}
+              {activeProjectId && (
+                <div>
+                  <Label htmlFor="activity_id">Actividad *</Label>
+                  {loadingActivities ? (
+                    <p className="mt-1.5 text-xs text-muted-foreground">Cargando actividades…</p>
+                  ) : !hasActivities ? (
+                    <div className="mt-1.5 rounded-md border border-dashed border-amber-300 bg-amber-50/50 p-3 text-xs text-amber-800">
+                      Este proyecto aún no tiene actividades asignadas. Un docente o coordinador debe crear una actividad antes de registrar avances semanales.
+                    </div>
+                  ) : (
+                    <Select value={selectedActivity} onValueChange={setSelectedActivity}>
+                      <SelectTrigger id="activity_id" className="mt-1.5">
+                        <SelectValue placeholder="Selecciona una actividad" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {activities.map((a) => (
+                          <SelectItem key={a.id} value={a.id}>{a.title}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+              )}
               <div>
                 <Label htmlFor="week_start">Semana del</Label>
                 <Input id="week_start" name="week_start" type="date" required className="mt-1.5" />
@@ -250,7 +314,7 @@ function WeeklyUpdatesPage() {
               </div>
               <Button
                 type="submit"
-                disabled={submitting || (showSelector && !selectedProject)}
+                disabled={submitting || !activeProjectId || !selectedActivity || !hasActivities}
                 className="w-full bg-primary hover:bg-primary/90"
               >
                 {submitting ? "Guardando..." : "Guardar avance"}

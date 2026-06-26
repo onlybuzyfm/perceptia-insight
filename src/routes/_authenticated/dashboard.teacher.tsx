@@ -357,6 +357,7 @@ function ProjectDetail({ project, onBack }: { project: ProjectCard; onBack: () =
       <Tabs defaultValue="updates">
         <TabsList>
           <TabsTrigger value="updates">Avances ({updates.length})</TabsTrigger>
+          <TabsTrigger value="activities">Actividades</TabsTrigger>
           <TabsTrigger value="team">Equipo ({members.length})</TabsTrigger>
         </TabsList>
 
@@ -375,6 +376,10 @@ function ProjectDetail({ project, onBack }: { project: ProjectCard; onBack: () =
               ))}
             </ul>
           )}
+        </TabsContent>
+
+        <TabsContent value="activities" className="mt-4">
+          <TeacherActivitiesPanel projectId={project.id} members={members} />
         </TabsContent>
 
         <TabsContent value="team" className="mt-4 space-y-3">
@@ -401,6 +406,177 @@ function ProjectDetail({ project, onBack }: { project: ProjectCard; onBack: () =
           )}
         </TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+type ActStatus = "pendiente" | "en_progreso" | "completada";
+interface TeacherActivity {
+  id: string;
+  title: string;
+  description: string;
+  deadline: string;
+  status: ActStatus;
+}
+
+function TeacherActivitiesPanel({ projectId, members }: { projectId: string; members: MemberRow[] }) {
+  const [list, setList] = useState<TeacherActivity[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [deadline, setDeadline] = useState("");
+  const [status, setStatus] = useState<ActStatus>("pendiente");
+  const [assignees, setAssignees] = useState<string[]>([]);
+  const [saving, setSaving] = useState(false);
+
+  const load = async () => {
+    setLoading(true);
+    const { data } = await supabase
+      .from("project_activities")
+      .select("id, title, description, deadline, status")
+      .eq("project_id", projectId)
+      .order("deadline");
+    setList((data ?? []) as TeacherActivity[]);
+    setLoading(false);
+  };
+  useEffect(() => { load(); }, [projectId]);
+
+  const reset = () => {
+    setTitle(""); setDescription(""); setDeadline(""); setStatus("pendiente"); setAssignees([]);
+  };
+
+  const save = async () => {
+    if (!title.trim()) return toast.error("El título es obligatorio");
+    if (!deadline) return toast.error("Define la fecha límite");
+    setSaving(true);
+    const { data, error } = await supabase
+      .from("project_activities")
+      .insert({
+        project_id: projectId,
+        title: title.trim(),
+        description: description.trim(),
+        deadline: new Date(deadline).toISOString(),
+        status,
+      })
+      .select("id")
+      .single();
+    if (error || !data) { setSaving(false); return toast.error(error?.message || "No se pudo crear"); }
+    if (assignees.length > 0) {
+      const { error: aerr } = await supabase.from("activity_assignees")
+        .insert(assignees.map((uid) => ({ activity_id: data.id, user_id: uid })));
+      if (aerr) toast.error("Actividad creada, pero falló asignación: " + aerr.message);
+    }
+    setSaving(false);
+    toast.success("Actividad creada");
+    setCreating(false); reset(); load();
+  };
+
+  const remove = async (id: string) => {
+    if (!confirm("¿Eliminar esta actividad?")) return;
+    const { error } = await supabase.from("project_activities").delete().eq("id", id);
+    if (error) return toast.error("No se pudo eliminar");
+    toast.success("Eliminada"); load();
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">{list.length} actividad(es) en este proyecto</p>
+        <Button size="sm" className="bg-amber-600 hover:bg-amber-700" onClick={() => setCreating(true)}>
+          <Plus className="mr-1.5 h-4 w-4" /> Nueva actividad
+        </Button>
+      </div>
+      {loading ? (
+        <p className="text-sm text-muted-foreground">Cargando…</p>
+      ) : list.length === 0 ? (
+        <Card className="border-dashed p-8 text-center text-sm text-muted-foreground">
+          Aún no hay actividades. Crea la primera para que tus estudiantes puedan registrar avances.
+        </Card>
+      ) : (
+        <ul className="space-y-2">
+          {list.map((a) => (
+            <li key={a.id} className="rounded-lg border border-border/70 bg-white p-3">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="font-medium text-foreground">{a.title}</p>
+                  {a.description && <p className="text-xs text-muted-foreground">{a.description}</p>}
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Vence: {new Date(a.deadline).toLocaleString("es-EC")} · {a.status}
+                  </p>
+                </div>
+                <Button size="sm" variant="ghost" className="text-destructive" onClick={() => remove(a.id)}>
+                  Eliminar
+                </Button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {creating && (
+        <Dialog open onOpenChange={(o) => { if (!o) { setCreating(false); reset(); } }}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader><DialogTitle>Nueva actividad</DialogTitle></DialogHeader>
+            <div className="grid gap-3 py-2">
+              <div className="grid gap-1.5">
+                <Label>Título</Label>
+                <Input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={200} />
+              </div>
+              <div className="grid gap-1.5">
+                <Label>Descripción</Label>
+                <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} maxLength={2000} />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="grid gap-1.5">
+                  <Label>Fecha y hora límite</Label>
+                  <Input type="datetime-local" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
+                </div>
+                <div className="grid gap-1.5">
+                  <Label>Estado</Label>
+                  <Select value={status} onValueChange={(v) => setStatus(v as ActStatus)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pendiente">Pendiente</SelectItem>
+                      <SelectItem value="en_progreso">En progreso</SelectItem>
+                      <SelectItem value="completada">Completada</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid gap-1.5 rounded-md border border-border/60 bg-secondary/30 p-3">
+                <Label className="text-xs">Asignar a integrantes (opcional)</Label>
+                {members.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">Este proyecto aún no tiene integrantes.</p>
+                ) : (
+                  <ul className="grid gap-1 sm:grid-cols-2 max-h-40 overflow-y-auto">
+                    {members.map((m) => {
+                      const checked = assignees.includes(m.user_id);
+                      return (
+                        <li key={m.user_id} className="flex items-center gap-2 text-sm">
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => setAssignees((cur) => checked ? cur.filter((x) => x !== m.user_id) : [...cur, m.user_id])}
+                          />
+                          <span>{m.full_name}</span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+                <p className="text-[11px] text-muted-foreground">Si no seleccionas a nadie, queda para todo el equipo.</p>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="ghost" onClick={() => { setCreating(false); reset(); }}>Cancelar</Button>
+              <Button onClick={save} disabled={saving} className="bg-amber-600 hover:bg-amber-700">
+                {saving ? "Creando…" : "Crear actividad"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
