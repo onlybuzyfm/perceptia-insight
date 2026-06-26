@@ -130,6 +130,7 @@ export function DashboardShell({ children, title }: { children: ReactNode; title
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          </div>
         </div>
       </header>
 
