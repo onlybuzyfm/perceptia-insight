@@ -83,11 +83,6 @@ export function DashboardShell({ children, title }: { children: ReactNode; title
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link to="/dashboard/student" className="cursor-pointer">
-                  <UserIcon className="mr-2 h-4 w-4" /> Mi perfil
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
                 <Link to="/dashboard/settings" className="cursor-pointer">
                   <Settings className="mr-2 h-4 w-4" /> Ajustes
                 </Link>
