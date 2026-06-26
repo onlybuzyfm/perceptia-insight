@@ -252,124 +252,152 @@ function StudentDashboard() {
 
   return (
     <DashboardShell title="Mi espacio">
-      <Card className="border-border/70 p-6">
-        <div className="flex items-center justify-between gap-3">
-          <h2 className="font-display text-lg font-semibold text-foreground">Mi perfil</h2>
-          {!editing ? (
-            <Button variant="outline" size="sm" onClick={startEdit} disabled={loading}>
-              <Pencil className="mr-1.5 h-3.5 w-3.5" /> Editar
-            </Button>
-          ) : (
-            <div className="flex gap-2">
-              <Button variant="ghost" size="sm" onClick={cancelEdit} disabled={saving}>
-                <X className="mr-1.5 h-3.5 w-3.5" /> Cancelar
-              </Button>
-              <Button size="sm" onClick={saveProfile} disabled={saving}>
-                <Save className="mr-1.5 h-3.5 w-3.5" /> {saving ? "Guardando..." : "Guardar"}
-              </Button>
-            </div>
-          )}
-        </div>
+      <Tabs defaultValue="inicio" className="w-full">
+        <TabsList className="flex w-full flex-wrap justify-start gap-1 bg-muted/60 p-1">
+          <TabsTrigger value="inicio">Inicio</TabsTrigger>
+          <TabsTrigger value="perfil">Mi perfil</TabsTrigger>
+          <TabsTrigger value="equipo">Mi equipo</TabsTrigger>
+          <TabsTrigger value="proyectos">Proyectos</TabsTrigger>
+          <TabsTrigger value="actividades">Actividades</TabsTrigger>
+          <TabsTrigger value="competencias">Competencias</TabsTrigger>
+          <TabsTrigger value="recursos">Recursos</TabsTrigger>
+          <TabsTrigger value="herramientas">Herramientas</TabsTrigger>
+        </TabsList>
 
-        {loading ? (
-          <p className="mt-4 text-sm text-muted-foreground">Cargando...</p>
-        ) : (
-          <>
-            <div className="mt-5 flex items-center gap-4 border-y border-border/60 py-5">
-              <Avatar className="h-20 w-20">
-                {profile.avatar_url && <AvatarImage src={profile.avatar_url} alt={profile.full_name} />}
-                <AvatarFallback className="bg-primary-soft text-lg font-semibold text-primary">
-                  {(profile.full_name || profile.username || "?").split(/\s+/).slice(0, 2).map((s) => s[0]?.toUpperCase()).join("") || "?"}
-                </AvatarFallback>
-              </Avatar>
-              <div className="min-w-0">
-                <p className="font-display text-base font-semibold text-foreground">{profile.full_name || "—"}</p>
-                {profile.username && <p className="text-sm text-muted-foreground">@{profile.username}</p>}
-                <p className="mt-0.5 text-xs text-muted-foreground">Cambia tu foto desde Ajustes.</p>
+        <TabsContent value="inicio" className="mt-5 space-y-0">
+          <AnnouncementsCard />
+          <UpcomingMeetingsCard />
+        </TabsContent>
+
+        <TabsContent value="perfil" className="mt-5">
+          <Card className="border-border/70 p-6">
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="font-display text-lg font-semibold text-foreground">Mi perfil</h2>
+              {!editing ? (
+                <Button variant="outline" size="sm" onClick={startEdit} disabled={loading}>
+                  <Pencil className="mr-1.5 h-3.5 w-3.5" /> Editar
+                </Button>
+              ) : (
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="sm" onClick={cancelEdit} disabled={saving}>
+                    <X className="mr-1.5 h-3.5 w-3.5" /> Cancelar
+                  </Button>
+                  <Button size="sm" onClick={saveProfile} disabled={saving}>
+                    <Save className="mr-1.5 h-3.5 w-3.5" /> {saving ? "Guardando..." : "Guardar"}
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {loading ? (
+              <p className="mt-4 text-sm text-muted-foreground">Cargando...</p>
+            ) : (
+              <>
+                <div className="mt-5 flex items-center gap-4 border-y border-border/60 py-5">
+                  <Avatar className="h-20 w-20">
+                    {profile.avatar_url && <AvatarImage src={profile.avatar_url} alt={profile.full_name} />}
+                    <AvatarFallback className="bg-primary-soft text-lg font-semibold text-primary">
+                      {(profile.full_name || profile.username || "?").split(/\s+/).slice(0, 2).map((s) => s[0]?.toUpperCase()).join("") || "?"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0">
+                    <p className="font-display text-base font-semibold text-foreground">{profile.full_name || "—"}</p>
+                    {profile.username && <p className="text-sm text-muted-foreground">@{profile.username}</p>}
+                    <p className="mt-0.5 text-xs text-muted-foreground">Cambia tu foto desde Ajustes.</p>
+                  </div>
+                </div>
+                {!editing ? (
+              <dl className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+                <Field label="Nombre" value={profile.full_name} />
+                <Field label="Username" value={profile.username ? "@" + profile.username : null} />
+                <Field label="Correo" value={auth.user?.email ?? "—"} />
+                <Field label="Carrera" value={profile.carrera} />
+                <Field label="Semestre" value={profile.semestre} />
+                <Field label="Línea de interés" value={lines.find((l) => l.id === profile.interest_line_id)?.title ?? null} />
+
+                <Field label="Teléfono" value={profile.phone} />
+                <Field label="GitHub" value={profile.github_url} />
+
+                <Field label="LinkedIn" value={profile.linkedin_url} />
+                <div className="sm:col-span-2">
+                  <dt className="text-muted-foreground">Bio</dt>
+                  <dd className="mt-1 whitespace-pre-wrap text-foreground">{profile.bio || "—"}</dd>
+                </div>
+              </dl>
+            ) : (
+              <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <FieldInput label="Nombre completo" value={draft.full_name} onChange={(v) => set("full_name", v)} required maxLength={120} />
+                <FieldInput label="Username" value={draft.username} onChange={(v) => set("username", v.toLowerCase())} required maxLength={30} placeholder="ej: juan.perez" />
+                <div>
+                  <Label className="text-muted-foreground">Correo</Label>
+                  <Input value={auth.user?.email ?? ""} disabled className="mt-1.5" />
+                </div>
+                <div>
+                  <Label className="text-muted-foreground">Carrera</Label>
+                  <Input value="Ciencia de Datos e Inteligencia Artificial" disabled className="mt-1.5" />
+                </div>
+                <FieldInput label="Semestre" value={draft.semestre ?? ""} onChange={(v) => set("semestre", v.replace(/[^0-9]/g, ""))} maxLength={2} placeholder="Ej: 5" />
+                <div>
+                  <Label className="text-muted-foreground">Línea de interés</Label>
+                  <select
+                    className="mt-1.5 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    value={draft.interest_line_id ?? ""}
+                    onChange={(e) => set("interest_line_id", e.target.value || null)}
+                  >
+                    <option value="">— Selecciona una línea —</option>
+                    {lines.map((l) => <option key={l.id} value={l.id}>{l.title}</option>)}
+                  </select>
+                </div>
+
+                <FieldInput label="Teléfono" value={draft.phone ?? ""} onChange={(v) => set("phone", v)} maxLength={30} />
+                <FieldInput label="GitHub URL" value={draft.github_url ?? ""} onChange={(v) => set("github_url", v)} placeholder="https://github.com/usuario" />
+                <FieldInput label="LinkedIn URL" value={draft.linkedin_url ?? ""} onChange={(v) => set("linkedin_url", v)} placeholder="https://linkedin.com/in/usuario" />
+                <div className="sm:col-span-2">
+                  <Label className="text-muted-foreground">Bio</Label>
+                  <Textarea
+                    className="mt-1.5"
+                    value={draft.bio ?? ""}
+                    onChange={(e) => set("bio", e.target.value)}
+                    rows={4}
+                    maxLength={500}
+                    placeholder="Cuéntanos sobre ti, tus intereses..."
+                  />
+                </div>
               </div>
-            </div>
-            {!editing ? (
-          <dl className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
-            <Field label="Nombre" value={profile.full_name} />
-            <Field label="Username" value={profile.username ? "@" + profile.username : null} />
-            <Field label="Correo" value={auth.user?.email ?? "—"} />
-            <Field label="Carrera" value={profile.carrera} />
-            <Field label="Semestre" value={profile.semestre} />
-            <Field label="Línea de interés" value={lines.find((l) => l.id === profile.interest_line_id)?.title ?? null} />
-
-            <Field label="Teléfono" value={profile.phone} />
-            <Field label="GitHub" value={profile.github_url} />
-
-            <Field label="LinkedIn" value={profile.linkedin_url} />
-            <div className="sm:col-span-2">
-              <dt className="text-muted-foreground">Bio</dt>
-              <dd className="mt-1 whitespace-pre-wrap text-foreground">{profile.bio || "—"}</dd>
-            </div>
-          </dl>
-        ) : (
-          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <FieldInput label="Nombre completo" value={draft.full_name} onChange={(v) => set("full_name", v)} required maxLength={120} />
-            <FieldInput label="Username" value={draft.username} onChange={(v) => set("username", v.toLowerCase())} required maxLength={30} placeholder="ej: juan.perez" />
-            <div>
-              <Label className="text-muted-foreground">Correo</Label>
-              <Input value={auth.user?.email ?? ""} disabled className="mt-1.5" />
-            </div>
-            <div>
-              <Label className="text-muted-foreground">Carrera</Label>
-              <Input value="Ciencia de Datos e Inteligencia Artificial" disabled className="mt-1.5" />
-            </div>
-            <FieldInput label="Semestre" value={draft.semestre ?? ""} onChange={(v) => set("semestre", v.replace(/[^0-9]/g, ""))} maxLength={2} placeholder="Ej: 5" />
-            <div>
-              <Label className="text-muted-foreground">Línea de interés</Label>
-              <select
-                className="mt-1.5 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                value={draft.interest_line_id ?? ""}
-                onChange={(e) => set("interest_line_id", e.target.value || null)}
-              >
-                <option value="">— Selecciona una línea —</option>
-                {lines.map((l) => <option key={l.id} value={l.id}>{l.title}</option>)}
-              </select>
-            </div>
-
-            <FieldInput label="Teléfono" value={draft.phone ?? ""} onChange={(v) => set("phone", v)} maxLength={30} />
-            <FieldInput label="GitHub URL" value={draft.github_url ?? ""} onChange={(v) => set("github_url", v)} placeholder="https://github.com/usuario" />
-            <FieldInput label="LinkedIn URL" value={draft.linkedin_url ?? ""} onChange={(v) => set("linkedin_url", v)} placeholder="https://linkedin.com/in/usuario" />
-            <div className="sm:col-span-2">
-              <Label className="text-muted-foreground">Bio</Label>
-              <Textarea
-                className="mt-1.5"
-                value={draft.bio ?? ""}
-                onChange={(e) => set("bio", e.target.value)}
-                rows={4}
-                maxLength={500}
-                placeholder="Cuéntanos sobre ti, tus intereses..."
-              />
-            </div>
-          </div>
+                )}
+              </>
             )}
-          </>
-        )}
-      </Card>
+          </Card>
+        </TabsContent>
 
-      <AnnouncementsCard />
+        <TabsContent value="equipo" className="mt-5">
+          <TeamCard team={team} mates={mates} loading={loading} />
+        </TabsContent>
 
-      <UpcomingMeetingsCard />
+        <TabsContent value="proyectos" className="mt-5">
+          <ProjectsCard projects={projects} loading={loading} userId={auth.user?.id ?? null} />
+        </TabsContent>
 
-      <TeamCard team={team} mates={mates} loading={loading} />
+        <TabsContent value="actividades" className="mt-5">
+          <ActivitiesCard userId={auth.user?.id ?? null} />
+        </TabsContent>
 
+        <TabsContent value="competencias" className="mt-5">
+          <CompetitionsCard competitions={competitions} loading={loading} hasTeam={!!team} />
+        </TabsContent>
 
-      <ProjectsCard projects={projects} loading={loading} userId={auth.user?.id ?? null} />
+        <TabsContent value="recursos" className="mt-5">
+          <ResourcesCard />
+        </TabsContent>
 
-      <ActivitiesCard userId={auth.user?.id ?? null} />
-
-      <CompetitionsCard competitions={competitions} loading={loading} hasTeam={!!team} />
-
-      <ResourcesCard />
-
-      <ToolsCard />
+        <TabsContent value="herramientas" className="mt-5">
+          <ToolsCard />
+        </TabsContent>
+      </Tabs>
     </DashboardShell>
   );
 }
+
 
 function TeamCard({ team, mates, loading }: { team: TeamInfo | null; mates: Mate[]; loading: boolean }) {
   const meta = team ? TEAM_ICONS[team.slug] ?? { icon: Users, color: "text-primary", bg: "bg-primary-soft" } : null;
