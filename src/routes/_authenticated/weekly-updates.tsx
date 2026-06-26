@@ -114,6 +114,8 @@ function WeeklyUpdatesPage() {
     const projList = Array.from(projMap, ([id, title]) => ({ id, title }));
     setProjects(projList);
     if (projList.length === 1 && !isStaff) setSelectedProject(projList[0].id);
+    if (projList.length !== 1 || isStaff) setSelectedProject("");
+    setSelectedActivity("");
 
 
     const { data } = await supabase
