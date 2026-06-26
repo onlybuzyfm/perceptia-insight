@@ -181,7 +181,7 @@ function WeeklyUpdatesPage() {
     }
     toast.success("Avance registrado");
     e.currentTarget.reset();
-    if (projects.length > 1) setSelectedProject("");
+    if (showSelector) setSelectedProject("");
     load();
   };
 
