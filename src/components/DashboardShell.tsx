@@ -46,7 +46,7 @@ export function DashboardShell({ children, title }: { children: ReactNode; title
         supabase
           .from("meetings")
           .select("id", { count: "exact", head: true })
-          .gte("scheduled_at", new Date().toISOString()),
+          .gte("meeting_date", new Date().toISOString()),
       ]);
       setHasNotifications((annCount ?? 0) + (meetCount ?? 0) > 0);
     };
