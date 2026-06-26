@@ -44,6 +44,7 @@ function PostularPage() {
 function ApplicationForm() {
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
+  const [lines, setLines] = useState<{ id: string; title: string }[]>([]);
   const [form, setForm] = useState({
     full_name: "",
     email: "",
@@ -53,6 +54,12 @@ function ApplicationForm() {
     interest_area: "",
     message: "",
   });
+
+  useEffect(() => {
+    supabase.from("research_lines").select("id, title").order("display_order").then(({ data }) => {
+      setLines(data ?? []);
+    });
+  }, []);
 
   const update = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -112,16 +119,27 @@ function ApplicationForm() {
           <Input id="carrera" value="Ciencia de Datos e Inteligencia Artificial" readOnly disabled />
         </Field>
         <Field label="Semestre" id="semestre">
-          <Input id="semestre" value={form.semestre} onChange={update("semestre")} maxLength={50} />
-        </Field>
-        <Field label="Área de interés" id="interest_area">
           <Input
-            id="interest_area"
-            placeholder="Visión por computador, NLP, robótica…"
-            value={form.interest_area}
-            onChange={update("interest_area")}
-            maxLength={200}
+            id="semestre"
+            type="number"
+            min={1}
+            max={12}
+            step={1}
+            inputMode="numeric"
+            placeholder="Ej: 5"
+            value={form.semestre}
+            onChange={update("semestre")}
           />
+        </Field>
+        <Field label="Línea de investigación de interés" id="interest_area">
+          <Select value={form.interest_area} onValueChange={(v) => setForm((f) => ({ ...f, interest_area: v }))}>
+            <SelectTrigger id="interest_area"><SelectValue placeholder="Selecciona una línea" /></SelectTrigger>
+            <SelectContent>
+              {lines.map((l) => (
+                <SelectItem key={l.id} value={l.title}>{l.title}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </Field>
       </div>
       <Field label="¿Por qué quieres unirte?" id="message">
