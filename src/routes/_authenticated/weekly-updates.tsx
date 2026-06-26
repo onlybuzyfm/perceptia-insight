@@ -135,12 +135,22 @@ function WeeklyUpdatesPage() {
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!auth.user) return;
+  const showSelector = isStaff || projects.length > 1;
+  const autoProjectId = !isStaff && projects.length === 1 ? projects[0].id : null;
+
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!auth.user) return;
     if (!hasProjects) {
-      toast.error("Debes tener un proyecto asignado para registrar avances semanales.");
+      toast.error(
+        isStaff
+          ? "No existen proyectos en la plataforma. Crea uno antes de registrar avances."
+          : "Debes tener un proyecto asignado para registrar avances semanales.",
+      );
       return;
     }
     const fd = new FormData(e.currentTarget);
-    const projectId = projects.length === 1 ? projects[0].id : selectedProject;
+    const projectId = autoProjectId ?? selectedProject;
     if (!projectId) {
       toast.error("Selecciona el proyecto al que pertenece este avance.");
       return;
@@ -154,6 +164,7 @@ function WeeklyUpdatesPage() {
       repo_url: fd.get("repo_url") || "",
       project_id: projectId,
     });
+
     if (!parsed.success) {
       toast.error(parsed.error.issues[0]?.message || "Revisa los campos del formulario.");
       return;
