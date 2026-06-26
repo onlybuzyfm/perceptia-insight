@@ -44,6 +44,14 @@ interface ProjectOption {
   title: string;
 }
 
+interface ActivityOption {
+  id: string;
+  title: string;
+  project_id: string;
+  status: string;
+  deadline: string;
+}
+
 const schema = z.object({
   week_start: z.string().min(1),
   summary: z.string().min(5).max(2000),
@@ -52,6 +60,7 @@ const schema = z.object({
   hours_spent: z.number().min(0).max(168),
   repo_url: z.string().url("Debe ser un enlace válido").max(500).optional().or(z.literal("")),
   project_id: z.string().uuid("Debes seleccionar un proyecto válido"),
+  activity_id: z.string().uuid("Debes seleccionar una actividad del proyecto"),
 });
 
 function WeeklyUpdatesPage() {
