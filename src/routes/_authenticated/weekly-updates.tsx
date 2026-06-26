@@ -63,38 +63,46 @@ function WeeklyUpdatesPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
+  const isStaff = auth.hasRole("admin") || auth.hasRole("coordinador");
+
   const load = async () => {
     if (!auth.user) return;
     setLoading(true);
 
-    // Cargar proyectos del usuario (directos + por equipo)
+    // Cargar proyectos del usuario (directos + por equipo). Admin/coord ven todos.
     const projMap = new Map<string, string>();
-    const { data: direct } = await supabase
-      .from("project_members")
-      .select("projects(id, title)")
-      .eq("user_id", auth.user.id);
-    (direct ?? []).forEach((r) => {
-      const p = r.projects as { id: string; title: string } | null;
-      if (p) projMap.set(p.id, p.title);
-    });
-    const { data: tm } = await supabase
-      .from("team_members")
-      .select("team_id")
-      .eq("user_id", auth.user.id);
-    const teamIds = (tm ?? []).map((t) => t.team_id);
-    if (teamIds.length > 0) {
-      const { data: tp } = await supabase
-        .from("team_projects")
+    if (isStaff) {
+      const { data: all } = await supabase.from("projects").select("id, title").order("title");
+      (all ?? []).forEach((p) => projMap.set(p.id, p.title));
+    } else {
+      const { data: direct } = await supabase
+        .from("project_members")
         .select("projects(id, title)")
-        .in("team_id", teamIds);
-      (tp ?? []).forEach((r) => {
+        .eq("user_id", auth.user.id);
+      (direct ?? []).forEach((r) => {
         const p = r.projects as { id: string; title: string } | null;
         if (p) projMap.set(p.id, p.title);
       });
+      const { data: tm } = await supabase
+        .from("team_members")
+        .select("team_id")
+        .eq("user_id", auth.user.id);
+      const teamIds = (tm ?? []).map((t) => t.team_id);
+      if (teamIds.length > 0) {
+        const { data: tp } = await supabase
+          .from("team_projects")
+          .select("projects(id, title)")
+          .in("team_id", teamIds);
+        (tp ?? []).forEach((r) => {
+          const p = r.projects as { id: string; title: string } | null;
+          if (p) projMap.set(p.id, p.title);
+        });
+      }
     }
     const projList = Array.from(projMap, ([id, title]) => ({ id, title }));
     setProjects(projList);
-    if (projList.length === 1) setSelectedProject(projList[0].id);
+    if (projList.length === 1 && !isStaff) setSelectedProject(projList[0].id);
+
 
     const { data } = await supabase
       .from("weekly_updates")
