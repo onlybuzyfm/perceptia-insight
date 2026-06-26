@@ -314,7 +314,7 @@ function WeeklyUpdatesPage() {
               </div>
               <Button
                 type="submit"
-                disabled={submitting || (showSelector && !selectedProject)}
+                disabled={submitting || !activeProjectId || !selectedActivity || !hasActivities}
                 className="w-full bg-primary hover:bg-primary/90"
               >
                 {submitting ? "Guardando..." : "Guardar avance"}
