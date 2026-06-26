@@ -265,6 +265,29 @@ function WeeklyUpdatesPage() {
                   Proyecto: <span className="font-medium text-foreground">{projects[0].title}</span>
                 </div>
               )}
+              {activeProjectId && (
+                <div>
+                  <Label htmlFor="activity_id">Actividad *</Label>
+                  {loadingActivities ? (
+                    <p className="mt-1.5 text-xs text-muted-foreground">Cargando actividades…</p>
+                  ) : !hasActivities ? (
+                    <div className="mt-1.5 rounded-md border border-dashed border-amber-300 bg-amber-50/50 p-3 text-xs text-amber-800">
+                      Este proyecto aún no tiene actividades asignadas. Un docente o coordinador debe crear una actividad antes de registrar avances semanales.
+                    </div>
+                  ) : (
+                    <Select value={selectedActivity} onValueChange={setSelectedActivity}>
+                      <SelectTrigger id="activity_id" className="mt-1.5">
+                        <SelectValue placeholder="Selecciona una actividad" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {activities.map((a) => (
+                          <SelectItem key={a.id} value={a.id}>{a.title}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+              )}
               <div>
                 <Label htmlFor="week_start">Semana del</Label>
                 <Input id="week_start" name="week_start" type="date" required className="mt-1.5" />
