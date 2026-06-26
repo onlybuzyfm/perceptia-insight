@@ -131,16 +131,13 @@ function WeeklyUpdatesPage() {
   }, [auth.user]);
 
   const hasProjects = projects.length > 0;
-
-  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!auth.user) return;
   const showSelector = isStaff || projects.length > 1;
   const autoProjectId = !isStaff && projects.length === 1 ? projects[0].id : null;
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!auth.user) return;
+
     if (!hasProjects) {
       toast.error(
         isStaff
