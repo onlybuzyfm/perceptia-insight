@@ -313,7 +313,7 @@ function StudentDashboard() {
                 <Field label="Username" value={profile.username ? "@" + profile.username : null} />
                 <Field label="Correo" value={auth.user?.email ?? "—"} />
                 <Field label="Carrera" value={profile.carrera} />
-                <Field label="Semestre" value={profile.semestre} />
+                {!auth.hasRole("docente_asociado") && <Field label="Semestre" value={profile.semestre} />}
                 <Field label="Línea de interés" value={lines.find((l) => l.id === profile.interest_line_id)?.title ?? null} />
 
                 <Field label="Teléfono" value={profile.phone} />
