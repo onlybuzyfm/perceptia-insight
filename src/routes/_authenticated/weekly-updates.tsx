@@ -63,38 +63,46 @@ function WeeklyUpdatesPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
+  const isStaff = auth.hasRole("admin") || auth.hasRole("coordinador");
+
   const load = async () => {
     if (!auth.user) return;
     setLoading(true);
 
-    // Cargar proyectos del usuario (directos + por equipo)
+    // Cargar proyectos del usuario (directos + por equipo). Admin/coord ven todos.
     const projMap = new Map<string, string>();
-    const { data: direct } = await supabase
-      .from("project_members")
-      .select("projects(id, title)")
-      .eq("user_id", auth.user.id);
-    (direct ?? []).forEach((r) => {
-      const p = r.projects as { id: string; title: string } | null;
-      if (p) projMap.set(p.id, p.title);
-    });
-    const { data: tm } = await supabase
-      .from("team_members")
-      .select("team_id")
-      .eq("user_id", auth.user.id);
-    const teamIds = (tm ?? []).map((t) => t.team_id);
-    if (teamIds.length > 0) {
-      const { data: tp } = await supabase
-        .from("team_projects")
+    if (isStaff) {
+      const { data: all } = await supabase.from("projects").select("id, title").order("title");
+      (all ?? []).forEach((p) => projMap.set(p.id, p.title));
+    } else {
+      const { data: direct } = await supabase
+        .from("project_members")
         .select("projects(id, title)")
-        .in("team_id", teamIds);
-      (tp ?? []).forEach((r) => {
+        .eq("user_id", auth.user.id);
+      (direct ?? []).forEach((r) => {
         const p = r.projects as { id: string; title: string } | null;
         if (p) projMap.set(p.id, p.title);
       });
+      const { data: tm } = await supabase
+        .from("team_members")
+        .select("team_id")
+        .eq("user_id", auth.user.id);
+      const teamIds = (tm ?? []).map((t) => t.team_id);
+      if (teamIds.length > 0) {
+        const { data: tp } = await supabase
+          .from("team_projects")
+          .select("projects(id, title)")
+          .in("team_id", teamIds);
+        (tp ?? []).forEach((r) => {
+          const p = r.projects as { id: string; title: string } | null;
+          if (p) projMap.set(p.id, p.title);
+        });
+      }
     }
     const projList = Array.from(projMap, ([id, title]) => ({ id, title }));
     setProjects(projList);
-    if (projList.length === 1) setSelectedProject(projList[0].id);
+    if (projList.length === 1 && !isStaff) setSelectedProject(projList[0].id);
+
 
     const { data } = await supabase
       .from("weekly_updates")
@@ -123,16 +131,23 @@ function WeeklyUpdatesPage() {
   }, [auth.user]);
 
   const hasProjects = projects.length > 0;
+  const showSelector = isStaff || projects.length > 1;
+  const autoProjectId = !isStaff && projects.length === 1 ? projects[0].id : null;
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!auth.user) return;
+
     if (!hasProjects) {
-      toast.error("Debes tener un proyecto asignado para registrar avances semanales.");
+      toast.error(
+        isStaff
+          ? "No existen proyectos en la plataforma. Crea uno antes de registrar avances."
+          : "Debes tener un proyecto asignado para registrar avances semanales.",
+      );
       return;
     }
     const fd = new FormData(e.currentTarget);
-    const projectId = projects.length === 1 ? projects[0].id : selectedProject;
+    const projectId = autoProjectId ?? selectedProject;
     if (!projectId) {
       toast.error("Selecciona el proyecto al que pertenece este avance.");
       return;
@@ -146,6 +161,7 @@ function WeeklyUpdatesPage() {
       repo_url: fd.get("repo_url") || "",
       project_id: projectId,
     });
+
     if (!parsed.success) {
       toast.error(parsed.error.issues[0]?.message || "Revisa los campos del formulario.");
       return;
@@ -165,7 +181,7 @@ function WeeklyUpdatesPage() {
     }
     toast.success("Avance registrado");
     e.currentTarget.reset();
-    if (projects.length > 1) setSelectedProject("");
+    if (showSelector) setSelectedProject("");
     load();
   };
 
@@ -179,12 +195,16 @@ function WeeklyUpdatesPage() {
               <Lock className="h-8 w-8 text-muted-foreground" />
               <p className="text-sm font-medium text-foreground">Apartado bloqueado</p>
               <p className="text-xs text-muted-foreground">
-                Debes tener un proyecto asignado para registrar avances semanales.
+                {isStaff
+                  ? "No existen proyectos en la plataforma. Crea uno para registrar avances."
+                  : auth.hasRole("docente_asociado")
+                  ? "Para registrar un avance semanal debes estar asignado a un proyecto existente o crear un proyecto propio desde la pestaña Proyectos."
+                  : "Debes tener un proyecto asignado para registrar avances semanales."}
               </p>
             </div>
           ) : (
             <form onSubmit={onSubmit} className="mt-4 space-y-3">
-              {projects.length > 1 && (
+              {showSelector && (
                 <div>
                   <Label htmlFor="project_id">Proyecto *</Label>
                   <Select value={selectedProject} onValueChange={setSelectedProject}>
@@ -199,7 +219,7 @@ function WeeklyUpdatesPage() {
                   </Select>
                 </div>
               )}
-              {projects.length === 1 && (
+              {autoProjectId && (
                 <div className="rounded-md border border-border/60 bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
                   Proyecto: <span className="font-medium text-foreground">{projects[0].title}</span>
                 </div>
@@ -230,13 +250,14 @@ function WeeklyUpdatesPage() {
               </div>
               <Button
                 type="submit"
-                disabled={submitting || (projects.length > 1 && !selectedProject)}
+                disabled={submitting || (showSelector && !selectedProject)}
                 className="w-full bg-primary hover:bg-primary/90"
               >
                 {submitting ? "Guardando..." : "Guardar avance"}
               </Button>
             </form>
           )}
+
         </Card>
 
         <Card className="border-border/70 p-6">
