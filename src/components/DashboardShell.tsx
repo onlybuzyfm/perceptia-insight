@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { type ReactNode, useEffect, useState } from "react";
-import { LayoutDashboard, FileText, BookOpen, LogOut, Users, Settings, GraduationCap, User as UserIcon, ChevronDown, Briefcase } from "lucide-react";
+import { LayoutDashboard, FileText, BookOpen, LogOut, Users, Settings, GraduationCap, User as UserIcon, ChevronDown, Briefcase, Bell } from "lucide-react";
 import logo from "@/assets/perceptia-logo.svg";
 import { useAuth } from "@/lib/auth-context";
 
