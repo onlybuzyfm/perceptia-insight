@@ -24,8 +24,7 @@ interface Student {
   email_secundario: string | null;
   carrera: string | null;
   semestre: string | null;
-  paralelo: string | null;
-  codigo_estudiantil: string | null;
+
   is_active: boolean;
   interest_line_id: string | null;
   project_ids: string[];
@@ -44,7 +43,7 @@ function StudentsAdmin() {
   const [q, setQ] = useState("");
   const [carreraFilter, setCarreraFilter] = useState("all");
   const [semestreFilter, setSemestreFilter] = useState("all");
-  const [paraleloFilter, setParaleloFilter] = useState("all");
+  
   const [statusFilter, setStatusFilter] = useState("all");
   const [lineFilter, setLineFilter] = useState("all");
 
@@ -59,7 +58,7 @@ function StudentsAdmin() {
       setStudents([]); setLoading(false); return;
     }
     const [profs, ls, members, projs] = await Promise.all([
-      supabase.from("profiles").select("id, full_name, username, email, email_secundario, carrera, semestre, paralelo, codigo_estudiantil, is_active, interest_line_id").in("id", ids),
+      supabase.from("profiles").select("id, full_name, username, email, email_secundario, carrera, semestre, is_active, interest_line_id").in("id", ids),
       supabase.from("research_lines").select("id, title").order("display_order"),
       supabase.from("project_members").select("user_id, project_id").in("user_id", ids),
       supabase.from("projects").select("id, title"),
@@ -80,9 +79,8 @@ function StudentsAdmin() {
       email_secundario: p.email_secundario,
       carrera: p.carrera,
       semestre: p.semestre,
-      paralelo: p.paralelo,
-      codigo_estudiantil: p.codigo_estudiantil,
       is_active: p.is_active ?? true,
+
       interest_line_id: p.interest_line_id,
       project_ids: memberMap.get(p.id) ?? [],
       project_titles: (memberMap.get(p.id) ?? []).map((id) => projMap.get(id) ?? "—"),
@@ -95,21 +93,20 @@ function StudentsAdmin() {
 
   const carreras = useMemo(() => Array.from(new Set(students.map((s) => s.carrera).filter(Boolean) as string[])), [students]);
   const semestres = useMemo(() => Array.from(new Set(students.map((s) => s.semestre).filter(Boolean) as string[])), [students]);
-  const paralelos = useMemo(() => Array.from(new Set(students.map((s) => s.paralelo).filter(Boolean) as string[])), [students]);
 
   const filtered = useMemo(() => students.filter((s) => {
     if (q && !`${s.full_name} ${s.email} ${s.username ?? ""}`.toLowerCase().includes(q.toLowerCase())) return false;
     if (carreraFilter !== "all" && s.carrera !== carreraFilter) return false;
     if (semestreFilter !== "all" && s.semestre !== semestreFilter) return false;
-    if (paraleloFilter !== "all" && s.paralelo !== paraleloFilter) return false;
     if (statusFilter === "active" && !s.is_active) return false;
     if (statusFilter === "inactive" && s.is_active) return false;
     if (lineFilter !== "all" && s.interest_line_id !== lineFilter) return false;
     return true;
-  }), [students, q, carreraFilter, semestreFilter, paraleloFilter, statusFilter, lineFilter]);
+  }), [students, q, carreraFilter, semestreFilter, statusFilter, lineFilter]);
+
 
   const exportCSV = () => {
-    const headers = ["Nombre", "Username", "Correo", "Gmail notif.", "Carrera", "Semestre", "Paralelo", "Estado", "Línea", "Proyectos"];
+    const headers = ["Nombre", "Username", "Correo", "Gmail notif.", "Carrera", "Semestre", "Estado", "Línea", "Proyectos"];
     const rows = filtered.map((s) => [
       s.full_name,
       s.username ?? "",
@@ -117,11 +114,11 @@ function StudentsAdmin() {
       s.email_secundario ?? "",
       s.carrera ?? "",
       s.semestre ?? "",
-      s.paralelo ?? "",
       s.is_active ? "Activo" : "Inactivo",
       lines.find((l) => l.id === s.interest_line_id)?.title ?? "",
       s.project_titles.join(" | "),
     ]);
+
     const csv = [headers, ...rows].map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
@@ -141,7 +138,7 @@ function StudentsAdmin() {
           </div>
           <FilterSelect value={carreraFilter} onChange={setCarreraFilter} placeholder="Carrera" all="Todas las carreras" options={carreras} />
           <FilterSelect value={semestreFilter} onChange={setSemestreFilter} placeholder="Semestre" all="Todos" options={semestres} />
-          <FilterSelect value={paraleloFilter} onChange={setParaleloFilter} placeholder="Paralelo" all="Todos" options={paralelos} />
+          
           <Select value={lineFilter} onValueChange={setLineFilter}>
             <SelectTrigger className="w-[160px]"><SelectValue /></SelectTrigger>
             <SelectContent>
@@ -179,7 +176,8 @@ function StudentsAdmin() {
                 <th className="px-4 py-3">Gmail (notif.)</th>
                 <th className="px-4 py-3">Carrera</th>
                 <th className="px-4 py-3">Sem.</th>
-                <th className="px-4 py-3">Par.</th>
+
+
                 
                 <th className="px-4 py-3">Línea</th>
                 <th className="px-4 py-3">Proyectos</th>
@@ -196,7 +194,8 @@ function StudentsAdmin() {
                   <td className="px-4 py-2.5 text-muted-foreground">{s.email_secundario ?? "—"}</td>
                   <td className="px-4 py-2.5 text-muted-foreground">{s.carrera ?? "—"}</td>
                   <td className="px-4 py-2.5 text-muted-foreground">{s.semestre ?? "—"}</td>
-                  <td className="px-4 py-2.5 text-muted-foreground">{s.paralelo ?? "—"}</td>
+
+
                   
                   <td className="px-4 py-2.5 text-muted-foreground">
                     {lines.find((l) => l.id === s.interest_line_id)?.title ?? "—"}
@@ -254,7 +253,7 @@ function EditDialog({ student, lines, onClose, onSaved }: { student: Student | n
       username: uname,
       carrera: form.carrera || null,
       semestre: form.semestre || null,
-      paralelo: form.paralelo || null,
+
 
       interest_line_id: form.interest_line_id || null,
       is_active: form.is_active ?? true,
@@ -305,9 +304,8 @@ function EditDialog({ student, lines, onClose, onSaved }: { student: Student | n
                 onChange={(e) => setForm({ ...form, semestre: e.target.value.replace(/[^0-9]/g, "") })}
               />
             </Field>
-            <Field label="Paralelo">
-              <Input value={form.paralelo ?? ""} onChange={(e) => setForm({ ...form, paralelo: e.target.value })} />
-            </Field>
+
+
 
           </div>
           <Field label="Línea de interés">
