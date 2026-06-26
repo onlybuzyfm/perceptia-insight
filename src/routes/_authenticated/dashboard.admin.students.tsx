@@ -255,7 +255,7 @@ function EditDialog({ student, lines, onClose, onSaved }: { student: Student | n
       carrera: form.carrera || null,
       semestre: form.semestre || null,
       paralelo: form.paralelo || null,
-      codigo_estudiantil: form.codigo_estudiantil || null,
+
       interest_line_id: form.interest_line_id || null,
       is_active: form.is_active ?? true,
     }).eq("id", student.id);
