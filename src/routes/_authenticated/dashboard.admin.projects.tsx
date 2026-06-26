@@ -245,7 +245,7 @@ function ProjectsAdmin() {
   );
 }
 
-function ProjectDialog({ project, onClose, onSaved }: { project: Project | null; onClose: () => void; onSaved: () => void }) {
+function ProjectDialog({ project, lines, onClose, onSaved }: { project: Project | null; lines: ResearchLine[]; onClose: () => void; onSaved: () => void }) {
   const isNew = !project;
   const [title, setTitle] = useState(project?.title ?? "");
   const [slug, setSlug] = useState(project?.slug ?? "");
@@ -267,7 +267,7 @@ function ProjectDialog({ project, onClose, onSaved }: { project: Project | null;
     setSaving(true);
     const payload = {
       title: title.trim(), slug: slug.trim(), description: description.trim(),
-      status, is_published: isPublished, icon, line: line.trim() || null,
+      status, is_published: isPublished, icon, line: line || null,
     };
     const { error } = isNew
       ? await supabase.from("projects").insert(payload)
@@ -311,8 +311,19 @@ function ProjectDialog({ project, onClose, onSaved }: { project: Project | null;
               </Select>
             </div>
             <div className="grid gap-1.5">
-              <Label>Línea</Label>
-              <Input value={line} onChange={(e) => setLine(e.target.value)} placeholder="Ej. Visión artificial" />
+              <Label>Línea del semillero</Label>
+              {lines.length === 0 ? (
+                <p className="text-sm text-muted-foreground rounded-md border border-dashed border-border/60 px-3 py-2">
+                  No hay líneas del semillero disponibles.
+                </p>
+              ) : (
+                <Select value={line || undefined} onValueChange={setLine}>
+                  <SelectTrigger><SelectValue placeholder="Selecciona una línea del semillero" /></SelectTrigger>
+                  <SelectContent>
+                    {lines.map((l) => <SelectItem key={l.id} value={l.title}>{l.title}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
