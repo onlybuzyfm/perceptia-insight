@@ -74,6 +74,7 @@ const slugify = (s: string) =>
 
 function ProjectsAdmin() {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [lines, setLines] = useState<ResearchLine[]>([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -83,12 +84,20 @@ function ProjectsAdmin() {
 
   const load = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("projects")
-      .select("id, title, slug, description, status, is_published, icon, line, created_at")
-      .order("created_at", { ascending: false });
-    if (error) toast.error("Error al cargar proyectos");
-    setProjects((data ?? []) as Project[]);
+    const [projRes, linesRes] = await Promise.all([
+      supabase
+        .from("projects")
+        .select("id, title, slug, description, status, is_published, icon, line, created_at")
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("research_lines")
+        .select("id, title")
+        .order("display_order", { ascending: true }),
+    ]);
+    if (projRes.error) toast.error("Error al cargar proyectos");
+    if (linesRes.error) toast.error("Error al cargar líneas");
+    setProjects((projRes.data ?? []) as Project[]);
+    setLines((linesRes.data ?? []) as ResearchLine[]);
     setLoading(false);
   };
 
