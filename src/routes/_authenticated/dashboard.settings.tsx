@@ -38,6 +38,8 @@ function SettingsPage() {
   const fnGetLinkCode = useServerFn(getOrCreateMyTelegramLinkCode);
   const fnUnlink = useServerFn(unlinkMyTelegram);
   const fnTest = useServerFn(sendMyTelegramTest);
+  const fnGroupTest = useServerFn(broadcastTelegramToGroups);
+  const isStaff = auth.isStaff();
   const [tgLoading, setTgLoading] = useState(false);
   const [tgCode, setTgCode] = useState<string | null>(null);
   const [tgBot, setTgBot] = useState<string | null>(null);
