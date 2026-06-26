@@ -19,15 +19,15 @@ export const Route = createFileRoute("/api/public/seed-test-student")({
           auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
         });
 
-        const email = "estudiante.prueba@perceptia.test";
-        const password = "Prueba1234!";
+        const email = "demo.estudiante@perceptia.test";
+        const password = "Demo1234!";
 
         // Crear usuario auth (email confirmado)
         const { data: created, error: createErr } = await admin.auth.admin.createUser({
           email,
           password,
           email_confirm: true,
-          user_metadata: { full_name: "Estudiante Prueba", username: "estudiante.prueba" },
+          user_metadata: { full_name: "Demo Estudiante", username: "demo.estudiante" },
         });
         if (createErr && !createErr.message.toLowerCase().includes("already")) {
           return new Response(JSON.stringify({ error: createErr.message }), { status: 500 });
@@ -41,16 +41,15 @@ export const Route = createFileRoute("/api/public/seed-test-student")({
 
         // Actualizar perfil con datos completos
         await admin.from("profiles").update({
-          full_name: "Estudiante Prueba",
-          username: "estudiante.prueba",
-          carrera: "Ingeniería en Software",
+          full_name: "Demo Estudiante",
+          username: "demo.estudiante",
+          carrera: "Ciencia de Datos e Inteligencia Artificial",
           semestre: "5",
-          paralelo: "A",
-          codigo_estudiantil: "TEST-0001",
-          email_secundario: "estudiante.prueba@gmail.com",
+          email_secundario: "demo.estudiante@gmail.com",
           notificaciones_email_activas: true,
           is_active: true,
         }).eq("id", userId);
+
 
         // Asegurar rol estudiante
         await admin.from("user_roles").insert({ user_id: userId, role: "estudiante" as never });
