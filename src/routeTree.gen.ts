@@ -43,6 +43,7 @@ import { Route as AuthenticatedDashboardAdminLateUpdatesRouteImport } from './ro
 import { Route as AuthenticatedDashboardAdminIndicatorsRouteImport } from './routes/_authenticated/dashboard.admin.indicators'
 import { Route as AuthenticatedDashboardAdminCompetitionsRouteImport } from './routes/_authenticated/dashboard.admin.competitions'
 import { Route as AuthenticatedDashboardAdminApplicationsRouteImport } from './routes/_authenticated/dashboard.admin.applications'
+import { Route as AuthenticatedDashboardAdminAnnouncementsRouteImport } from './routes/_authenticated/dashboard.admin.announcements'
 import { Route as AuthenticatedDashboardAdminActivitiesRouteImport } from './routes/_authenticated/dashboard.admin.activities'
 
 const SobreRoute = SobreRouteImport.update({
@@ -236,6 +237,12 @@ const AuthenticatedDashboardAdminApplicationsRoute =
     path: '/applications',
     getParentRoute: () => AuthenticatedDashboardAdminRoute,
   } as any)
+const AuthenticatedDashboardAdminAnnouncementsRoute =
+  AuthenticatedDashboardAdminAnnouncementsRouteImport.update({
+    id: '/announcements',
+    path: '/announcements',
+    getParentRoute: () => AuthenticatedDashboardAdminRoute,
+  } as any)
 const AuthenticatedDashboardAdminActivitiesRoute =
   AuthenticatedDashboardAdminActivitiesRouteImport.update({
     id: '/activities',
@@ -264,6 +271,7 @@ export interface FileRoutesByFullPath {
   '/api/public/seed-test-student': typeof ApiPublicSeedTestStudentRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/admin/activities': typeof AuthenticatedDashboardAdminActivitiesRoute
+  '/dashboard/admin/announcements': typeof AuthenticatedDashboardAdminAnnouncementsRoute
   '/dashboard/admin/applications': typeof AuthenticatedDashboardAdminApplicationsRoute
   '/dashboard/admin/competitions': typeof AuthenticatedDashboardAdminCompetitionsRoute
   '/dashboard/admin/indicators': typeof AuthenticatedDashboardAdminIndicatorsRoute
@@ -299,6 +307,7 @@ export interface FileRoutesByTo {
   '/api/public/seed-test-student': typeof ApiPublicSeedTestStudentRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/admin/activities': typeof AuthenticatedDashboardAdminActivitiesRoute
+  '/dashboard/admin/announcements': typeof AuthenticatedDashboardAdminAnnouncementsRoute
   '/dashboard/admin/applications': typeof AuthenticatedDashboardAdminApplicationsRoute
   '/dashboard/admin/competitions': typeof AuthenticatedDashboardAdminCompetitionsRoute
   '/dashboard/admin/indicators': typeof AuthenticatedDashboardAdminIndicatorsRoute
@@ -337,6 +346,7 @@ export interface FileRoutesById {
   '/api/public/seed-test-student': typeof ApiPublicSeedTestStudentRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/admin/activities': typeof AuthenticatedDashboardAdminActivitiesRoute
+  '/_authenticated/dashboard/admin/announcements': typeof AuthenticatedDashboardAdminAnnouncementsRoute
   '/_authenticated/dashboard/admin/applications': typeof AuthenticatedDashboardAdminApplicationsRoute
   '/_authenticated/dashboard/admin/competitions': typeof AuthenticatedDashboardAdminCompetitionsRoute
   '/_authenticated/dashboard/admin/indicators': typeof AuthenticatedDashboardAdminIndicatorsRoute
@@ -375,6 +385,7 @@ export interface FileRouteTypes {
     | '/api/public/seed-test-student'
     | '/dashboard/'
     | '/dashboard/admin/activities'
+    | '/dashboard/admin/announcements'
     | '/dashboard/admin/applications'
     | '/dashboard/admin/competitions'
     | '/dashboard/admin/indicators'
@@ -410,6 +421,7 @@ export interface FileRouteTypes {
     | '/api/public/seed-test-student'
     | '/dashboard'
     | '/dashboard/admin/activities'
+    | '/dashboard/admin/announcements'
     | '/dashboard/admin/applications'
     | '/dashboard/admin/competitions'
     | '/dashboard/admin/indicators'
@@ -447,6 +459,7 @@ export interface FileRouteTypes {
     | '/api/public/seed-test-student'
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/admin/activities'
+    | '/_authenticated/dashboard/admin/announcements'
     | '/_authenticated/dashboard/admin/applications'
     | '/_authenticated/dashboard/admin/competitions'
     | '/_authenticated/dashboard/admin/indicators'
@@ -719,6 +732,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAdminApplicationsRouteImport
       parentRoute: typeof AuthenticatedDashboardAdminRoute
     }
+    '/_authenticated/dashboard/admin/announcements': {
+      id: '/_authenticated/dashboard/admin/announcements'
+      path: '/announcements'
+      fullPath: '/dashboard/admin/announcements'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminAnnouncementsRouteImport
+      parentRoute: typeof AuthenticatedDashboardAdminRoute
+    }
     '/_authenticated/dashboard/admin/activities': {
       id: '/_authenticated/dashboard/admin/activities'
       path: '/activities'
@@ -731,6 +751,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedDashboardAdminRouteChildren {
   AuthenticatedDashboardAdminActivitiesRoute: typeof AuthenticatedDashboardAdminActivitiesRoute
+  AuthenticatedDashboardAdminAnnouncementsRoute: typeof AuthenticatedDashboardAdminAnnouncementsRoute
   AuthenticatedDashboardAdminApplicationsRoute: typeof AuthenticatedDashboardAdminApplicationsRoute
   AuthenticatedDashboardAdminCompetitionsRoute: typeof AuthenticatedDashboardAdminCompetitionsRoute
   AuthenticatedDashboardAdminIndicatorsRoute: typeof AuthenticatedDashboardAdminIndicatorsRoute
@@ -750,6 +771,8 @@ const AuthenticatedDashboardAdminRouteChildren: AuthenticatedDashboardAdminRoute
   {
     AuthenticatedDashboardAdminActivitiesRoute:
       AuthenticatedDashboardAdminActivitiesRoute,
+    AuthenticatedDashboardAdminAnnouncementsRoute:
+      AuthenticatedDashboardAdminAnnouncementsRoute,
     AuthenticatedDashboardAdminApplicationsRoute:
       AuthenticatedDashboardAdminApplicationsRoute,
     AuthenticatedDashboardAdminCompetitionsRoute:
