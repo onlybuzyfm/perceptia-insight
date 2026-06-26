@@ -17,6 +17,7 @@ import { AdminShell } from "@/components/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Search, Pencil, Trash2, Plus, Eye, EyeOff } from "lucide-react";
+import { IconPicker } from "@/components/IconPicker";
 
 export const Route = createFileRoute("/_authenticated/dashboard/admin/projects")({
   component: () => <AdminShell><ProjectsAdmin /></AdminShell>,
@@ -302,12 +303,7 @@ function ProjectDialog({ project, onClose, onSaved }: { project: Project | null;
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-1.5">
               <Label>Ícono</Label>
-              <Select value={icon} onValueChange={setIcon}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {ICON_OPTIONS.map((i) => <SelectItem key={i} value={i}>{i}</SelectItem>)}
-                </SelectContent>
-              </Select>
+              <IconPicker value={icon} onChange={setIcon} />
             </div>
             <div className="flex items-end gap-3 pb-1">
               <div className="flex items-center gap-2">
