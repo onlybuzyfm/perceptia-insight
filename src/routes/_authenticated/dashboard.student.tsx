@@ -1074,16 +1074,46 @@ interface ActivityRow {
 }
 
 function ActivitiesCard({ userId }: { userId: string | null }) {
+  const auth = useAuth();
+  const isStaff = auth.hasRole("admin") || auth.hasRole("coordinador");
   const [items, setItems] = useState<ActivityRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   const load = async () => {
     if (!userId) { setItems([]); setLoading(false); return; }
     setLoading(true);
-    const { data: acts } = await supabase
+
+    // Proyectos del usuario (directos + equipo). Admin/coord ven todo.
+    let projectIds: string[] | null = null;
+    if (!isStaff) {
+      const projSet = new Set<string>();
+      const { data: pm } = await supabase
+        .from("project_members")
+        .select("project_id")
+        .eq("user_id", userId);
+      (pm ?? []).forEach((r) => projSet.add(r.project_id));
+      const { data: tm } = await supabase
+        .from("team_members")
+        .select("team_id")
+        .eq("user_id", userId);
+      const teamIds = (tm ?? []).map((t) => t.team_id);
+      if (teamIds.length > 0) {
+        const { data: tp } = await supabase
+          .from("team_projects")
+          .select("project_id")
+          .in("team_id", teamIds);
+        (tp ?? []).forEach((r) => projSet.add(r.project_id));
+      }
+      projectIds = Array.from(projSet);
+      if (projectIds.length === 0) { setItems([]); setLoading(false); return; }
+    }
+
+    let q = supabase
       .from("project_activities")
       .select("id, project_id, title, description, deadline, status, projects(title)")
       .order("deadline");
+    if (projectIds) q = q.in("project_id", projectIds);
+    const { data: acts } = await q;
     const ids = (acts ?? []).map((a) => a.id);
     let assigneesByActivity = new Map<string, string[]>();
     if (ids.length > 0) {
@@ -1109,7 +1139,7 @@ function ActivitiesCard({ userId }: { userId: string | null }) {
           description: a.description,
           deadline: a.deadline,
           status: a.status,
-          is_assigned: assignees.length === 0 || assignees.includes(userId),
+          is_assigned: isStaff || assignees.length === 0 || assignees.includes(userId),
           assignee_count: assignees.length,
         };
       }),
@@ -1127,6 +1157,7 @@ function ActivitiesCard({ userId }: { userId: string | null }) {
   };
 
   const visible = items.filter((i) => i.is_assigned);
+
 
   return (
     <Card className="mt-6 border-border/70 p-6">
