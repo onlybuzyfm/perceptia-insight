@@ -16,6 +16,7 @@ import {
   getOrCreateMyTelegramLinkCode,
   unlinkMyTelegram,
   sendMyTelegramTest,
+  broadcastTelegramToGroups,
 } from "@/lib/telegram.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/settings")({
