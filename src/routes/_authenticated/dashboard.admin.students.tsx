@@ -180,7 +180,7 @@ function StudentsAdmin() {
                 <th className="px-4 py-3">Carrera</th>
                 <th className="px-4 py-3">Sem.</th>
                 <th className="px-4 py-3">Par.</th>
-                <th className="px-4 py-3">Código</th>
+                
                 <th className="px-4 py-3">Línea</th>
                 <th className="px-4 py-3">Proyectos</th>
                 <th className="px-4 py-3">Estado</th>
