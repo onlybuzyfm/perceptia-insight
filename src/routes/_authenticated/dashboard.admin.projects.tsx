@@ -17,6 +17,7 @@ import { AdminShell } from "@/components/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Search, Pencil, Trash2, Plus, Eye, EyeOff } from "lucide-react";
+import { IconPicker } from "@/components/IconPicker";
 
 export const Route = createFileRoute("/_authenticated/dashboard/admin/projects")({
   component: () => <AdminShell><ProjectsAdmin /></AdminShell>,
