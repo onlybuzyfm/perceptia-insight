@@ -19,6 +19,7 @@ export function DashboardShell({ children, title }: { children: ReactNode; title
   const auth = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<{ username: string; full_name: string; avatar_url: string | null } | null>(null);
+  const [hasNotifications, setHasNotifications] = useState(false);
 
   useEffect(() => {
     if (!auth.user) return;
@@ -30,6 +31,28 @@ export function DashboardShell({ children, title }: { children: ReactNode; title
       .then(({ data }) => {
         if (data) setProfile({ username: data.username ?? "", full_name: data.full_name ?? "", avatar_url: data.avatar_url ?? null });
       });
+  }, [auth.user]);
+
+  useEffect(() => {
+    if (!auth.user) return;
+    const tenDaysAgo = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString();
+    const check = async () => {
+      const [{ count: annCount }, { count: meetCount }] = await Promise.all([
+        supabase
+          .from("announcements")
+          .select("id", { count: "exact", head: true })
+          .eq("archived", false)
+          .gte("created_at", tenDaysAgo),
+        supabase
+          .from("meetings")
+          .select("id", { count: "exact", head: true })
+          .gte("scheduled_at", new Date().toISOString()),
+      ]);
+      setHasNotifications((annCount ?? 0) + (meetCount ?? 0) > 0);
+    };
+    check();
+    const interval = setInterval(check, 60000);
+    return () => clearInterval(interval);
   }, [auth.user]);
 
   const handleSignOut = async () => {
