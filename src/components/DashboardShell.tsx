@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { type ReactNode, useEffect, useState } from "react";
-import { LayoutDashboard, FileText, BookOpen, LogOut, Users, Settings, GraduationCap, User as UserIcon, ChevronDown, Briefcase } from "lucide-react";
+import { LayoutDashboard, FileText, BookOpen, LogOut, Users, Settings, GraduationCap, User as UserIcon, ChevronDown, Briefcase, Bell } from "lucide-react";
 import logo from "@/assets/perceptia-logo.svg";
 import { useAuth } from "@/lib/auth-context";
 
@@ -19,6 +19,7 @@ export function DashboardShell({ children, title }: { children: ReactNode; title
   const auth = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<{ username: string; full_name: string; avatar_url: string | null } | null>(null);
+  const [hasNotifications, setHasNotifications] = useState(false);
 
   useEffect(() => {
     if (!auth.user) return;
@@ -30,6 +31,28 @@ export function DashboardShell({ children, title }: { children: ReactNode; title
       .then(({ data }) => {
         if (data) setProfile({ username: data.username ?? "", full_name: data.full_name ?? "", avatar_url: data.avatar_url ?? null });
       });
+  }, [auth.user]);
+
+  useEffect(() => {
+    if (!auth.user) return;
+    const tenDaysAgo = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString();
+    const check = async () => {
+      const [{ count: annCount }, { count: meetCount }] = await Promise.all([
+        supabase
+          .from("announcements")
+          .select("id", { count: "exact", head: true })
+          .eq("archived", false)
+          .gte("created_at", tenDaysAgo),
+        supabase
+          .from("meetings")
+          .select("id", { count: "exact", head: true })
+          .gte("meeting_date", new Date().toISOString()),
+      ]);
+      setHasNotifications((annCount ?? 0) + (meetCount ?? 0) > 0);
+    };
+    check();
+    const interval = setInterval(check, 60000);
+    return () => clearInterval(interval);
   }, [auth.user]);
 
   const handleSignOut = async () => {
@@ -61,7 +84,21 @@ export function DashboardShell({ children, title }: { children: ReactNode; title
               </span>
             </span>
           </Link>
-          <DropdownMenu>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/dashboard"
+              aria-label="Notificaciones"
+              className="relative flex h-9 w-9 items-center justify-center rounded-full border border-border/60 bg-background text-primary transition-colors hover:bg-primary-soft"
+            >
+              <Bell className="h-4 w-4" />
+              {hasNotifications && (
+                <span className="absolute right-1.5 top-1.5 flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+                </span>
+              )}
+            </Link>
+            <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="flex items-center gap-2 rounded-full border border-border/60 bg-background px-1.5 py-1 pr-2.5 text-sm transition-colors hover:bg-secondary">
                 <Avatar className="h-7 w-7">
@@ -93,6 +130,7 @@ export function DashboardShell({ children, title }: { children: ReactNode; title
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          </div>
         </div>
       </header>
 
