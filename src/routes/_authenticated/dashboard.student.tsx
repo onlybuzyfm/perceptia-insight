@@ -313,7 +313,7 @@ function StudentDashboard() {
                 <Field label="Username" value={profile.username ? "@" + profile.username : null} />
                 <Field label="Correo" value={auth.user?.email ?? "—"} />
                 <Field label="Carrera" value={profile.carrera} />
-                <Field label="Semestre" value={profile.semestre} />
+                {!auth.hasRole("docente_asociado") && <Field label="Semestre" value={profile.semestre} />}
                 <Field label="Línea de interés" value={lines.find((l) => l.id === profile.interest_line_id)?.title ?? null} />
 
                 <Field label="Teléfono" value={profile.phone} />
@@ -337,7 +337,7 @@ function StudentDashboard() {
                   <Label className="text-muted-foreground">Carrera</Label>
                   <Input value="Ciencia de Datos e Inteligencia Artificial" disabled className="mt-1.5" />
                 </div>
-                <FieldInput label="Semestre" value={draft.semestre ?? ""} onChange={(v) => set("semestre", v.replace(/[^0-9]/g, ""))} maxLength={2} placeholder="Ej: 5" />
+                {!auth.hasRole("docente_asociado") && <FieldInput label="Semestre" value={draft.semestre ?? ""} onChange={(v) => set("semestre", v.replace(/[^0-9]/g, ""))} maxLength={2} placeholder="Ej: 5" />}
                 <div>
                   <Label className="text-muted-foreground">Línea de interés</Label>
                   <select
