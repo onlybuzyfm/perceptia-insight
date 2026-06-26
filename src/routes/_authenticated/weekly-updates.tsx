@@ -6,11 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DashboardShell } from "@/components/DashboardShell";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Star } from "lucide-react";
+import { Star, Lock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/_authenticated/weekly-updates")({
@@ -34,7 +35,13 @@ interface Update {
   blockers: string | null;
   hours_spent: number | null;
   repo_url: string | null;
+  project_id: string | null;
   created_at: string;
+}
+
+interface ProjectOption {
+  id: string;
+  title: string;
 }
 
 const schema = z.object({
@@ -44,17 +51,51 @@ const schema = z.object({
   blockers: z.string().max(2000).optional(),
   hours_spent: z.number().min(0).max(168),
   repo_url: z.string().url("Debe ser un enlace válido").max(500).optional().or(z.literal("")),
+  project_id: z.string().uuid("Debes seleccionar un proyecto válido"),
 });
 
 function WeeklyUpdatesPage() {
   const auth = useAuth();
   const [updates, setUpdates] = useState<Update[]>([]);
   const [evals, setEvals] = useState<Evaluation[]>([]);
+  const [projects, setProjects] = useState<ProjectOption[]>([]);
+  const [selectedProject, setSelectedProject] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
   const load = async () => {
     if (!auth.user) return;
+    setLoading(true);
+
+    // Cargar proyectos del usuario (directos + por equipo)
+    const projMap = new Map<string, string>();
+    const { data: direct } = await supabase
+      .from("project_members")
+      .select("projects(id, title)")
+      .eq("user_id", auth.user.id);
+    (direct ?? []).forEach((r) => {
+      const p = r.projects as { id: string; title: string } | null;
+      if (p) projMap.set(p.id, p.title);
+    });
+    const { data: tm } = await supabase
+      .from("team_members")
+      .select("team_id")
+      .eq("user_id", auth.user.id);
+    const teamIds = (tm ?? []).map((t) => t.team_id);
+    if (teamIds.length > 0) {
+      const { data: tp } = await supabase
+        .from("team_projects")
+        .select("projects(id, title)")
+        .in("team_id", teamIds);
+      (tp ?? []).forEach((r) => {
+        const p = r.projects as { id: string; title: string } | null;
+        if (p) projMap.set(p.id, p.title);
+      });
+    }
+    const projList = Array.from(projMap, ([id, title]) => ({ id, title }));
+    setProjects(projList);
+    if (projList.length === 1) setSelectedProject(projList[0].id);
+
     const { data } = await supabase
       .from("weekly_updates")
       .select("*")
@@ -81,10 +122,21 @@ function WeeklyUpdatesPage() {
     load();
   }, [auth.user]);
 
+  const hasProjects = projects.length > 0;
+
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!auth.user) return;
+    if (!hasProjects) {
+      toast.error("Debes tener un proyecto asignado para registrar avances semanales.");
+      return;
+    }
     const fd = new FormData(e.currentTarget);
+    const projectId = projects.length === 1 ? projects[0].id : selectedProject;
+    if (!projectId) {
+      toast.error("Selecciona el proyecto al que pertenece este avance.");
+      return;
+    }
     const parsed = schema.safeParse({
       week_start: fd.get("week_start"),
       summary: fd.get("summary"),
@@ -92,15 +144,17 @@ function WeeklyUpdatesPage() {
       blockers: fd.get("blockers") || undefined,
       hours_spent: Number(fd.get("hours_spent") || 0),
       repo_url: fd.get("repo_url") || "",
+      project_id: projectId,
     });
     if (!parsed.success) {
-      toast.error("Revisa los campos del formulario.");
+      toast.error(parsed.error.issues[0]?.message || "Revisa los campos del formulario.");
       return;
     }
     setSubmitting(true);
-    const { repo_url, ...rest } = parsed.data;
+    const { repo_url, project_id, ...rest } = parsed.data;
     const { error } = await supabase.from("weekly_updates").insert({
       user_id: auth.user.id,
+      project_id,
       ...rest,
       repo_url: repo_url ? repo_url : null,
     });
@@ -111,6 +165,7 @@ function WeeklyUpdatesPage() {
     }
     toast.success("Avance registrado");
     e.currentTarget.reset();
+    if (projects.length > 1) setSelectedProject("");
     load();
   };
 
@@ -119,35 +174,69 @@ function WeeklyUpdatesPage() {
       <div className="grid gap-6 lg:grid-cols-[1fr_1.2fr]">
         <Card className="border-border/70 p-6">
           <h2 className="font-display text-lg font-semibold text-foreground">Registrar avance</h2>
-          <form onSubmit={onSubmit} className="mt-4 space-y-3">
-            <div>
-              <Label htmlFor="week_start">Semana del</Label>
-              <Input id="week_start" name="week_start" type="date" required className="mt-1.5" />
+          {!loading && !hasProjects ? (
+            <div className="mt-4 flex flex-col items-center gap-3 rounded-lg border border-dashed border-border/70 bg-muted/30 p-6 text-center">
+              <Lock className="h-8 w-8 text-muted-foreground" />
+              <p className="text-sm font-medium text-foreground">Apartado bloqueado</p>
+              <p className="text-xs text-muted-foreground">
+                Debes tener un proyecto asignado para registrar avances semanales.
+              </p>
             </div>
-            <div>
-              <Label htmlFor="summary">Resumen</Label>
-              <Textarea id="summary" name="summary" rows={3} required className="mt-1.5" />
-            </div>
-            <div>
-              <Label htmlFor="achievements">Logros</Label>
-              <Textarea id="achievements" name="achievements" rows={2} className="mt-1.5" />
-            </div>
-            <div>
-              <Label htmlFor="blockers">Bloqueos</Label>
-              <Textarea id="blockers" name="blockers" rows={2} className="mt-1.5" />
-            </div>
-            <div>
-              <Label htmlFor="hours_spent">Horas dedicadas</Label>
-              <Input id="hours_spent" name="hours_spent" type="number" min={0} max={168} step="0.5" defaultValue={0} className="mt-1.5" />
-            </div>
-            <div>
-              <Label htmlFor="repo_url">Repositorio de GitHub</Label>
-              <Input id="repo_url" name="repo_url" type="url" placeholder="https://github.com/usuario/repo" maxLength={500} className="mt-1.5" />
-            </div>
-            <Button type="submit" disabled={submitting} className="w-full bg-primary hover:bg-primary/90">
-              {submitting ? "Guardando..." : "Guardar avance"}
-            </Button>
-          </form>
+          ) : (
+            <form onSubmit={onSubmit} className="mt-4 space-y-3">
+              {projects.length > 1 && (
+                <div>
+                  <Label htmlFor="project_id">Proyecto *</Label>
+                  <Select value={selectedProject} onValueChange={setSelectedProject}>
+                    <SelectTrigger id="project_id" className="mt-1.5">
+                      <SelectValue placeholder="Selecciona un proyecto" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {projects.map((p) => (
+                        <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              {projects.length === 1 && (
+                <div className="rounded-md border border-border/60 bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
+                  Proyecto: <span className="font-medium text-foreground">{projects[0].title}</span>
+                </div>
+              )}
+              <div>
+                <Label htmlFor="week_start">Semana del</Label>
+                <Input id="week_start" name="week_start" type="date" required className="mt-1.5" />
+              </div>
+              <div>
+                <Label htmlFor="summary">Resumen</Label>
+                <Textarea id="summary" name="summary" rows={3} required className="mt-1.5" />
+              </div>
+              <div>
+                <Label htmlFor="achievements">Logros</Label>
+                <Textarea id="achievements" name="achievements" rows={2} className="mt-1.5" />
+              </div>
+              <div>
+                <Label htmlFor="blockers">Bloqueos</Label>
+                <Textarea id="blockers" name="blockers" rows={2} className="mt-1.5" />
+              </div>
+              <div>
+                <Label htmlFor="hours_spent">Horas dedicadas</Label>
+                <Input id="hours_spent" name="hours_spent" type="number" min={0} max={168} step="0.5" defaultValue={0} className="mt-1.5" />
+              </div>
+              <div>
+                <Label htmlFor="repo_url">Repositorio de GitHub</Label>
+                <Input id="repo_url" name="repo_url" type="url" placeholder="https://github.com/usuario/repo" maxLength={500} className="mt-1.5" />
+              </div>
+              <Button
+                type="submit"
+                disabled={submitting || (projects.length > 1 && !selectedProject)}
+                className="w-full bg-primary hover:bg-primary/90"
+              >
+                {submitting ? "Guardando..." : "Guardar avance"}
+              </Button>
+            </form>
+          )}
         </Card>
 
         <Card className="border-border/70 p-6">
