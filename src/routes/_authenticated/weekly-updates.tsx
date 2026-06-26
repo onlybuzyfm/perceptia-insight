@@ -195,12 +195,16 @@ function WeeklyUpdatesPage() {
               <Lock className="h-8 w-8 text-muted-foreground" />
               <p className="text-sm font-medium text-foreground">Apartado bloqueado</p>
               <p className="text-xs text-muted-foreground">
-                Debes tener un proyecto asignado para registrar avances semanales.
+                {isStaff
+                  ? "No existen proyectos en la plataforma. Crea uno para registrar avances."
+                  : auth.hasRole("docente_asociado")
+                  ? "Para registrar un avance semanal debes estar asignado a un proyecto existente o crear un proyecto propio desde la pestaña Proyectos."
+                  : "Debes tener un proyecto asignado para registrar avances semanales."}
               </p>
             </div>
           ) : (
             <form onSubmit={onSubmit} className="mt-4 space-y-3">
-              {projects.length > 1 && (
+              {showSelector && (
                 <div>
                   <Label htmlFor="project_id">Proyecto *</Label>
                   <Select value={selectedProject} onValueChange={setSelectedProject}>
@@ -215,7 +219,7 @@ function WeeklyUpdatesPage() {
                   </Select>
                 </div>
               )}
-              {projects.length === 1 && (
+              {autoProjectId && (
                 <div className="rounded-md border border-border/60 bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
                   Proyecto: <span className="font-medium text-foreground">{projects[0].title}</span>
                 </div>
@@ -246,13 +250,14 @@ function WeeklyUpdatesPage() {
               </div>
               <Button
                 type="submit"
-                disabled={submitting || (projects.length > 1 && !selectedProject)}
+                disabled={submitting || (showSelector && !selectedProject)}
                 className="w-full bg-primary hover:bg-primary/90"
               >
                 {submitting ? "Guardando..." : "Guardar avance"}
               </Button>
             </form>
           )}
+
         </Card>
 
         <Card className="border-border/70 p-6">
