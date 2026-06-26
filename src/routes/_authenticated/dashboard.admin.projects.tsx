@@ -221,6 +221,7 @@ function ProjectsAdmin() {
       {(editing || creating) && (
         <ProjectDialog
           project={editing}
+          lines={lines}
           onClose={() => { setEditing(null); setCreating(false); }}
           onSaved={() => { setEditing(null); setCreating(false); load(); }}
         />
