@@ -296,14 +296,19 @@ function EditDialog({ student, lines, onClose, onSaved }: { student: Student | n
               <Input value={form.carrera ?? ""} onChange={(e) => setForm({ ...form, carrera: e.target.value })} />
             </Field>
             <Field label="Semestre">
-              <Input value={form.semestre ?? ""} onChange={(e) => setForm({ ...form, semestre: e.target.value })} />
+              <Input
+                type="number"
+                min={1}
+                max={12}
+                inputMode="numeric"
+                value={form.semestre ?? ""}
+                onChange={(e) => setForm({ ...form, semestre: e.target.value.replace(/[^0-9]/g, "") })}
+              />
             </Field>
             <Field label="Paralelo">
               <Input value={form.paralelo ?? ""} onChange={(e) => setForm({ ...form, paralelo: e.target.value })} />
             </Field>
-            <Field label="Código estudiantil">
-              <Input value={form.codigo_estudiantil ?? ""} onChange={(e) => setForm({ ...form, codigo_estudiantil: e.target.value })} />
-            </Field>
+
           </div>
           <Field label="Línea de interés">
             <Select value={form.interest_line_id ?? "none"} onValueChange={(v) => setForm({ ...form, interest_line_id: v === "none" ? null : v })}>
