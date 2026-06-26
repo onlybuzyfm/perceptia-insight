@@ -197,7 +197,7 @@ function StudentsAdmin() {
                   <td className="px-4 py-2.5 text-muted-foreground">{s.carrera ?? "—"}</td>
                   <td className="px-4 py-2.5 text-muted-foreground">{s.semestre ?? "—"}</td>
                   <td className="px-4 py-2.5 text-muted-foreground">{s.paralelo ?? "—"}</td>
-                  <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground">{s.codigo_estudiantil ?? "—"}</td>
+                  
                   <td className="px-4 py-2.5 text-muted-foreground">
                     {lines.find((l) => l.id === s.interest_line_id)?.title ?? "—"}
                   </td>
