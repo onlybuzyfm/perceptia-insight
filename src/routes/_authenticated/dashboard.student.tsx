@@ -860,9 +860,12 @@ function AnnouncementsCard() {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     (async () => {
+      const tenDaysAgo = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString();
       const { data } = await supabase
         .from("announcements")
         .select("id, title, content, created_at")
+        .eq("archived", false)
+        .gte("created_at", tenDaysAgo)
         .order("created_at", { ascending: false })
         .limit(10);
       setItems((data ?? []) as AnnouncementRow[]);
