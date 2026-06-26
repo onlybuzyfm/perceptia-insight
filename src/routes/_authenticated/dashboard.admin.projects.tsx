@@ -45,11 +45,6 @@ const STATUS_STYLES: Record<ProjectStatus, string> = {
   archivado: "bg-zinc-100 text-zinc-600 border-zinc-200",
 };
 
-const ICON_OPTIONS = [
-  "apple", "tags", "graduation-cap", "bot", "satellite", "landmark",
-  "cpu", "globe", "scan-search", "shield-alert", "cloud-rain", "brain-circuit",
-  "database", "network", "flask-conical", "chart-line", "code", "zap",
-];
 
 interface Project {
   id: string;
