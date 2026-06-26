@@ -68,7 +68,10 @@ function WeeklyUpdatesPage() {
   const [updates, setUpdates] = useState<Update[]>([]);
   const [evals, setEvals] = useState<Evaluation[]>([]);
   const [projects, setProjects] = useState<ProjectOption[]>([]);
+  const [activities, setActivities] = useState<ActivityOption[]>([]);
   const [selectedProject, setSelectedProject] = useState<string>("");
+  const [selectedActivity, setSelectedActivity] = useState<string>("");
+  const [loadingActivities, setLoadingActivities] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
