@@ -113,8 +113,7 @@ function WeeklyUpdatesPage() {
     }
     const projList = Array.from(projMap, ([id, title]) => ({ id, title }));
     setProjects(projList);
-    if (projList.length === 1 && !isStaff) setSelectedProject(projList[0].id);
-    if (projList.length !== 1 || isStaff) setSelectedProject("");
+    setSelectedProject(projList.length === 1 && !isStaff ? projList[0].id : "");
     setSelectedActivity("");
 
 
