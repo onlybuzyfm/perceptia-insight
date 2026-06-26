@@ -259,31 +259,58 @@ function ActivityDialog({
       if (assErr) { setSaving(false); return toast.error("Guardado pero falló asignación: " + assErr.message); }
     }
 
-    // Notificación Telegram a los asignados + grupos (solo cuando hay asignados)
-    if (activityId && assignees.length > 0 && isNew) {
+    // Notificación Telegram al grupo + DM a asignados vinculados
+    if (activityId && isNew) {
       try {
+        const projectTitle = projects.find((p) => p.id === projectId)?.title ?? "Proyecto";
+        const portalUrl = `${window.location.origin}/dashboard`;
         const { sendTelegramNotification, broadcastTelegramToGroups } = await import("@/lib/telegram.functions");
         const dlLabel = new Date(deadline).toLocaleString("es-CO", { dateStyle: "full", timeStyle: "short" });
-        await Promise.allSettled([
+        const shortDesc = description.trim() ? `\n\n${description.trim().slice(0, 400)}` : "";
+        const groupBody = `📂 Proyecto: ${projectTitle}\n🗓 Fecha límite: ${dlLabel}${shortDesc}\n👥 Asignados: ${assignees.length} estudiante(s).`;
+        const dmBody = `Proyecto: ${projectTitle}\nFecha límite: ${dlLabel}${shortDesc}`;
+
+        const results = await Promise.allSettled([
+          broadcastTelegramToGroups({
+            data: {
+              kind: "activity_created",
+              title: `📝 Nueva actividad: ${title.trim()}`,
+              body: groupBody,
+              url: portalUrl,
+            },
+          }),
           ...assignees.map((uid) =>
             sendTelegramNotification({
               data: {
                 targetUserId: uid,
                 kind: "activity_assigned",
                 title: `📝 Nueva actividad: ${title.trim()}`,
-                body: `Fecha límite: ${dlLabel}${description ? `\n\n${description}` : ""}`,
+                body: dmBody,
+                url: portalUrl,
               },
             }),
           ),
-          broadcastTelegramToGroups({
-            data: {
-              kind: "activity_created",
-              title: `📝 Nueva actividad: ${title.trim()}`,
-              body: `Fecha límite: ${dlLabel}${description ? `\n\n${description}` : ""}\n\nAsignados: ${assignees.length} estudiante(s).`,
-            },
-          }),
         ]);
-      } catch { /* ignore */ }
+
+        const groupRes = results[0];
+        if (groupRes.status === "fulfilled") {
+          const r = groupRes.value as { sent: number; failed: number };
+          if (r.sent === 0 && r.failed === 0) {
+            toast.warning("No hay grupos de Telegram registrados. Envía /registrar_grupo en el grupo.");
+          } else if (r.failed > 0) {
+            toast.warning(`Telegram: ${r.sent} grupo(s) notificados, ${r.failed} fallaron.`);
+          } else {
+            toast.success(`Telegram: notificado a ${r.sent} grupo(s).`);
+          }
+        } else {
+          toast.error("Telegram (grupo): " + (groupRes.reason instanceof Error ? groupRes.reason.message : "fallo"));
+        }
+        if (assignees.length === 0) {
+          toast.info("No asignaste estudiantes: no se envió mensaje directo.");
+        }
+      } catch (e) {
+        toast.error("Telegram: " + (e instanceof Error ? e.message : "error"));
+      }
     }
 
     setSaving(false);
