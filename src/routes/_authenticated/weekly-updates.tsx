@@ -186,6 +186,10 @@ function WeeklyUpdatesPage() {
       toast.error("Selecciona el proyecto al que pertenece este avance.");
       return;
     }
+    if (!selectedActivity) {
+      toast.error("Selecciona la actividad sobre la que estás reportando.");
+      return;
+    }
     const parsed = schema.safeParse({
       week_start: fd.get("week_start"),
       summary: fd.get("summary"),
@@ -194,6 +198,7 @@ function WeeklyUpdatesPage() {
       hours_spent: Number(fd.get("hours_spent") || 0),
       repo_url: fd.get("repo_url") || "",
       project_id: projectId,
+      activity_id: selectedActivity,
     });
 
     if (!parsed.success) {
@@ -201,10 +206,11 @@ function WeeklyUpdatesPage() {
       return;
     }
     setSubmitting(true);
-    const { repo_url, project_id, ...rest } = parsed.data;
+    const { repo_url, project_id, activity_id, ...rest } = parsed.data;
     const { error } = await supabase.from("weekly_updates").insert({
       user_id: auth.user.id,
       project_id,
+      activity_id,
       ...rest,
       repo_url: repo_url ? repo_url : null,
     });
@@ -216,6 +222,7 @@ function WeeklyUpdatesPage() {
     toast.success("Avance registrado");
     e.currentTarget.reset();
     if (showSelector) setSelectedProject("");
+    setSelectedActivity("");
     load();
   };
 
