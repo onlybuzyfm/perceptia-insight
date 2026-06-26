@@ -130,6 +130,29 @@ function SettingsPage() {
     else toast.error("No se pudo enviar (" + (res.reason ?? "error") + ")");
   };
 
+  const handleGroupTest = async () => {
+    try {
+      const res = await fnGroupTest({
+        data: {
+          kind: "test_group",
+          title: "Prueba de notificación",
+          body: "Este es un mensaje de prueba desde el portal PerceptIA. Si lo ves, las notificaciones de grupo están funcionando correctamente. ✅",
+        },
+      });
+      const r = res as { sent: number; failed: number };
+      if (r.sent === 0 && r.failed === 0) {
+        toast.warning("No hay grupos registrados. Agrega el bot a un grupo y envía /registrar_grupo.");
+      } else if (r.failed > 0) {
+        toast.warning(`Enviado a ${r.sent} grupo(s), ${r.failed} fallaron.`);
+      } else {
+        toast.success(`Mensaje enviado a ${r.sent} grupo(s).`);
+      }
+    } catch (e) {
+      toast.error("Error: " + (e instanceof Error ? e.message : "fallo"));
+    }
+  };
+
+
   const toggleTgNotify = async (val: boolean) => {
     if (!auth.user) return;
     setTgSavingNotify(true);
