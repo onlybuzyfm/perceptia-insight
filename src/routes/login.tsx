@@ -132,7 +132,8 @@ function LoginPage() {
     const { error } = await auth.signIn(email, password);
     setLoading(false);
     if (error) return setGlobalError(error);
-    navigate({ to: "/dashboard" });
+    if (next) window.location.href = next;
+    else navigate({ to: "/dashboard" });
   };
 
   const title =
