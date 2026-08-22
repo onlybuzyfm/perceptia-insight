@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as ProyectosRouteImport } from './routes/proyectos'
 import { Route as PostularRouteImport } from './routes/postular'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LineasRouteImport } from './routes/lineas'
 import { Route as IntegrantesRouteImport } from './routes/integrantes'
@@ -22,6 +23,8 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedWeeklyUpdatesRouteImport } from './routes/_authenticated/weekly-updates'
 import { Route as AuthenticatedResourcesRouteImport } from './routes/_authenticated/resources'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as ApiPublicSeedTestStudentRouteImport } from './routes/api/public/seed-test-student'
 import { Route as AuthenticatedDashboardTeacherRouteImport } from './routes/_authenticated/dashboard.teacher'
@@ -29,6 +32,7 @@ import { Route as AuthenticatedDashboardStudentRouteImport } from './routes/_aut
 import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
 import { Route as AuthenticatedDashboardCoordinatorRouteImport } from './routes/_authenticated/dashboard.coordinator'
 import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated/dashboard.admin'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as AuthenticatedDashboardAdminIndexRouteImport } from './routes/_authenticated/dashboard.admin.index'
 import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
 import { Route as AuthenticatedDashboardAdminUsersRouteImport } from './routes/_authenticated/dashboard.admin.users'
@@ -59,6 +63,11 @@ const ProyectosRoute = ProyectosRouteImport.update({
 const PostularRoute = PostularRouteImport.update({
   id: '/postular',
   path: '/postular',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -111,6 +120,18 @@ const AuthenticatedResourcesRoute = AuthenticatedResourcesRouteImport.update({
   path: '/resources',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedDashboardIndexRoute =
   AuthenticatedDashboardIndexRouteImport.update({
     id: '/dashboard/',
@@ -152,6 +173,12 @@ const AuthenticatedDashboardAdminRoute =
     id: '/dashboard/admin',
     path: '/dashboard/admin',
     getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const Char91DotmcpChar93InvokeToolToolRoute =
+  Char91DotmcpChar93InvokeToolToolRouteImport.update({
+    id: '/.mcp/invoke-tool/$tool',
+    path: '/.mcp/invoke-tool/$tool',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const AuthenticatedDashboardAdminIndexRoute =
   AuthenticatedDashboardAdminIndexRouteImport.update({
@@ -258,11 +285,15 @@ export interface FileRoutesByFullPath {
   '/integrantes': typeof IntegrantesRoute
   '/lineas': typeof LineasRoute
   '/login': typeof LoginRoute
+  '/mcp': typeof McpRoute
   '/postular': typeof PostularRoute
   '/proyectos': typeof ProyectosRoute
   '/sobre': typeof SobreRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/resources': typeof AuthenticatedResourcesRoute
   '/weekly-updates': typeof AuthenticatedWeeklyUpdatesRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/coordinator': typeof AuthenticatedDashboardCoordinatorRoute
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
@@ -295,11 +326,15 @@ export interface FileRoutesByTo {
   '/integrantes': typeof IntegrantesRoute
   '/lineas': typeof LineasRoute
   '/login': typeof LoginRoute
+  '/mcp': typeof McpRoute
   '/postular': typeof PostularRoute
   '/proyectos': typeof ProyectosRoute
   '/sobre': typeof SobreRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/resources': typeof AuthenticatedResourcesRoute
   '/weekly-updates': typeof AuthenticatedWeeklyUpdatesRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/dashboard/coordinator': typeof AuthenticatedDashboardCoordinatorRoute
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/dashboard/student': typeof AuthenticatedDashboardStudentRoute
@@ -333,11 +368,15 @@ export interface FileRoutesById {
   '/integrantes': typeof IntegrantesRoute
   '/lineas': typeof LineasRoute
   '/login': typeof LoginRoute
+  '/mcp': typeof McpRoute
   '/postular': typeof PostularRoute
   '/proyectos': typeof ProyectosRoute
   '/sobre': typeof SobreRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/resources': typeof AuthenticatedResourcesRoute
   '/_authenticated/weekly-updates': typeof AuthenticatedWeeklyUpdatesRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/_authenticated/dashboard/coordinator': typeof AuthenticatedDashboardCoordinatorRoute
   '/_authenticated/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
@@ -372,11 +411,15 @@ export interface FileRouteTypes {
     | '/integrantes'
     | '/lineas'
     | '/login'
+    | '/mcp'
     | '/postular'
     | '/proyectos'
     | '/sobre'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/resources'
     | '/weekly-updates'
+    | '/.mcp/invoke-tool/$tool'
     | '/dashboard/admin'
     | '/dashboard/coordinator'
     | '/dashboard/settings'
@@ -409,11 +452,15 @@ export interface FileRouteTypes {
     | '/integrantes'
     | '/lineas'
     | '/login'
+    | '/mcp'
     | '/postular'
     | '/proyectos'
     | '/sobre'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/resources'
     | '/weekly-updates'
+    | '/.mcp/invoke-tool/$tool'
     | '/dashboard/coordinator'
     | '/dashboard/settings'
     | '/dashboard/student'
@@ -446,11 +493,15 @@ export interface FileRouteTypes {
     | '/integrantes'
     | '/lineas'
     | '/login'
+    | '/mcp'
     | '/postular'
     | '/proyectos'
     | '/sobre'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/_authenticated/resources'
     | '/_authenticated/weekly-updates'
+    | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/dashboard/admin'
     | '/_authenticated/dashboard/coordinator'
     | '/_authenticated/dashboard/settings'
@@ -485,9 +536,13 @@ export interface RootRouteChildren {
   IntegrantesRoute: typeof IntegrantesRoute
   LineasRoute: typeof LineasRoute
   LoginRoute: typeof LoginRoute
+  McpRoute: typeof McpRoute
   PostularRoute: typeof PostularRoute
   ProyectosRoute: typeof ProyectosRoute
   SobreRoute: typeof SobreRoute
+  Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicSeedTestStudentRoute: typeof ApiPublicSeedTestStudentRoute
   ApiPublicTelegramWebhookRoute: typeof ApiPublicTelegramWebhookRoute
 }
@@ -513,6 +568,13 @@ declare module '@tanstack/react-router' {
       path: '/postular'
       fullPath: '/postular'
       preLoaderRoute: typeof PostularRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -585,6 +647,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedResourcesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/list-tools': {
+      id: '/.mcp/list-tools'
+      path: '/.mcp/list-tools'
+      fullPath: '/.mcp/list-tools'
+      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/dashboard/': {
       id: '/_authenticated/dashboard/'
       path: '/dashboard'
@@ -633,6 +709,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/admin'
       preLoaderRoute: typeof AuthenticatedDashboardAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard/admin/': {
       id: '/_authenticated/dashboard/admin/'
@@ -842,9 +925,14 @@ const rootRouteChildren: RootRouteChildren = {
   IntegrantesRoute: IntegrantesRoute,
   LineasRoute: LineasRoute,
   LoginRoute: LoginRoute,
+  McpRoute: McpRoute,
   PostularRoute: PostularRoute,
   ProyectosRoute: ProyectosRoute,
   SobreRoute: SobreRoute,
+  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicSeedTestStudentRoute: ApiPublicSeedTestStudentRoute,
   ApiPublicTelegramWebhookRoute: ApiPublicTelegramWebhookRoute,
 }
