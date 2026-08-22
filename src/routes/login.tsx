@@ -59,6 +59,7 @@ function LoginPage() {
   const [signupAvatarUploaded, setSignupAvatarUploaded] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const { next } = Route.useSearch();
 
   const onAvatarChange = (file: File | null) => {
     if (avatarPreview) URL.revokeObjectURL(avatarPreview);
