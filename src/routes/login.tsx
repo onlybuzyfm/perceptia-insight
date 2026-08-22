@@ -12,6 +12,10 @@ import { ArrowLeft, Camera, Loader2, User as UserIcon, X as XIcon } from "lucide
 
 
 export const Route = createFileRoute("/login")({
+  validateSearch: (s: Record<string, unknown>): { next?: string } =>
+    typeof s.next === "string" && s.next.startsWith("/") && !s.next.startsWith("//")
+      ? { next: s.next }
+      : {},
   head: () => ({
     meta: [
       { title: "Ingresar — PerceptIA" },
@@ -55,6 +59,7 @@ function LoginPage() {
   const [signupAvatarUploaded, setSignupAvatarUploaded] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const { next } = Route.useSearch();
 
   const onAvatarChange = (file: File | null) => {
     if (avatarPreview) URL.revokeObjectURL(avatarPreview);
@@ -74,7 +79,8 @@ function LoginPage() {
 
   useEffect(() => {
     if (auth.isAuthenticated) {
-      navigate({ to: "/dashboard" });
+      if (next) window.location.href = next;
+      else navigate({ to: "/dashboard" });
     }
   }, [auth.isAuthenticated, navigate]);
 
@@ -126,7 +132,8 @@ function LoginPage() {
     const { error } = await auth.signIn(email, password);
     setLoading(false);
     if (error) return setGlobalError(error);
-    navigate({ to: "/dashboard" });
+    if (next) window.location.href = next;
+    else navigate({ to: "/dashboard" });
   };
 
   const title =

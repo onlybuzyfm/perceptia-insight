@@ -1,0 +1,205 @@
+{
+  "version": 1,
+  "sdk_version": "0.26.3",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://sjdzwpnnzfajwkbgafxj.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "perceptia-mcp",
+      "version": "0.1.0",
+      "title": "PerceptIA"
+    },
+    "tools": [
+      {
+        "name": "whoami",
+        "title": "Mi perfil",
+        "description": "Devuelve el perfil y los roles del usuario conectado en el portal PerceptIA.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_my_projects",
+        "title": "Mis proyectos",
+        "description": "Lista los proyectos del semillero PerceptIA visibles para el usuario conectado.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_my_activities",
+        "title": "Mis actividades",
+        "description": "Lista las actividades de los proyectos del usuario conectado, con su fecha límite y estado. Permite filtrar por estado.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "status": {
+              "description": "Filtro de estado. Por defecto: todas.",
+              "type": "string",
+              "enum": [
+                "pendiente",
+                "en_progreso",
+                "completada",
+                "todas"
+              ]
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_my_weekly_updates",
+        "title": "Mis avances semanales",
+        "description": "Lista los avances semanales registrados por el usuario conectado, del más reciente al más antiguo.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "limit": {
+              "description": "Cantidad máxima de avances a devolver (por defecto 20).",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "create_weekly_update",
+        "title": "Registrar avance semanal",
+        "description": "Registra un avance semanal del usuario conectado para un proyecto y una actividad asignada. La semana debe indicarse en formato YYYY-MM-DD (lunes de la semana).",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "week_start": {
+              "type": "string",
+              "description": "Lunes de la semana en formato YYYY-MM-DD."
+            },
+            "summary": {
+              "type": "string",
+              "description": "Resumen del avance de la semana."
+            },
+            "project_id": {
+              "type": "string",
+              "description": "UUID del proyecto al que pertenece el avance."
+            },
+            "activity_id": {
+              "type": "string",
+              "description": "UUID de la actividad del proyecto asociada al avance."
+            },
+            "achievements": {
+              "description": "Logros de la semana.",
+              "type": "string"
+            },
+            "blockers": {
+              "description": "Bloqueos o dificultades.",
+              "type": "string"
+            },
+            "hours_spent": {
+              "description": "Horas dedicadas durante la semana.",
+              "type": "number"
+            },
+            "repo_url": {
+              "description": "Enlace al repositorio o commit relacionado.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "week_start",
+            "summary",
+            "project_id",
+            "activity_id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_upcoming_meetings",
+        "title": "Próximas reuniones",
+        "description": "Lista las próximas reuniones del semillero PerceptIA visibles para el usuario conectado.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "limit": {
+              "description": "Cantidad máxima de reuniones (por defecto 10).",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_announcements",
+        "title": "Anuncios recientes",
+        "description": "Lista los anuncios vigentes del portal PerceptIA visibles para el usuario conectado.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "limit": {
+              "description": "Cantidad máxima de anuncios (por defecto 10).",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          }
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
