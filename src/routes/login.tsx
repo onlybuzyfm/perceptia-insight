@@ -78,7 +78,8 @@ function LoginPage() {
 
   useEffect(() => {
     if (auth.isAuthenticated) {
-      navigate({ to: "/dashboard" });
+      if (next) window.location.href = next;
+      else navigate({ to: "/dashboard" });
     }
   }, [auth.isAuthenticated, navigate]);
 
